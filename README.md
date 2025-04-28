@@ -4,11 +4,10 @@ Welcome to the official Naxai Python SDK!
 This SDK provides easy, Pythonic, and asynchronous access to Naxai's APIs, including Voice, SMS, Email, and RCS services (only Voice is currently implemented).
 
 📦 Installation
-```
-bash
+```bash
 pip install naxai
 ```
-(Coming soon: SDK will be published on PyPI)
+
 
 🚀 Quick Start
 ```python
@@ -137,6 +136,8 @@ client = NaxaiAsyncClient(
  🚧 Add Email resource
 
  🚧 Add RCS resource
+
+ 🚧 Add Webhook resource
 
  🚧 Provide a client for synchronous code
 
