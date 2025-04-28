@@ -60,11 +60,12 @@ Resources are available as properties:
 
 📋 Current Supported Resources
 
-Resource    Status	Example Access
-Voice   ✅ Implemented	client.voice.call.create(...)
-SMS 🚧  Not yet	
-Email   🚧  Not yet	
-RCS 🚧  Not yet
+| Resource | Status | Example Access |
+|----------|--------|----------------|
+| Voice | ✅ Implemented | client.voice.call.create(...) |
+| SMS | 🚧 | Not yet |	
+| Email | 🚧 | Not yet |
+| RCS | 🚧 | Not yet |
 
 📖 API Methods
 Inside voice, you can:
