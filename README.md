@@ -23,7 +23,7 @@ async def main():
         api_client_id="your_client_id",
         api_client_secret="your_client_secret",
         auth_url="https://auth.naxai.com/oauth2/token",
-        api_base_url="https://api.naxai.com/"
+        api_base_url="https://api.naxai.com"
     )
 
     # Example: Create a voice call
