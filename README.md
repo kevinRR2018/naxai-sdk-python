@@ -104,9 +104,8 @@ NaxaiResourceNotFound	Resource not found (404)
 NaxaiRateLimitExceeded	Rate limit hit
 NaxaiAPIRequestError	Generic API error
 Example:
-
-python
 ```
+python
 try:
     await client.voice.call.create(data={...})
 except NaxaiException as e:
@@ -118,9 +117,8 @@ The SDK supports custom logging.
 Pass your own logger into NaxaiAsyncClient to integrate with your application's logging system.
 
 Example:
-
-python
 ```
+python
 import logging
 
 logger = logging.getLogger("naxai")
@@ -156,8 +154,8 @@ Coming soon!
 MIT License (or your preferred license)
 
 ➡ Example Folder Structure:
-arduino
 ```
+arduino
 naxai/
     __init__.py
     base/
