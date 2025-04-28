@@ -1,12 +1,13 @@
 import time
+import os
 import httpx
-from typing import Any, Dict
-
+from typing import Any, Optional
 from naxai.base.base_client import BaseClient
 from naxai.base.exceptions import *
 from naxai.models.token_response import TokenResponse
 from naxai.resources import RESOURCE_CLASSES
 from naxai.resources.voice import VoiceResource
+from .config import API_BASE_URL, AUTH_URL
 
 class NaxaiAsyncClient(BaseClient):
     """
@@ -15,7 +16,14 @@ class NaxaiAsyncClient(BaseClient):
 
     voice: Optional[VoiceResource]
 
-    def __init__(self, api_client_id: str, api_client_secret: str, auth_url: str, api_base_url: str, logger=None):
+    def __init__(self,
+                 api_client_id: Optional[str] = os.getenv("NAXAI_CLIENT_ID"),
+                 api_client_secret: Optional[str] = os.getenv("NAXAI_SECRET"),
+                 auth_url: Optional[str] = AUTH_URL,
+                 api_base_url: Optional[str] = API_BASE_URL,
+                 logger=None):
+        if not api_client_id or not api_client_secret:
+            raise NaxaiValueError("api_client_id and api_client_secret must be provided.")
         super().__init__(api_client_id, api_client_secret, auth_url, logger)
         self.api_base_url = api_base_url
         self._http = httpx.AsyncClient()
