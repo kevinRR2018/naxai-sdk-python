@@ -11,8 +11,7 @@ pip install naxai
 (Coming soon: SDK will be published on PyPI)
 
 🚀 Quick Start
-```
-python
+```python
 import asyncio
 from naxai import NaxaiAsyncClient
 from naxai.models.voice.voice_flow import Welcome, End
@@ -52,8 +51,7 @@ asyncio.run(main())
 🏗 Client Structure
 The main entrypoint is:
 
-```
-python
+```python
 from naxai import NaxaiAsyncClient
 ```
 NaxaiAsyncClient is an async client, using httpx.AsyncClient under the hood.
@@ -63,30 +61,31 @@ Resources are available as properties:
 
 📋 Current Supported Resources
 
-Resource	Status	Example Access
-Voice	✅ Implemented	client.voice.call.create(...)
-SMS	🚧 Not yet	
-Email	🚧 Not yet	
-RCS	🚧 Not yet	
+Resource    Status	Example Access
+Voice   ✅ Implemented	client.voice.call.create(...)
+SMS 🚧  Not yet	
+Email   🚧  Not yet	
+RCS 🚧  Not yet
+
 📖 API Methods
 Inside voice, you can:
-
 
 Method	Description
 client.voice.call.create(data)	Create a new voice call.
 client.voice.call.cancel(call_id)	Cancel a scheduled voice call.
+
 ⚙ Authentication
 Authentication is automatic:
 
 When you first perform an action, the SDK will authenticate using the provided client_id and client_secret.
+If no client_id or client_secret are provided, environment variables NAXAI_CLIENT_ID and NAXAI_SECRET will be used.
 
 The access token is automatically stored and refreshed when needed (valid for 24 hours).
 
 🧹 Closing the client
 Always close the HTTP session after usage:
 
-```
-python
+```python
 await client.aclose()
 ```
 (This properly releases network resources.)
@@ -103,9 +102,10 @@ NaxaiAuthorizationError	Access forbidden
 NaxaiResourceNotFound	Resource not found (404)
 NaxaiRateLimitExceeded	Rate limit hit
 NaxaiAPIRequestError	Generic API error
+NaxaiValueError         Incorrect parameter value
+
 Example:
-```
-python
+```python
 try:
     await client.voice.call.create(data={...})
 except NaxaiException as e:
@@ -117,8 +117,7 @@ The SDK supports custom logging.
 Pass your own logger into NaxaiAsyncClient to integrate with your application's logging system.
 
 Example:
-```
-python
+```python
 import logging
 
 logger = logging.getLogger("naxai")
@@ -133,19 +132,17 @@ client = NaxaiAsyncClient(
 )
 ```
 ⏳ Roadmap
- Add SMS resource
+ 🚧 Add SMS resource
 
- Add Email resource
+ 🚧 Add Email resource
 
- Add RCS resource
+ 🚧 Add RCS resource
 
- Provide a NaxaiSyncClient for synchronous code
+ 🚧 Provide a client for synchronous code
 
- Publish SDK on PyPI
+ ✅ Publish SDK on PyPI
 
- Add retry logic and backoff for robustness
-
- Improve type hints for auto-completion and IDE support
+ 🚧 Improve type hints for auto-completion and IDE support
 
 🤝 Contributing
 Coming soon!
@@ -154,8 +151,7 @@ Coming soon!
 MIT License (or your preferred license)
 
 ➡ Example Folder Structure:
-```
-arduino
+```arduino
 naxai/
     __init__.py
     base/
