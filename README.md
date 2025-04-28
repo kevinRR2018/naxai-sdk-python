@@ -5,46 +5,57 @@ This SDK provides easy, Pythonic, and asynchronous access to Naxai's APIs, inclu
 
 📦 Installation
 bash
-Copy
-Edit
+```
 pip install naxai
+```
 (Coming soon: SDK will be published on PyPI)
 
 🚀 Quick Start
 python
-Copy
-Edit
+```
 import asyncio
 from naxai import NaxaiAsyncClient
+from naxai.models.voice.voice_flow import Welcome, End
+from naxai.models.voice.create_call_request import CreateCallRequest
 
 async def main():
     client = NaxaiAsyncClient(
         api_client_id="your_client_id",
         api_client_secret="your_client_secret",
         auth_url="https://auth.naxai.com/oauth2/token",
-        api_base_url="https://api.naxai.com/v1"
+        api_base_url="https://api.naxai.com/"
     )
 
     # Example: Create a voice call
-    call_data = {
-        "to": "+1234567890",
-        "from": "+0987654321",
-        "message": "Hello from Naxai SDK!"
-    }
+    welcome = Welcome(say="Welcome to the Naxai demo")
+    end = End(say="Thank you to have used the Naxai demo")
+    call_request = CreateCallRequest(
+        batchId=str(uuid.uuid4()),
+        to=["123456789"],
+        from_="123456789",
+        language="en-GB",
+        voice="man",
+        idempotencyKey=str(uuid.uuid4()),
+        machineDetection=False,
+        welcome=welcome,
+        end=end,
+        scheduledAt=int(datetime.datetime.now(tz=datetime.timezone.utc)).timestamp()
+    )
 
-    response = await client.voice.call.create(data=call_data)
+    response = await client.voice.call.create(data=call_request)
     print(response)
 
     await client.aclose()
 
 asyncio.run(main())
+```
 🏗 Client Structure
 The main entrypoint is:
 
 python
-Copy
-Edit
+```
 from naxai import NaxaiAsyncClient
+```
 NaxaiAsyncClient is an async client, using httpx.AsyncClient under the hood.
 
 Resources are available as properties:
@@ -75,9 +86,9 @@ The access token is automatically stored and refreshed when needed (valid for 24
 Always close the HTTP session after usage:
 
 python
-Copy
-Edit
+```
 await client.aclose()
+```
 (This properly releases network resources.)
 
 🛠 Error Handling
@@ -95,12 +106,12 @@ NaxaiAPIRequestError	Generic API error
 Example:
 
 python
-Copy
-Edit
+```
 try:
     await client.voice.call.create(data={...})
 except NaxaiException as e:
     print(f"API call failed: {e}")
+```
 📓 Logging
 The SDK supports custom logging.
 
@@ -109,8 +120,7 @@ Pass your own logger into NaxaiAsyncClient to integrate with your application's 
 Example:
 
 python
-Copy
-Edit
+```
 import logging
 
 logger = logging.getLogger("naxai")
@@ -123,6 +133,7 @@ client = NaxaiAsyncClient(
     api_base_url="xxx",
     logger=logger
 )
+```
 ⏳ Roadmap
  Add SMS resource
 
@@ -146,8 +157,7 @@ MIT License (or your preferred license)
 
 ➡ Example Folder Structure:
 arduino
-Copy
-Edit
+```
 naxai/
     __init__.py
     base/
@@ -164,6 +174,7 @@ tests/
 README.md
 pyproject.toml
 setup.py
+```
 ✨ Summary
 ✅ Async support
 ✅ Proper exception handling
