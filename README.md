@@ -4,15 +4,15 @@ Welcome to the official Naxai Python SDK!
 This SDK provides easy, Pythonic, and asynchronous access to Naxai's APIs, including Voice, SMS, Email, and RCS services (only Voice is currently implemented).
 
 📦 Installation
-bash
 ```
+bash
 pip install naxai
 ```
 (Coming soon: SDK will be published on PyPI)
 
 🚀 Quick Start
-python
 ```
+python
 import asyncio
 from naxai import NaxaiAsyncClient
 from naxai.models.voice.voice_flow import Welcome, End
@@ -52,8 +52,8 @@ asyncio.run(main())
 🏗 Client Structure
 The main entrypoint is:
 
-python
 ```
+python
 from naxai import NaxaiAsyncClient
 ```
 NaxaiAsyncClient is an async client, using httpx.AsyncClient under the hood.
@@ -85,8 +85,8 @@ The access token is automatically stored and refreshed when needed (valid for 24
 🧹 Closing the client
 Always close the HTTP session after usage:
 
-python
 ```
+python
 await client.aclose()
 ```
 (This properly releases network resources.)
