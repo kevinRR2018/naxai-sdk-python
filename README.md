@@ -95,13 +95,14 @@ All exceptions inherit from NaxaiException, found under naxai.base.exceptions.
 Common exceptions:
 
 
-Exception	When it Happens
-NaxaiAuthenticationError	Authentication failed
-NaxaiAuthorizationError	Access forbidden
-NaxaiResourceNotFound	Resource not found (404)
-NaxaiRateLimitExceeded	Rate limit hit
-NaxaiAPIRequestError	Generic API error
-NaxaiValueError         Incorrect parameter value
+| Exception | When it Happens |
+|-----------|-----------------|
+| NaxaiAuthenticationError | Authentication failed |
+| NaxaiAuthorizationError | Access forbidden |
+| NaxaiResourceNotFound | Resource not found (404) |
+| NaxaiRateLimitExceeded | Rate limit hit |
+| NaxaiAPIRequestError | Generic API error |
+| NaxaiValueError | Incorrect parameter value |
 
 Example:
 ```python
