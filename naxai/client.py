@@ -12,6 +12,7 @@ from naxai.base.exceptions import (NaxaiAuthenticationError,
 from naxai.models.token_response import TokenResponse
 from naxai.resources import RESOURCE_CLASSES
 from naxai.resources.voice import VoiceResource
+from naxai.resources.calendars import CalendarsResource
 from .config import API_BASE_URL
 
 
@@ -39,6 +40,7 @@ class NaxaiClient(BaseClient):
             
         self._http = httpx.Client()
         self.voice = VoiceResource(self)
+        self.calendars = CalendarsResource(self)
         # Dynamically load resources
         for resource_name, resource_class in RESOURCE_CLASSES.items():
             setattr(self, resource_name, resource_class(self))
