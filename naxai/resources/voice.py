@@ -21,6 +21,5 @@ class VoiceResource:
         self.activity_logs: ActivityLogsResource
 
         for name, cls in RESOURCE_CLASSES.items():
-            print(f"Setting up resource: {name}")
-            print(f"Resource Class: {cls}")
+            self._client.logger.debug("Setting up resource %s. Resource class: %s", name, cls)
             setattr(self, name, cls(client, "/voice"))

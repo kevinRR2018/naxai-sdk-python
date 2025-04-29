@@ -1,6 +1,7 @@
 import time
 import os
 import httpx
+import logging
 from typing import Any, Optional
 from naxai.base.base_client import BaseClient
 from naxai.base.exceptions import *
@@ -17,15 +18,20 @@ class NaxaiAsyncClient(BaseClient):
     voice: Optional[VoiceResource]
 
     def __init__(self,
-                 api_client_id: Optional[str] = os.getenv("NAXAI_CLIENT_ID"),
-                 api_client_secret: Optional[str] = os.getenv("NAXAI_SECRET"),
-                 auth_url: Optional[str] = AUTH_URL,
-                 api_base_url: Optional[str] = API_BASE_URL,
+                 api_client_id: str = None,
+                 api_client_secret: str = None,
+                 auth_url: str = None,
+                 api_base_url: str = None,
                  logger=None):
-        if not api_client_id or not api_client_secret:
-            raise NaxaiValueError("api_client_id and api_client_secret must be provided.")
         super().__init__(api_client_id, api_client_secret, auth_url, logger)
-        self.api_base_url = api_base_url
+
+        if not api_base_url:
+            self.api_base_url = os.getenv("NAXAI_API_URL", API_BASE_URL)
+            if not self.api_base_url:
+                raise NaxaiValueError("api_base_url is required")
+        else:
+            self.api_base_url = api_base_url
+            
         self._http = httpx.AsyncClient()
         self.voice = VoiceResource(self)
         # Dynamically load resources
@@ -33,6 +39,7 @@ class NaxaiAsyncClient(BaseClient):
             setattr(self, resource_name, resource_class(self))
 
     async def _authenticate(self):
+        self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
         if self._is_token_valid():
             return
 
