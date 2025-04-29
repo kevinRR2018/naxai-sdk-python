@@ -146,7 +146,7 @@ client = NaxaiAsyncClient(
 
  🚧 Add Webhook resource
 
- 🚧 Add Calendars resource
+ ✅ Add Calendars resource
 
  🚧 Add People resource
 
