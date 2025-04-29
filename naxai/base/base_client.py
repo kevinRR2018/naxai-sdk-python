@@ -23,6 +23,8 @@ class BaseClient:
             if not self.api_client_id:
                 self.logger.warning("api_client_id not provided and could not be read from environment variable NAXAI_CLIENT_ID")
                 raise NaxaiValueError("api_client_id is required")
+        else:
+            self.api_client_id = api_client_id
 
         if not api_client_secret:
             self.logger.info("api_client_secret not provided, attempting to read from environment variable NAXAI_SECRET")
@@ -30,6 +32,8 @@ class BaseClient:
             if not self.api_client_secret:
                 self.logger.warning("api_client_secret not provided and could not be read from environment variable NAXAI_SECRET")
                 raise NaxaiValueError("api_client_secret is required")
+        else:
+            self.api_client_secret = api_client_secret
             
         self.logger.debug("auth_url: %s", auth_url)
 
