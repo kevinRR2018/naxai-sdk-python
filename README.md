@@ -146,6 +146,10 @@ client = NaxaiAsyncClient(
 
  🚧 Add Webhook resource
 
+ ✅ Add Calendars resource
+
+ 🚧 Add People resource
+
  ✅ Provide a client for synchronous code
 
  ✅ Publish SDK on PyPI

@@ -12,7 +12,8 @@ class VoiceResource:
 
     def __init__(self, client):
         self._client = client
-        self.call: CallResource = CallResource(client, "/voice")
+        self.root_path = "/voice"
+        self.call: CallResource
         self.broadcasts: BroadcastsResource
         self.scheduled_calls: ScheduledCallsResource
         self.reporting: ReportingResource
@@ -20,4 +21,4 @@ class VoiceResource:
 
         for name, cls in RESOURCE_CLASSES.items():
             self._client.logger.debug("Setting up resource %s. Resource class: %s", name, cls)
-            setattr(self, name, cls(client, "/voice"))
+            setattr(self, name, cls(client, self.root_path))
