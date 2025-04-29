@@ -1,16 +1,19 @@
-from pydantic import BaseModel, Field
 from typing import Optional, Literal, Union
+from pydantic import BaseModel, Field
 from .voice_flow import VoiceFlow
 
 class ActionItem(BaseModel):
+    """ActionItem model to use for creating a new broadcast"""
     attribute: Optional[str] = Field(alias="attribute", default=None)
     value: Optional[Union[str, int, bool]] = Field(alias="value", default=None)
 
 class Sms(BaseModel):
+    """Sms model to use for creating a new broadcast"""
     message: Optional[str] = Field(alias="message", default=None)
     sender_service_id: Optional[str] = Field(alias="senderServiceId", default=None)
 
 class Inputs(BaseModel):
+    """Inputs model to use for creating a new broadcast"""
     field_0: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="0", default=None)
     field_1: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="1", default=None)
     field_2: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="2", default=None)
@@ -26,6 +29,7 @@ class Inputs(BaseModel):
 
 
 class Status(BaseModel):
+    """Status model to use for creating a new broadcast"""
     delivered: Optional[Union[
         list[ActionItem],                # list of ActionItem
         dict[str, Sms]]]                # OR dict like {"sms": SmsMessage}
@@ -34,10 +38,12 @@ class Status(BaseModel):
         dict[str, Sms]]]                # OR dict like {"sms": SmsMessage}
 
 class Actions(BaseModel):
+    """Actions model to use for creating a new broadcast"""
     status: Optional[Status] = Field(alias="actions", default=None)
     inputs: Optional[Inputs] = Field(alias="inputs", default=None)
 
 class CreateBroadcastRequest(BaseModel):
+    """Request model for creating a new broadcast"""
     name: str
     from_: str = Field(alias="from", min_length=8, max_length=15)
     source: Optional[str] = Field(alias="source", default="people")
@@ -57,5 +63,6 @@ class CreateBroadcastRequest(BaseModel):
     actions: Optional[Actions] = Field(alias="actions", default=None)
 
     class Config:
-        allow_population_by_field_name = True
+        """Pydantic config class to enable populating by field name"""
+        validate_by_name = True
         populate_by_name = True

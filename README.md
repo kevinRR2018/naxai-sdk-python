@@ -48,12 +48,14 @@ async def main():
 asyncio.run(main())
 ```
 🏗 Client Structure
-The main entrypoint is:
+The main entrypoint are:
 
 ```python
 from naxai import NaxaiAsyncClient
+from naxai import NaxaiClient
 ```
 NaxaiAsyncClient is an async client, using httpx.AsyncClient under the hood.
+NaxaiClient is synchronous client, using httpx.Client under the hood.
 
 Resources are available as properties:
 (e.g., client.voice, client.sms, client.email, client.rcs — only voice currently implemented.)
@@ -86,7 +88,10 @@ The access token is automatically stored and refreshed when needed (valid for 24
 Always close the HTTP session after usage:
 
 ```python
+# Async client
 await client.aclose()
+# Synchronous client
+client.close()
 ```
 (This properly releases network resources.)
 
@@ -141,7 +146,7 @@ client = NaxaiAsyncClient(
 
  🚧 Add Webhook resource
 
- 🚧 Provide a client for synchronous code
+ ✅ Provide a client for synchronous code
 
  ✅ Publish SDK on PyPI
 
@@ -152,28 +157,3 @@ Coming soon!
 
 📜 License
 MIT License (or your preferred license)
-
-➡ Example Folder Structure:
-```arduino
-naxai/
-    __init__.py
-    base/
-        __init__.py
-        base_client.py
-        exceptions.py
-    models/
-        token_response.py
-    resources/
-        __init__.py
-        voice.py
-tests/
-    test_voice_resource.py
-README.md
-pyproject.toml
-setup.py
-```
-✨ Summary
-✅ Async support
-✅ Proper exception handling
-✅ Logger integration
-✅ Future expansion ready

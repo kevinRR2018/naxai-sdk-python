@@ -10,7 +10,7 @@ class InputResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
 
-    def get(self, broadcast_id: str):
+    async def get(self, broadcast_id: str):
         """
         Get the inputs for a voice broadcast by id.
         https://docs.naxai.com/reference/voicebroadcastmetricsinputgetbyid
@@ -22,9 +22,9 @@ class InputResource:
             dict: The API response containing the input counts for given broadcast.
             
         Example:
-            >>> input_result = client.voice.broadcasts.metrics.inputs.get(
+            >>> input_result = await client.voice.broadcasts.metrics.inputs.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
 
-        return self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics/input", headers=self.headers)
+        return await self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics/input", headers=self.headers)

@@ -12,7 +12,7 @@ class TransferResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    def list(self,
+    async def list(self,
              group: Literal["hour", "day", "month"],
              start_date: Optional[str] = None,
              stop_date: Optional[str] = None,
@@ -57,4 +57,4 @@ class TransferResource:
         if number:
             params["number"] = number
 
-        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)

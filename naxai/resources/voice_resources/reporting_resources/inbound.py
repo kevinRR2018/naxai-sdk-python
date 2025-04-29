@@ -2,6 +2,9 @@ from typing import Literal, Optional
 from naxai.base.exceptions import NaxaiValueError
 
 class InboundResource:
+    """
+    Inbound Resource for reporting resource
+    """
     
     def __init__(self, client, root_path):
         self._client = client
@@ -10,12 +13,20 @@ class InboundResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    async def list(self,
-                    group: Literal["hour", "day", "month"],
-                    start_date: Optional[str] = None,
-                    stop_date: Optional[str] = None,
-                    number: Optional[str] = None
-                    ):
+    def list(self,
+            group: Literal["hour", "day", "month"],
+            start_date: Optional[str] = None,
+            stop_date: Optional[str] = None,
+            number: Optional[str] = None
+            ):
+        """
+        List inbound calls
+        :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
+        :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
+        :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
+        :param number: The number to filter the report by. Optional
+        :return: The report
+        """
         #TODO: verify the validation of start_date and stop_date
         if group == "hour":
             if start_date is None:
@@ -47,4 +58,4 @@ class InboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
