@@ -12,20 +12,20 @@ class ActivityLogsResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    def list(self,
-            page: Optional[int] = 1,
-            page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25,
-            start: Optional[int] = None,
-            stop: Optional[int] = None,
-            direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,
-            status: Optional[Literal["delivered", "failed"]] = None,
-            from_: Annotated[Optional[str], Field(alias="from")] = None,
-            to: Optional[str] = None,
-            client_id: Optional[str] = None,
-            survey_id: Optional[str] = None,
-            campaign_id: Optional[str] = None,
-            broadcast_id: Optional[str] = None
-            ):
+    async def list(self,
+                   page: Optional[int] = 1,
+                   page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25,
+                   start: Optional[int] = None,
+                   stop: Optional[int] = None,
+                   direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,
+                   status: Optional[Literal["delivered", "failed"]] = None,
+                   from_: Annotated[Optional[str], Field(alias="from")] = None,
+                   to: Optional[str] = None,
+                   client_id: Optional[str] = None,
+                   survey_id: Optional[str] = None,
+                   campaign_id: Optional[str] = None,
+                   broadcast_id: Optional[str] = None
+                   ):
         """
         Retrieves a list of activity logs based on specified filters.
 
@@ -41,7 +41,7 @@ class ActivityLogsResource:
             dict: The API response containing the list of activity logs.
 
         Example:
-            >>> activity_logs = client.voice.activity_logs.list(
+            >>> activity_logs = await client.voice.activity_logs.list(
             ...     page=1,
             ...     page_size=10,
             ...     order_by="desc",
@@ -76,9 +76,9 @@ class ActivityLogsResource:
         if broadcast_id:
             params["broadcastId"] = broadcast_id
 
-        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
     
-    def get(self, call_id:str):
+    async def get(self, call_id:str):
         """
         Retrieves a specific activity log by call ID.
 
@@ -89,9 +89,9 @@ class ActivityLogsResource:
             dict: The API response containing the activity log details.
 
         Example:
-            >>> activity_log = client.voice.activity_logs.get(
+            >>> activity_log = await client.voice.activity_logs.get(
             ...     call_id="XXXXXXXXX"
             ... )
         """
         
-        return self._client._request("GET", self.root_path + "/" + call_id, headers=self.headers)
+        return await self._client._request("GET", self.root_path + "/" + call_id, headers=self.headers)

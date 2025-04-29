@@ -4,7 +4,7 @@ setup(
     name='naxai',
     packages=find_packages(),
     description='Python sdk for Naxai\'s API',
-    version='0.0.4',
+    version='0.0.5',
     url='https://github.com/kevinRR2018/naxai-sdk-python',
     author='kevin',
     author_email='k.bertin@ringring.be',

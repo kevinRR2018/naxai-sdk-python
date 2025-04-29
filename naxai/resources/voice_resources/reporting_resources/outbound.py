@@ -2,6 +2,9 @@ from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
 
 class OutboundResource:
+    """
+    Outbound Resource for reporting resource
+    """
     
     def __init__(self, client, root_path):
         self._client = client
@@ -11,12 +14,20 @@ class OutboundResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    async def list(self,
-             group: Literal["hour", "day", "month"],
-             start_date: Optional[str] = None,
-             stop_date: Optional[str] = None,
-             number: Optional[str] = None
-             ):
+    def list(self,
+            group: Literal["hour", "day", "month"],
+            start_date: Optional[str] = None,
+            stop_date: Optional[str] = None,
+            number: Optional[str] = None
+            ):
+        """
+        List outbound calls
+        :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
+        :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
+        :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
+        :param number: The number to filter the report by. Optional
+        :return: The report
+        """
         #TODO: verify the validation of start_date and stop_date
         if group == "hour":
             if start_date is None:
@@ -49,13 +60,19 @@ class OutboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
     
-    async def list_by_country(self,
-                              start_date: str,
-                              stop_date: str,
-                              number: Optional[str] = None
-                              ):
+    def list_by_country(self,
+                        start_date: str,
+                        stop_date: str,
+                        number: Optional[str] = None
+                        ):
+        """List country, nbr of outbound calls
+        :param start_date: The start date for the report. 'YYYY-MM-DD'
+        :param stop_date: The stop date for the report. 'YYYY-MM-DD'
+        :param number: The number to filter the report by. Optional
+        :return: The report
+        """
         if len(start_date) != 10:
             raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD'")
         if len(stop_date) != 10:
@@ -67,4 +84,4 @@ class OutboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)
+        return self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)

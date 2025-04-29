@@ -1,25 +1,27 @@
 from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
 
-class TransferResource:
-    """ Transfer resource for reporting resource """
-
-
+class OutboundResource:
+    """
+    Outbound Resource for reporting resource
+    """
+    
     def __init__(self, client, root_path):
         self._client = client
-        self.root_path = root_path + "/transfer"
+        self.previous_path = root_path
+        self.root_path = root_path + "/outbound"
         self.version = "2023-03-25"
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    def list(self,
+    async def list(self,
              group: Literal["hour", "day", "month"],
              start_date: Optional[str] = None,
              stop_date: Optional[str] = None,
              number: Optional[str] = None
              ):
         """
-        List transfer calls
+        List outbound calls
         :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
         :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
         :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
@@ -48,7 +50,8 @@ class TransferResource:
             
             if len(stop_date) < 8 or len(stop_date) > 10:
                 raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
+
         params = {"group": group}
         if start_date:
             params["startDate"] = start_date
@@ -57,4 +60,28 @@ class TransferResource:
         if number:
             params["number"] = number
 
-        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
+    
+    async def list_by_country(self,
+                              start_date: str,
+                              stop_date: str,
+                              number: Optional[str] = None
+                              ):
+        """List country, nbr of outbound calls
+        :param start_date: The start date for the report. 'YYYY-MM-DD'
+        :param stop_date: The stop date for the report. 'YYYY-MM-DD'
+        :param number: The number to filter the report by. Optional
+        :return: The report
+        """
+        if len(start_date) != 10:
+            raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD'")
+        if len(stop_date) != 10:
+            raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD'")
+        
+        params = {"startDate": start_date,
+                  "stopDate": stop_date}
+        
+        if number:
+            params["number"] = number
+
+        return await self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)

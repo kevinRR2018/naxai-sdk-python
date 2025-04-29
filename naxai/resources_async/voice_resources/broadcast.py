@@ -19,9 +19,9 @@ class BroadcastsResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
 
-    def list(self,
-            page: Optional[int] = 1,
-            page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25):
+    async def list(self,
+                   page: Optional[int] = 1,
+                   page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25):
         """
         Retrieves a list of all broadcasts.
 
@@ -29,12 +29,12 @@ class BroadcastsResource:
             dict: The API response containing the list of broadcasts.
 
         Example:
-            >>> broadcasts = client.voice.broadcasts.list()
+            >>> broadcasts = await client.voice.broadcasts.list()
         """
         params = {"page": page, "pagesize": page_size}
-        return self._client._request("GET", self.root_path, headers=self.headers, params=params)
+        return await self._client._request("GET", self.root_path, headers=self.headers, params=params)
     
-    def create(self, data: CreateBroadcastRequest):
+    async def create(self, data: CreateBroadcastRequest):
         """
         Creates a new broadcast.
 
@@ -45,7 +45,7 @@ class BroadcastsResource:
             dict: The API response containing the details of the created broadcast.
 
         Example:
-            >>> new_broadcast = client.voice.broadcasts.create(
+            >>> new_broadcast = await client.voice.broadcasts.create(
             ...     CreateBroadcastRequest(
             ...         name="My Broadcast",
             ...         from_="123456789",
@@ -54,9 +54,9 @@ class BroadcastsResource:
             ...     )
             ... )
         """
-        return self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        return await self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
     
-    def get(self, broadcast_id: str):
+    async def get(self, broadcast_id: str):
         """
         Retrieves a specific broadcast by its ID.
 
@@ -67,13 +67,13 @@ class BroadcastsResource:
             dict: The API response containing the details of the broadcast.
 
         Example:
-            >>> broadcast_details = client.voice.broadcasts.get(
+            >>> broadcast_details = await client.voice.broadcasts.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("GET", self.root_path + "/" + broadcast_id, headers=self.headers)
+        return await self._client._request("GET", self.root_path + "/" + broadcast_id, headers=self.headers)
     
-    def delete(self, broadcast_id: str):
+    async def delete(self, broadcast_id: str):
         """
         Deletes a specific broadcast by its ID.
 
@@ -84,13 +84,13 @@ class BroadcastsResource:
             dict: The API response confirming the deletion of the broadcast.
 
         Example:
-            >>> deletion_result = client.voice.broadcasts.delete(
+            >>> deletion_result = await client.voice.broadcasts.delete(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("DELETE", self.root_path + "/" + broadcast_id, headers=self.headers)
+        return await self._client._request("DELETE", self.root_path + "/" + broadcast_id, headers=self.headers)
 
-    def update(self, broadcast_id: str, data: CreateBroadcastRequest):
+    async def update(self, broadcast_id: str, data: CreateBroadcastRequest):
         """
         Updates a specific broadcast by its ID.
 
@@ -102,7 +102,7 @@ class BroadcastsResource:
             dict: The API response containing the details of the updated broadcast.
 
         Example:
-            >>> updated_broadcast = client.voice.broadcasts.update(
+            >>> updated_broadcast = await client.voice.broadcasts.update(
             ...     broadcast_id="XXXXXXXXX",
             ...     CreateBroadcastRequest(
             ...         name="Updated Broadcast",
@@ -111,9 +111,9 @@ class BroadcastsResource:
             ...     )
             ... )
         """
-        return self._client._request("PUT", self.root_path + "/" + broadcast_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        return await self._client._request("PUT", self.root_path + "/" + broadcast_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
 
-    def start(self, broadcast_id: str):
+    async def start(self, broadcast_id: str):
         """
         Starts a broadcast.
 
@@ -128,9 +128,9 @@ class BroadcastsResource:
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/start", headers=self.headers)
+        return await self._client._request("POST", self.root_path + "/" + broadcast_id + "/start", headers=self.headers)
     
-    def pause(self, broadcast_id: str):
+    async def pause(self, broadcast_id: str):
         """
         Pauses a broadcast.
 
@@ -145,9 +145,9 @@ class BroadcastsResource:
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/pause", headers=self.headers)
+        return await self._client._request("POST", self.root_path + "/" + broadcast_id + "/pause", headers=self.headers)
     
-    def resume(self, broadcast_id: str):
+    async def resume(self, broadcast_id: str):
         """
         Resumes a broadcast.
 
@@ -158,13 +158,13 @@ class BroadcastsResource:
             dict: The API response confirming the resume of the broadcast.
 
         Example:
-            >>> resume_result = client.voice.broadcasts.resume(
+            >>> resume_result = await client.voice.broadcasts.resume(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/resume", headers=self.headers)
+        return await self._client._request("POST", self.root_path + "/" + broadcast_id + "/resume", headers=self.headers)
     
-    def cancel(self, broadcast_id: str):
+    async def cancel(self, broadcast_id: str):
         """
         Cancels a broadcast.
 
@@ -175,9 +175,9 @@ class BroadcastsResource:
             dict: The API response confirming the cancellation of the broadcast.
 
         Example:
-            >>> cancel_result = client.voice.broadcasts.cancel(
+            >>> cancel_result = await client.voice.broadcasts.cancel(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/cancel", headers=self.headers)
+        return await self._client._request("POST", self.root_path + "/" + broadcast_id + "/cancel", headers=self.headers)
     

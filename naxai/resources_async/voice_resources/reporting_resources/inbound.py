@@ -1,25 +1,26 @@
-from typing import Optional, Literal
+from typing import Literal, Optional
 from naxai.base.exceptions import NaxaiValueError
 
-class TransferResource:
-    """ Transfer resource for reporting resource """
-
-
+class InboundResource:
+    """
+    Inbound Resource for reporting resource
+    """
+    
     def __init__(self, client, root_path):
         self._client = client
-        self.root_path = root_path + "/transfer"
+        self.root_path = root_path + "/inbound"
         self.version = "2023-03-25"
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    def list(self,
-             group: Literal["hour", "day", "month"],
-             start_date: Optional[str] = None,
-             stop_date: Optional[str] = None,
-             number: Optional[str] = None
-             ):
+    async def list(self,
+                    group: Literal["hour", "day", "month"],
+                    start_date: Optional[str] = None,
+                    stop_date: Optional[str] = None,
+                    number: Optional[str] = None
+                    ):
         """
-        List transfer calls
+        List inbound calls
         :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
         :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
         :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
@@ -57,4 +58,4 @@ class TransferResource:
         if number:
             params["number"] = number
 
-        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)

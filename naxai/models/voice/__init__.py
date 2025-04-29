@@ -6,8 +6,7 @@ from .voice_flow import (VoiceFlow,
                          Choice,
                          Whisper,
                          VoiceMail,
-                         End,
-                         VoiceFlow)
+                         End)
 from .create_broadcast_request import (CreateBroadcastRequest,
                                        Actions,
                                        Inputs,

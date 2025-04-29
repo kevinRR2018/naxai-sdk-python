@@ -9,7 +9,7 @@ class CallResource:
         self.root_path = root_path + "/call"
 
 
-    def create(self, data: CreateCallRequest):
+    async def create(self, data: CreateCallRequest):
         """
         Creates a new call.
 
@@ -20,7 +20,7 @@ class CallResource:
             dict: The API response containing the details of the created call.
 
         Example:
-            >>> new call = client.voice.call.create(
+            >>> new call = await client.voice.call.create(
             ...     CreateCallRequest(
             ...         from_="123456789",
             ...         to="1234567890",
@@ -28,5 +28,5 @@ class CallResource:
             ...     )
             ... )
         """
-        return self._client._request("POST", "/voice/call", json=data.model_dump(by_alias=True, exclude_none=True))
+        return await self._client._request("POST", "/voice/call", json=data.model_dump(by_alias=True, exclude_none=True))
 
