@@ -1,9 +1,10 @@
 from typing import Optional, Annotated, Literal
 from pydantic import Field
 from naxai.models.voice.create_broadcast_request import CreateBroadcastRequest
-from naxai.resources_async.voice_resources.broadcast_resources.metrics import MetricsResource
-from naxai.resources_async.voice_resources.broadcast_resources.recipients import RecipientsResource
-from naxai.resources_async.voice_resources.broadcast_resources.settings import SettingsResource
+from .broadcast_resources.metrics import MetricsResource
+from .broadcast_resources.recipients import RecipientsResource
+from .broadcast_resources.settings import SettingsResource
+
 
 
 class BroadcastsResource:
@@ -124,7 +125,7 @@ class BroadcastsResource:
             dict: The API response confirming the start of the broadcast.
 
         Example:
-            >>> start_result = await client.voice.broadcasts.start(
+            >>> start_result = client.voice.broadcasts.start(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
@@ -141,7 +142,7 @@ class BroadcastsResource:
             dict: The API response confirming the pause of the broadcast.
 
         Example:
-            >>> pause_result = await client.voice.broadcasts.pause(
+            >>> pause_result = client.voice.broadcasts.pause(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """

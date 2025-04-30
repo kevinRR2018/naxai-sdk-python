@@ -13,7 +13,7 @@ class MetricsResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    async def get(self, broadcast_id: str):
+    def get(self, broadcast_id: str):
         """
         Get the metrics for a voice broadcast by id.
         
@@ -24,9 +24,9 @@ class MetricsResource:
             dict: The API response.
             
         Example:
-            >>> metrics_result = await client.voice.broadcasts.metrics.get(
+            >>> metrics_result = client.voice.broadcasts.metrics.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
 
-        return await self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics", headers=self.headers)
+        return self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics", headers=self.headers)

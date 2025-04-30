@@ -15,13 +15,13 @@ class RecipientsResource:
         self.headers = {"X-version": self.version,
                         "Content-Type": "application/json"}
         
-    async def list(self,
-                    broadcast_id: str,
-                    page: Optional[int] = 1,
-                    page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25,
-                    phone: Optional[str] = None,
-                    completed: Optional[bool] = None,
-                    status: Optional[Literal["delivered", "failed", "in-progress", "canceled", "invalid", "paused"]] = None):
+    def list(self,
+            broadcast_id: str,
+            page: Optional[int] = 1,
+            page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25,
+            phone: Optional[str] = None,
+            completed: Optional[bool] = None,
+            status: Optional[Literal["delivered", "failed", "in-progress", "canceled", "invalid", "paused"]] = None):
         
         """
         Get the recipients for a voice broadcast by broadcast id.
@@ -39,7 +39,7 @@ class RecipientsResource:
             dict: The API response confirming recipients of the broadcast.
             
         Example:
-            >>> metrics_result = await client.voice.broadcasts.recipients.list(
+            >>> metrics_result = client.voice.broadcasts.recipients.list(
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
@@ -50,9 +50,9 @@ class RecipientsResource:
             params["completed"] = completed
         if status is not None:
             params["status"] = status
-        return await self._client._request("GET",self.root_path + "/" + broadcast_id + "/recipients", params=params, headers=self.headers)
+        return self._client._request("GET",self.root_path + "/" + broadcast_id + "/recipients", params=params, headers=self.headers)
     
-    async def get(self, broadcast_id: str, recipient_id: str):
+    def get(self, broadcast_id: str, recipient_id: str):
         """
         Get the recipient details for a voice broadcast by broadcast id and recipient id.
         
@@ -64,11 +64,11 @@ class RecipientsResource:
             dict: The API response containing the recipient.
             
         Example:
-            >>> recipients_result = await client.voice.broadcasts.recipients.get(
+            >>> recipients_result = client.voice.broadcasts.recipients.get(
             ...     broadcast_id="XXXXXXXXX",
             ...     recipient_id="XXXXXXXXX"
             ... )
         """
 
-        return await self._client._request("GET",self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id, headers=self.headers )
+        return self._client._request("GET",self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id, headers=self.headers )
     
