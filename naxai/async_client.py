@@ -13,6 +13,7 @@ from naxai.models.token_response import TokenResponse
 from naxai.resources_async import RESOURCE_CLASSES
 from naxai.resources_async.voice import VoiceResource
 from naxai.resources_async.calendars import CalendarsResource
+from naxai.resources_async.email import EmailResource
 from .config import API_BASE_URL
 
 class NaxaiAsyncClient(BaseClient):
@@ -40,6 +41,7 @@ class NaxaiAsyncClient(BaseClient):
         self._http = httpx.AsyncClient()
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
+        self.email = EmailResource(self)
         # Dynamically load resources
         for resource_name, resource_class in RESOURCE_CLASSES.items():
             setattr(self, resource_name, resource_class(self))
@@ -74,7 +76,7 @@ class NaxaiAsyncClient(BaseClient):
 
         url = f"{self.api_base_url.rstrip('/')}/{path.lstrip('/')}"
 
-
+        self.logger.debug("Performing call to: %s", url)
         response = await self._http.request(method, url, headers=headers, **kwargs)
         
         if response.is_error:
