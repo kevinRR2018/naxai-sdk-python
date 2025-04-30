@@ -1,6 +1,6 @@
-from naxai.resources_async.voice_resources.reporting_resources.outbound import OutboundResource
-from naxai.resources_async.voice_resources.reporting_resources.inbound import InboundResource
-from naxai.resources_async.voice_resources.reporting_resources.transfer import TransferResource
+from .reporting_resources.outbound import OutboundResource
+from .reporting_resources.inbound import InboundResource
+from .reporting_resources.transfer import TransferResource
 
 class ReportingResource:
     """ reporting resource for voice resource """

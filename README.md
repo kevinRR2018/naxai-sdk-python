@@ -1,7 +1,9 @@
 📚 Naxai Python SDK Documentation
 Welcome to the official Naxai Python SDK!
 
-This SDK provides easy, Pythonic, and asynchronous access to Naxai's APIs, including Voice, SMS, Email, and RCS services (only Voice is currently implemented).
+⚠️ This sdk is a work in progress. No guarantees till release of version 1.0.0 ⚠️
+
+This SDK provides easy, Pythonic, and asynchronous access to Naxai's APIs, including Voice, SMS, Email, RCS, Webhooks, People and Calendar services (only Voice and Calendars are currently implemented).
 
 📦 Installation
 ```bash
@@ -64,17 +66,27 @@ Resources are available as properties:
 
 | Resource | Status | Example Access |
 |----------|--------|----------------|
-| Voice | ✅ Implemented | client.voice.call.create(...) |
+| Voice | ✅ Implemented | client.voice...... |
 | SMS | 🚧 | Not yet |	
-| Email | 🚧 | Not yet |
+| Email | ✅ Implemented ( Partially ) | client.email.... |
 | RCS | 🚧 | Not yet |
+| Calendars | ✅ Implemented | client.calendars.... |
+| Webhooks | 🚧 | Not yet |
+| People | 🚧 | Not yet |
 
 📖 API Methods
 Inside voice, you can:
 
-Method	Description
-client.voice.call.create(data)	Create a new voice call.
-client.voice.call.cancel(call_id)	Cancel a scheduled voice call.
+| Method | Description |
+| --- | --- |
+| client.voice.call.create(data) | Create a new voice call. |
+| client.voice.call.cancel(call_id) | Cancel a scheduled voice call. |
+| client.voice.broadcasts. | |
+| client.voice.scheduled_calls. | |
+| client.voice.reporting. | |
+| client.voice.activity_logs. | |
+
+
 
 ⚙ Authentication
 Authentication is automatic:
@@ -138,9 +150,10 @@ client = NaxaiAsyncClient(
 )
 ```
 ⏳ Roadmap
+
  🚧 Add SMS resource
 
- 🚧 Add Email resource
+ ✅ Add Email resource ( Partially implemented )
 
  🚧 Add RCS resource
 

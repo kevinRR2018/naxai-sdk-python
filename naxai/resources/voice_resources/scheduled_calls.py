@@ -85,7 +85,7 @@ class ScheduledCallsResource:
         """
         return self._client._request("POST", self.root_path + "/cancel/call", json={"callId": call_id}, headers=self.headers)
     
-    async def cancel_batch(self, batch_id: str):
+    def cancel_batch(self, batch_id: str):
         """
         Cancels all scheduled calls associated with a specific batch ID.
 
