@@ -68,7 +68,7 @@ Resources are available as properties:
 |----------|--------|----------------|
 | Voice | ✅ Implemented | client.voice...... |
 | SMS | 🚧 | Not yet |	
-| Email | 🚧 | Not yet |
+| Email | ✅ Implemented ( Partially ) | client.email.... |
 | RCS | 🚧 | Not yet |
 | Calendars | ✅ Implemented | client.calendars.... |
 | Webhooks | 🚧 | Not yet |
@@ -153,7 +153,7 @@ client = NaxaiAsyncClient(
 
  🚧 Add SMS resource
 
- 🚧 Add Email resource
+ ✅ Add Email resource ( Partially implemented )
 
  🚧 Add RCS resource
 
