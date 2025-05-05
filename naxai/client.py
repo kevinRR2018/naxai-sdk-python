@@ -27,10 +27,11 @@ class NaxaiClient(BaseClient):
     def __init__(self,
                  api_client_id: str = None,
                  api_client_secret: str = None,
+                 api_version: str = None,
                  auth_url: str = None,
                  api_base_url: str = None,
                  logger=None):
-        super().__init__(api_client_id, api_client_secret, auth_url, logger)
+        super().__init__(api_client_id, api_client_secret, api_version, auth_url, logger)
 
         if not api_base_url:
             self.api_base_url = os.getenv("NAXAI_API_URL", API_BASE_URL)
@@ -73,7 +74,8 @@ class NaxaiClient(BaseClient):
         self._authenticate()
 
         headers = kwargs.pop("headers", {})
-        headers.update({"Authorization": f"Bearer {self.token}"})
+        headers.update({"Authorization": f"Bearer {self.token}",
+                        "X-version": self.api_version})
 
         url = f"{self.api_base_url.rstrip('/')}/{path.lstrip('/')}"
         response = self._http.request(method, url, headers=headers, **kwargs)

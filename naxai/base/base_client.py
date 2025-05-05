@@ -12,6 +12,7 @@ class BaseClient:
     def __init__(self,
                  api_client_id: str = None,
                  api_client_secret: str = None,
+                 api_version: str = None,
                  auth_url: str = None,
                  logger = None):
         
@@ -34,6 +35,13 @@ class BaseClient:
                 raise NaxaiValueError("api_client_secret is required")
         else:
             self.api_client_secret = api_client_secret
+
+        if not api_version:
+            self.logger.info("api_version not provided, attempting to read from environment variable NAXAI_API_VERSION")
+            self.api_version = os.getenv("NAXAI_API_VERSION", None)
+            if not self.api_version:
+                self.logger.warning("api_version not provided and could not be read from environment variable NAXAI_API_VERSION")
+                raise NaxaiValueError("api_version is required")
             
         self.logger.debug("auth_url: %s", auth_url)
 
