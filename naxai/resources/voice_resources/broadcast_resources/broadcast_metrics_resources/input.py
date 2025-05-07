@@ -1,3 +1,6 @@
+import json
+from naxai.models.voice.responses.broadcasts_responses import GetBroadcastInputMetricsResponse
+
 class InputResource:
     """
     This class provides methods to interact with the Voice Broadcast Metrics Input resource in the API.
@@ -17,12 +20,15 @@ class InputResource:
             broadcast_id (str): The unique identifier of the broadcast to get the inputs.
             
         Returns:
-            dict: The API response containing the input counts for given broadcast.
-            
+            GetBroadcastInputMetricsResponse: A Pydantic model containing the input counts for the given broadcast.
+                The model includes counts for each DTMF key (0-9, *, #) and a total count.
+                
         Example:
             >>> input_result = client.voice.broadcasts.metrics.inputs.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Total inputs received: {input_result.total}")
+            >>> print(f"Option 1 selected: {input_result.input_1} times")
         """
 
-        return self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics/input", headers=self.headers)
+        return GetBroadcastInputMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics/input", headers=self.headers)))

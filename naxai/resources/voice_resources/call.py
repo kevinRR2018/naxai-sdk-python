@@ -1,8 +1,9 @@
 import json
 from typing import Optional, Literal
 from pydantic import Field, validate_call
-from naxai.models.voice.create_call_request import CreateCallRequest, Welcome, VoiceMail, Menu, End
-from naxai.models.voice.responses.create_call_response import CreateCallResponse
+from naxai.models.voice.requests.call_requests import CreateCallRequest, Welcome, End, Menu, VoiceMail
+from naxai.models.voice.responses.call_responses import CreateCallResponse
+
 
 class CallResource:
     """ call resource for the voice resource """
@@ -36,19 +37,19 @@ class CallResource:
 
     @validate_call
     def create(self,
-            welcome: Welcome,
-            language: Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"],
-            to: list[str] = Field(min_length=1, max_length=1000),
-            from_: str = Field(min_length=8, max_length=15),
-            batch_id: Optional[str] = Field(max_length=64, default=None, alias="batchId"),
-            voice: Optional[Literal["man", "woman"]] = Field(default="woman"),
-            idempotency_key: Optional[str] = Field(max_length=128, min_length=1, default=None, alias="idempotencyKey"),
-            calendar_id: Optional[str] = Field(max_length=64, default=None, alias="calendarId"),
-            scheduled_at: Optional[str] = Field(max_length=64, default=None, alias="scheduledAt"),
-            machine_detection: Optional[bool] = Field(default=False, alias="machineDetection"),
-            voicemail: Optional[VoiceMail] = Field(default=None),
-            menu: Optional[Menu] = Field(default=None),
-            end: Optional[End] = Field(default=None)):
+                welcome: Welcome,
+                language: Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"],
+                to: list[str] = Field(min_length=1, max_length=1000),
+                from_: str = Field(min_length=8, max_length=15),
+                batch_id: Optional[str] = Field(max_length=64, default=None, alias="batchId"),
+                voice: Optional[Literal["man", "woman"]] = Field(default="woman"),
+                idempotency_key: Optional[str] = Field(max_length=128, min_length=1, default=None, alias="idempotencyKey"),
+                calendar_id: Optional[str] = Field(max_length=64, default=None, alias="calendarId"),
+                scheduled_at: Optional[str] = Field(max_length=64, default=None, alias="scheduledAt"),
+                machine_detection: Optional[bool] = Field(default=False, alias="machineDetection"),
+                voicemail: Optional[VoiceMail] = Field(default=None),
+                menu: Optional[Menu] = Field(default=None),
+                end: Optional[End] = Field(default=None)):
         """Create a new voice call with specified parameters.
 
         This method initiates a new voice call with the provided configuration, including
@@ -111,9 +112,4 @@ class CallResource:
                                                menu=menu,
                                                end=end)
         
-        response = self._create(data=create_call_object)
-
-        if response:
-            return CreateCallResponse.model_validate_json(json.dumps(response))
-        
-        return response
+        return CreateCallResponse.model_validate_json(json.dumps(self._create(create_call_object)))

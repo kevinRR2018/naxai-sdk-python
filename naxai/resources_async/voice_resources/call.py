@@ -1,8 +1,8 @@
 import json
 from typing import Optional, Literal
 from pydantic import Field, validate_call
-from naxai.models.voice.create_call_request import CreateCallRequest, Welcome, End, Menu, VoiceMail
-from naxai.models.voice.responses.create_call_response import CreateCallResponse
+from naxai.models.voice.requests.call_requests import CreateCallRequest, Welcome, End, Menu, VoiceMail
+from naxai.models.voice.responses.call_responses import CreateCallResponse
 
 
 class CallResource:
