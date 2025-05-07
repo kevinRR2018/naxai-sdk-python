@@ -9,9 +9,7 @@ class InboundResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/inbound"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     def list(self,
             group: Literal["hour", "day", "month"],

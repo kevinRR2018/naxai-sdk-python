@@ -1,17 +1,15 @@
 from typing import Optional
-from pydantic import Field
+from pydantic import Field, validate_call
 from .domains_resources.shared_domains import SharedDomainsResource
 
 class DomainsResource:
     """ domains resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/domains"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
-            self.shared_domains = SharedDomainsResource(client, self.root_path)
+        self._client = client
+        self.root_path = root_path + "/domains"
+        self.headers = {"Content-Type": "application/json"}
+        self.shared_domains = SharedDomainsResource(client, self.root_path)
 
     async def update_tracking_settings(self,
                                        domain_id: str,
@@ -111,6 +109,7 @@ class DomainsResource:
         self._client.logger.debug("domains url: %s", self.root_path)
         return await self._client._request("GET", self.root_path + "/" + domain_id, headers=self.headers)
     
+    @validate_call
     async def create(self,
                      domain_name: str = Field(min_length=3),
                      shared_with_subaccounts: Optional[bool] = False):

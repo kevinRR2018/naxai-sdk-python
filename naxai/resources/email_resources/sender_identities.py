@@ -4,11 +4,9 @@ class SenderIdentitiesResource:
     """ sender_identities resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/senders"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/senders"
+        self.headers = {"Content-Type": "application/json"}
             
     #TODO: email validation
     def update(self, sender_id: str, name: str, email: str):

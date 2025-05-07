@@ -10,9 +10,7 @@ class OutboundResource:
         self._client = client
         self.previous_path = root_path
         self.root_path = root_path + "/outbound"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     async def list(self,
              group: Literal["hour", "day", "month"],

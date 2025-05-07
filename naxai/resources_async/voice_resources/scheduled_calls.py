@@ -1,6 +1,3 @@
-import json
-import logging
-from naxai.models.voice.create_call_request import CreateCallRequest
 from typing import Optional, Annotated
 from pydantic import validate_call, Field, StringConstraints
 
@@ -11,11 +8,9 @@ class ScheduledCallsResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/scheduled"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
 
-    @validate_call()
+    @validate_call
     async def list(self,
                    to: Annotated[str, StringConstraints(min_length=8)],
                    page: Optional[int] = 1,

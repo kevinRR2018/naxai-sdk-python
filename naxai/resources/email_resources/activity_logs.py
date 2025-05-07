@@ -1,15 +1,13 @@
 from typing import Optional, Literal
-from pydantic import Field, validate_call
+from pydantic import Field
 
 class ActivityLogsResource:
     """ activity_logs resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/activity-logs"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/activity-logs"
+        self.headers = {"Content-Type": "application/json"}
             
     #TODO: email validation
     def get(self, message_id: str, email: str):

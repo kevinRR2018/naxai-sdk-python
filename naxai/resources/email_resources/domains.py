@@ -8,9 +8,7 @@ class DomainsResource:
     def __init__(self, client, root_path):
             self._client = client
             self.root_path = root_path + "/domains"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+            self.headers = {"Content-Type": "application/json"}
             self.shared_domains = SharedDomainsResource(client, self.root_path)
 
     def update_tracking_settings(self,

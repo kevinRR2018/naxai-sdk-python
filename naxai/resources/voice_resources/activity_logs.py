@@ -8,9 +8,7 @@ class ActivityLogsResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/activity-logs"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     def list(self,
             page: Optional[int] = 1,
@@ -22,7 +20,6 @@ class ActivityLogsResource:
             from_: Annotated[Optional[str], Field(alias="from")] = None,
             to: Optional[str] = None,
             client_id: Optional[str] = None,
-            survey_id: Optional[str] = None,
             campaign_id: Optional[str] = None,
             broadcast_id: Optional[str] = None
             ):

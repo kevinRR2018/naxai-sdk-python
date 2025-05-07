@@ -14,7 +14,7 @@ class VoiceResource:
         self._client = client
         self.call: CallResource = CallResource(client, "/voice")
         self.broadcasts: BroadcastsResource
-        self.scheduled_calls: ScheduledCallsResource
+        #self.scheduled_calls: ScheduledCallsResource
         self.reporting: ReportingResource
         self.activity_logs: ActivityLogsResource
 

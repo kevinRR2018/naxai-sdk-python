@@ -1,3 +1,5 @@
-from .create_calendars_request import CreateCalendarRequest, ScheduleObject
+from .calendar import Calendar
+from .schedule_object import ScheduleObject
+from .holiday_template import HolidayTemplate
 
-__all__ = ["CreateCalendarRequest", "ScheduleObject"]
+__all__ = ["ScheduleObject", "Calendar"]

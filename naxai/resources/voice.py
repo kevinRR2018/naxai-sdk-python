@@ -15,7 +15,7 @@ class VoiceResource:
         self.root_path = "/voice"
         self.call: CallResource
         self.broadcasts: BroadcastsResource
-        self.scheduled_calls: ScheduledCallsResource
+        #self.scheduled_calls: ScheduledCallsResource
         self.reporting: ReportingResource
         self.activity_logs: ActivityLogsResource
 

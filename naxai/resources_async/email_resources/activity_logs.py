@@ -5,11 +5,9 @@ class ActivityLogsResource:
     """ activity_logs resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/activity-logs"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/activity-logs"
+        self.headers = {"Content-Type": "application/json"}
             
     #TODO: email validation
     async def get(self, message_id: str, email: str):
@@ -31,6 +29,7 @@ class ActivityLogsResource:
         return await self._client._request("GET", self.root_path + "/" + message_id + "/" + email, headers=self.headers)
     
     #TODO: email validation
+    @validate_call
     async def list(self,
                    page: Optional[int] = 1,
                    page_size: Optional[int] = Field(default=50, ge=1, le=100),

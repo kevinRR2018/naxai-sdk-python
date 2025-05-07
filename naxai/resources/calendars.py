@@ -1,9 +1,14 @@
 import datetime
+import json
 from typing import Optional
-from naxai.models.calendars.create_calendars_request import CreateCalendarRequest
+from naxai.models.calendars.requests.create_calendars_request import CreateCalendarRequest
 from naxai.base.exceptions import NaxaiValueError
-from .calendars_resources import RESOURCE_CLASSES
+from naxai.models.calendars.responses.create_calendar_response import CreateCalendarResponse
+from naxai.models.calendars.responses.exclusion_response import ExclusionResponse
+from naxai.models.calendars.responses.check_calendar_response import CheckCalendarResponse
+from naxai.models.calendars.calendar import Calendar
 from .calendars_resources.holidays_templates import HolidaysTemplatesResource
+
 
 
 class CalendarsResource:
@@ -13,75 +18,158 @@ class CalendarsResource:
 
     def __init__(self, client):
         self._client = client
-        self.holidays_templates: HolidaysTemplatesResource
         self.root_path = "/calendars"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
-
-        for name, cls in RESOURCE_CLASSES.items():
-            self._client.logger.debug("Setting up resource %s. Resource class: %s", name, cls)
-            setattr(self, name, cls(client, self.root_path))
+        self.headers = {"Content-Type": "application/json"}
+        self.holidays_templates: HolidaysTemplatesResource = HolidaysTemplatesResource(self._client, self.root_path)
 
     def check(self,
               calendar_id: str,
               timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
               ):
-        """
-        Checks the opening of a calendar.
+        """Checks the availability of a calendar at a specific time.
+
+        This method verifies whether a given timestamp falls within the calendar's working hours,
+        considering the schedule and exclusions. If the time is outside working hours, it also
+        provides the next available time.
 
         Args:
-            calendar_id (str): The ID of the calendar to check.
-            timestamp (Optional[int], optional): The timestamp to check for availability. Defaults to current timestamp utc.
+            calendar_id (str): The unique identifier of the calendar to check.
+            timestamp (Optional[int]): The timestamp to check for availability.
+                Defaults to the current UTC timestamp if not provided.
 
         Returns:
-            dict: The API response containing the availability status.
+            CheckCalendarResponse: An object containing:
+                - match_ (bool): Whether the timestamp falls within working hours.
+                Mapped from JSON key 'match'.
+                - next_ (Optional[int]): If match_ is False, provides the timestamp
+                of the next available working time. Mapped from JSON key 'next'.
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the response data cannot be properly validated.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
+            ConnectionError: If there are network connectivity issues.
 
         Example:
-            >>> response = client.calendars.check("calendar_id", 1672531200)
+            >>> # Check current time
+            >>> response = client.calendars.check("cal_123abc")
+            >>> if response.match_:
+            ...     print("Time is within working hours")
+            ... else:
+            ...     print(f"Next available time: {response.next_}")
+            >>>
+            >>> # Check specific timestamp
+            >>> specific_time = 1703066400000  # Some future timestamp
+            >>> response = client.calendars.check(
+            ...     "cal_123abc",
+            ...     timestamp=specific_time
+            ... )
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - Timestamps are represented in milliseconds since epoch
+            - The check considers both regular and extended hours if configured
+            - Exclusion dates are taken into account during availability checking
+            - The default timestamp is the current UTC time
+
+        See Also:
+            Calendar: The main calendar model class
+            CheckCalendarResponse: The response model for availability checks
         """
         params = {"timestamp": timestamp}
-        return self._client._request("GET", self.root_path + "/" + calendar_id + "/check", params=params, headers=self.headers)
-        
+        return CheckCalendarResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id + "/check", params=params, headers=self.headers)))
 
     def delete_exclusions(self, calendar_id: str, exclusions: list[str]):
-        """
-        Deletes exclusions from a calendar.
+        """Deletes exclusion dates from a calendar.
+
+        This method removes specified dates from the calendar's exclusion list. These dates
+        will no longer be considered as non-working days in the calendar.
 
         Args:
-            calendar_id (str): The ID of the calendar to delete exclusions from.
-            exclusions (list[str]): A list of dates to remove from the calendar's exclusions.
+            calendar_id (str): The unique identifier of the calendar to update.
+            exclusions (list[str]): List of dates to remove from the calendar's exclusions.
+                Each date should be in a "YYYY-MM-DD" string format. Maximum of 1000 dates
+                can be removed in a single request.
 
         Returns:
-            dict: The API response indicating the success of the operation.
+            ExclusionResponse: An object containing:
+                - exclusions (list[str]): The complete list of remaining exclusions for 
+                the calendar after removing the specified dates.
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the request data or response cannot be properly validated.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
+            NaxaiValueError: If more than 1000 exclusions are provided.
 
         Example:
-            >>> response = client.calendars.delete_exclusion("calendar_id", ["2023-01-01", "2023-01-02"])
+            >>> dates_to_remove = ["2024-12-25", "2024-12-26"]
+            >>> result = client.calendars.delete_exclusions(
+            ...     "cal_123abc",
+            ...     exclusions=dates_to_remove
+            ... )
+            >>> print(result.exclusions)  # Shows remaining exclusions after deletion
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - Maximum of 1000 exclusions can be deleted in a single request
+            - Non-existent dates in the exclusion list are ignored
+            - The response includes all remaining exclusions after the deletion
+
+        See Also:
+            Calendar: The main calendar model class
+            ExclusionResponse: The response model containing updated exclusions list
+            add_exclusions: Method to add exclusion dates to a calendar
         """
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only delete up to 1000 exclusions at a time.")
 
-        return self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/remove", json={"exclusions": exclusions}, headers=self.headers)
+        return ExclusionResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/remove", json={"exclusions": exclusions}, headers=self.headers)))
 
     def add_exclusions(self, calendar_id: str, exclusions: list[str]):
-        """
-        Adds exclusions to a calendar.
+        """Adds new exclusion dates to an existing calendar.
+
+        This method allows adding dates to the calendar's exclusion list. These dates
+        will be considered as non-working days in the calendar.
 
         Args:
-            calendar_id (str): The ID of the calendar to add exclusions to.
-            exclusions (list[str]): A list of dates to exclude from the calendar.
+            calendar_id (str): The unique identifier of the calendar to update.
+            exclusions (list[str]): List of dates to be added as exclusions.
+                Each date should be in a YYYY-MM-DD string format. Maximum of 1000 dates
+                can be added in a single request.
 
         Returns:
-            dict: The API response indicating the success of the operation.
+            ExclusionResponse: An object containing:
+                - exclusions (list[str]): The complete list of exclusions for the calendar
+                after adding the new dates.
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the request data or response cannot be properly validated.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
+            ValueError: If more than 1000 exclusions are provided.
 
         Example:
-            >>> response = client.calendars.add_exclusion("calendar_id", ["2023-01-01", "2023-01-02"])
+            >>> new_exclusions = ["2024-12-25", "2024-12-26"]
+            >>> result = client.calendars.add_exclusions(
+            ...     "cal_123abc",
+            ...     exclusions=new_exclusions
+            ... )
+            >>> print(result.exclusions)  # Shows all exclusions including the new ones
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - Maximum of 1000 exclusions can be added in a single request
+            - Existing exclusions are preserved and new ones are added to the list
+
+        See Also:
+            Calendar: The main calendar model class
+            ExclusionResponse: The response model containing updated exclusions list
         """
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only add up to 1000 exclusions at a time.")
         
-        return self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/add", json={"exclusions": exclusions}, headers=self.headers)
-
+        return ExclusionResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/add", json={"exclusions": exclusions}, headers=self.headers)))
 
     def delete(self, calendar_id):
         """
@@ -91,59 +179,166 @@ class CalendarsResource:
             calendar_id (str): The ID of the calendar to delete.
 
         Returns:
-            dict: The API response indicating the success of the deletion.
+            None
+
+        Raises:
+            APIError: If there is an error response from the API.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
 
         Example:
             >>> response = client.calendars.delete("calendar_id")
         """
         return self._client._request("DELETE", self.root_path + "/" + calendar_id, headers=self.headers)
 
-
     def update(self, calendar_id: str, data: CreateCalendarRequest):
-        """
-        Updates an existing calendar.
+        """Updates an existing calendar with new configuration.
+
+        This method modifies an existing calendar's settings using the provided
+        configuration data.
 
         Args:
-            calendar_id (str): The ID of the calendar to update.
-            data (CreateCalendarRequest): The request body containing the updated details of the calendar.
+            calendar_id (str): The unique identifier of the calendar to update.
+            data (CreateCalendarRequest): The request body containing the updated calendar
+                configuration with the following fields:
+                - name (str): The new name for the calendar
+                - timezone (Optional[str]): The timezone setting for the calendar
+                - schedule (list[ScheduleObject]): List of exactly 7 schedule objects containing:
+                    - day (int): Day of week (1-7)
+                    - open (bool): Whether the schedule is open
+                    - start (Optional[str]): Opening time in "HH:MM" format
+                    - stop (Optional[str]): Closing time in "HH:MM" format
+                    - extended (Optional[bool]): Whether extended hours are enabled
+                    - extension_start (Optional[str]): Extended hours start time
+                    - extension_stop (Optional[str]): Extended hours end time
+                - exclusions (Optional[list[str]]): List of dates to exclude
 
         Returns:
-            dict: The API response containing the details of the updated calendar.
+            Calendar: The updated calendar object containing all calendar properties
+                including the modifications made.
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the request data or response cannot be properly validated.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
 
         Example:
-            >>> updated_calendar = client.calendars.update("calendar_id", CreateCalendarRequest(
-            ...     name="Updated Calendar",
-            ...     ...
-            ... ))
+            >>> update_data = CreateCalendarRequest(
+            ...     name="Updated Calendar Name",
+            ...     timezone="Europe/London",
+            ...     schedule=[
+            ...         ScheduleObject(
+            ...             day=1,
+            ...             open=True,
+            ...             start="09:00",
+            ...             stop="17:00"
+            ...         ),
+            ...         # ... repeat for all 7 days
+            ...     ]
+            ... )
+            >>> updated_calendar = client.calendars.update("cal_123abc", update_data)
+            >>> print(updated_calendar.name)  # "Updated Calendar Name"
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - The request body is automatically serialized using model_dump
+            - None values are excluded from the request
+            - Schedule must contain exactly 7 ScheduleObject instances
+            - Time values must follow the "HH:MM" format
+
+        See Also:
+            Calendar: The model class for calendar data
+            ScheduleObject: The model class for daily schedule configuration
+            CreateCalendarRequest: The model class for update request data
         """
-        return self._client._request("PUT", self.root_path + "/" + calendar_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        return Calendar.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + calendar_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     def get(self, calendar_id: str):
-        """
-        Retrieves a specific calendar by its ID.
+        """Retrieves a specific calendar by its ID.
+
+        This method fetches detailed information about a single calendar using its
+        unique identifier and returns it as a Calendar object.
 
         Args:
-            calendar_id (str): The ID of the calendar to retrieve.
+            calendar_id (str): The unique identifier of the calendar to retrieve.
 
         Returns:
-            dict: The API response containing the details of the requested calendar.
+            Calendar: An object containing the calendar's details including:
+                - id (Optional[str]): The calendar's unique identifier
+                - name (str): The calendar's name
+                - timezone (Optional[str]): The calendar's timezone
+                - schedule (list[ScheduleObject]): List of 7 schedule objects containing:
+                    - day (int): Day of week (1-7)
+                    - open (bool): Whether the schedule is open
+                    - start (Optional[str]): Opening time in "HH:MM" format
+                    - stop (Optional[str]): Closing time in "HH:MM" format
+                    - extended (Optional[bool]): Whether extended hours are enabled
+                    - extension_start (Optional[str]): Extended hours start time
+                    - extension_stop (Optional[str]): Extended hours end time
+                - exclusions (Optional[list[str]]): List of excluded dates
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the response data cannot be properly validated into a Calendar object.
+            NotFoundError: If the calendar with the specified ID doesn't exist.
 
         Example:
-            >>> calendar = client.calendars.get("calendar_id")
+            >>> calendar = client.calendars.get("cal_123abc")
+            >>> print(calendar.name)
+            >>> print(calendar.timezone)
+            >>> for day_schedule in calendar.schedule:
+            ...     print(f"Day {day_schedule.day}: "
+            ...           f"{'Open' if day_schedule.open else 'Closed'} "
+            ...           f"from {day_schedule.start} to {day_schedule.stop}")
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - The response is automatically validated and converted to a Calendar object
+            - Schedule must contain exactly 7 ScheduleObject instances
+            - Time values must follow the "HH:MM" format
+            - The endpoint used is "{root_path}/calendars/{calendar_id}"
+
+        See Also:
+            Calendar: The model class for calendar data
+            ScheduleObject: The model class for daily schedule configuration
         """
-        return self._client._request("GET", self.root_path + "/" + calendar_id, headers=self.headers)
+
+        return Calendar.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id, headers=self.headers)))
 
     def list(self):
-        """
-        Retrieves a list of calendars.
+        """Retrieve a list of all calendars.
+
+        This method fetches all calendars associated with the account and returns them
+        as a list of Calendar objects.
 
         Returns:
-            dict: The API response containing the list of calendars.
+            list[Calendar]: A list of Calendar objects, each representing a calendar
+                with its properties and settings. If no calendars exist, returns an
+                empty list.
+
+        Raises:
+            APIError: If there is an error response from the API.
+            ValidationError: If the response data cannot be properly validated into Calendar objects.
 
         Example:
             >>> calendars = client.calendars.list()
+            >>> for calendar in calendars:
+            ...     print(calendar.name)
+
+        Note:
+            - The request is made with "Content-Type: application/json" header
+            - The response is automatically converted from JSON to Calendar objects
+            - This method performs model validation on the response data
+
+        See Also:
+            Calendar: The model class used for representing calendar data
         """
-        return self._client._request("GET", self.root_path, headers=self.headers)
+        results_list = []
+        results = self._client._request("GET", self.root_path, headers=self.headers)
+
+        for result in results:
+            results_list.append(Calendar.model_validate_json(json.dumps(result)))
+
+        return results_list
 
     def create(self,
                data: CreateCalendarRequest):
@@ -154,7 +349,7 @@ class CalendarsResource:
             data (CreateCalendarRequest): The request body containing the details of the calendar to be created.
 
         Returns:
-            dict: The API response containing the details of the created calendar.
+            Calendar: The created calendar with its properties and settings
 
         Example:
             >>> new_calendar = client.calendars.create(
@@ -164,4 +359,9 @@ class CalendarsResource:
             ...     )
             ... )
         """
-        return self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        response = self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+
+        if response:
+            return CreateCalendarResponse.model_validate_json(json.dumps(response))
+        
+        return response

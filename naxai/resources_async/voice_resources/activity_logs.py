@@ -1,5 +1,5 @@
 from typing import Optional, Literal, Annotated
-from pydantic import Field
+from pydantic import Field, validate_call
 
 class ActivityLogsResource:
     """ activity_logs resource for voice resource """
@@ -8,10 +8,9 @@ class ActivityLogsResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/activity-logs"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
-        
+        self.headers = {"Content-Type": "application/json"}
+
+    @validate_call
     async def list(self,
                    page: Optional[int] = 1,
                    page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25,

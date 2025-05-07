@@ -5,11 +5,9 @@ class NewslettersResource:
     """ newsletters resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/newsletters"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/newsletters"
+        self.headers = {"Content-Type": "application/json"}
             
     async def create(self, data:CreateEmailNewsletterRequest):
         """
@@ -30,6 +28,7 @@ class NewslettersResource:
         """
         return await self._client._request("POST", self.root_path, data=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
     
+    @validate_call
     async def list(self, page: int = 1, page_size: int = Field(default=25, le=100, ge=1)):
         """
         List all email newsletters.

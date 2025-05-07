@@ -1,5 +1,5 @@
 from typing import Annotated, Literal, Optional
-from pydantic import Field
+from pydantic import Field, validate_call
 from .recipients_resources.calls import CallsResource
 
 class RecipientsResource:
@@ -11,10 +11,9 @@ class RecipientsResource:
         self._client = client
         self.root_path = root_path
         self.calls = CallsResource(client, root_path)
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
-        
+        self.headers = {"Content-Type": "application/json"}
+
+    @validate_call
     def list(self,
             broadcast_id: str,
             page: Optional[int] = 1,
@@ -71,4 +70,3 @@ class RecipientsResource:
         """
 
         return self._client._request("GET",self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id, headers=self.headers )
-    

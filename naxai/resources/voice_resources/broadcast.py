@@ -1,5 +1,5 @@
-from typing import Optional, Annotated, Literal
-from pydantic import Field
+from typing import Optional, Annotated
+from pydantic import Field, validate_call
 from naxai.models.voice.create_broadcast_request import CreateBroadcastRequest
 from .broadcast_resources.metrics import MetricsResource
 from .broadcast_resources.recipients import RecipientsResource
@@ -15,11 +15,10 @@ class BroadcastsResource:
         self.root_path = root_path + "/broadcasts"
         self.metrics = MetricsResource(self._client, self.root_path)
         self.recipients = RecipientsResource(self._client, self.root_path)
-        self.settings = SettingsResource(self._client, self.root_path)
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        #self.settings = SettingsResource(self._client, self.root_path)
+        self.headers = {"Content-Type": "application/json"}
 
+    @validate_call
     def list(self,
             page: Optional[int] = 1,
             page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25):

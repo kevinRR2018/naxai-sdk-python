@@ -5,11 +5,9 @@ class MetricsResource:
     """ metrics resource for email.reporting resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/metrics"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/metrics"
+        self.headers = {"Content-Type": "application/json"}
             
     async def list(self,
                 start: Optional[int] = int((datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=7)).timestamp()),

@@ -12,9 +12,23 @@ class NaxaiException(Exception):
     def __str__(self):
         return f"{self.__class__.__name__}: {self.message} (status_code={self.status_code}, error_code={self.error_code})"
 
-class NaxaiAuthenticationError(NaxaiException): pass
-class NaxaiAuthorizationError(NaxaiException): pass
-class NaxaiResourceNotFound(NaxaiException): pass
-class NaxaiRateLimitExceeded(NaxaiException): pass
-class NaxaiAPIRequestError(NaxaiException): pass
-class NaxaiValueError(NaxaiException): pass
+class NaxaiAuthenticationError(NaxaiException):
+    """ Naxai authentication error """
+
+class NaxaiAuthorizationError(NaxaiException):
+    """ Naxai authorization error """
+
+class NaxaiResourceNotFound(NaxaiException):
+    """ Naxai resource not found error """
+
+class NaxaiRateLimitExceeded(NaxaiException):
+    """ Naxai rate limit exceeded error """
+
+class NaxaiAPIRequestError(NaxaiException):
+    """ Naxai API request error """
+
+class NaxaiValueError(NaxaiException):
+    """ Naxai value error """
+
+class NaxaiInvalidRequestError(NaxaiException):
+    """ Naxai invalid request error """
