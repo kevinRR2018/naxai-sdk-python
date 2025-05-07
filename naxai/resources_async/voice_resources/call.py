@@ -112,10 +112,4 @@ class CallResource:
                                                menu=menu,
                                                end=end)
         
-        response = await self._create(create_call_object)
-
-        if response:
-            return CreateCallResponse.model_validate_json(json.dumps(response))
-
-        return response
-
+        return CreateCallResponse.model_validate_json(json.dumps(await self._create(create_call_object)))
