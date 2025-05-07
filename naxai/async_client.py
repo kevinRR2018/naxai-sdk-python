@@ -8,7 +8,8 @@ from naxai.base.exceptions import (NaxaiAuthenticationError,
                                    NaxaiResourceNotFound,
                                    NaxaiRateLimitExceeded,
                                    NaxaiAPIRequestError,
-                                   NaxaiValueError)
+                                   NaxaiValueError,
+                                   NaxaiInvalidRequestError)
 from naxai.models.token_response import TokenResponse
 from naxai.resources_async import RESOURCE_CLASSES
 from naxai.resources_async.voice import VoiceResource
@@ -109,6 +110,8 @@ class NaxaiAsyncClient(BaseClient):
             raise NaxaiAuthorizationError(**exc_args)
         elif response.status_code == 404:
             raise NaxaiResourceNotFound(**exc_args)
+        elif response.status_code == 422:
+            raise NaxaiInvalidRequestError(**exc_args)
         elif response.status_code == 429:
             raise NaxaiRateLimitExceeded(**exc_args)
         else:
