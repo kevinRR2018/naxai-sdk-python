@@ -2,8 +2,6 @@ import json
 from typing import Optional, Annotated
 from pydantic import Field, validate_call
 from naxai.models.voice.requests.broadcasts_requests import CreateBroadcastRequest
-from naxai.resources_async.voice_resources.broadcast_resources.metrics import MetricsResource
-from naxai.resources_async.voice_resources.broadcast_resources.recipients import RecipientsResource
 from naxai.models.voice.responses.broadcasts_responses import (ListBroadcastResponse,
                                                                CreateBroadcastResponse,
                                                                GetBroadcastResponse,
@@ -12,6 +10,8 @@ from naxai.models.voice.responses.broadcasts_responses import (ListBroadcastResp
                                                                PauseBroadcastResponse,
                                                                ResumeBroadcastResponse,
                                                                CancelBroadcastResponse)
+from .broadcast_resources.metrics import MetricsResource
+from .broadcast_resources.recipients import RecipientsResource
 
 
 class BroadcastsResource:
