@@ -11,16 +11,16 @@ from naxai.base.exceptions import (NaxaiAuthenticationError,
                                    NaxaiValueError,
                                    NaxaiInvalidRequestError)
 from naxai.models.token_response import TokenResponse
-from naxai.resources import RESOURCE_CLASSES
 from naxai.resources.voice import VoiceResource
 from naxai.resources.calendars import CalendarsResource
 from naxai.resources.email import EmailResource
+from naxai.resources.sms import SMSResource
 from .config import API_BASE_URL
 
 
 class NaxaiClient(BaseClient):
     """
-    Naxai Client for interacting with Voice, SMS, Email, and RCS APIs.
+    Naxai Client for interacting with Voice, SMS, Email, Calendars and People API.
     """
 
     voice: Optional[VoiceResource]
@@ -44,7 +44,8 @@ class NaxaiClient(BaseClient):
         self._http = httpx.Client()
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
-        self.email = EmailResource(self)
+        #self.email = EmailResource(self)
+        self.sms = SMSResource(self)
 
     def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
