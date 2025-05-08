@@ -13,12 +13,8 @@ class PeopleResource:
     def __init__(self, client):
         self._client = client
         self.root_path = "/people"
-        self.attributes: AttributesResource
-        self.contacts: ContactsResource
-        self.exports: ExportsResource
-        self.imports: ImportsResource
-        self.segments: SegmentsResource
-
-        for name, cls in RESOURCE_CLASSES.items():
-            self._client.logger.debug("Setting up resource %s. Resource class: %s", name, cls)
-            setattr(self, name, cls(client, self.root_path))
+        self.attributes: AttributesResource = AttributesResource(self._client, self.root_path)
+        self.contacts: ContactsResource = ContactsResource(self._client, self.root_path)
+        self.exports: ExportsResource = ExportsResource(self._client, self.root_path)
+        self.imports: ImportsResource = ImportsResource(self._client, self.root_path)
+        self.segments: SegmentsResource = SegmentsResource(self._client, self.root_path)

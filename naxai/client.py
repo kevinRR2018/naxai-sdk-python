@@ -45,9 +45,6 @@ class NaxaiClient(BaseClient):
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
         self.email = EmailResource(self)
-        # Dynamically load resources
-        for resource_name, resource_class in RESOURCE_CLASSES.items():
-            setattr(self, resource_name, resource_class(self))
 
     def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
