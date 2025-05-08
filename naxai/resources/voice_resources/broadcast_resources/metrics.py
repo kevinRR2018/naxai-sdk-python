@@ -1,3 +1,5 @@
+import json
+from naxai.models.voice.responses.broadcasts_responses import GetBroadcastMetricsResponse
 from .broadcast_metrics_resources.input import InputResource
 
 class MetricsResource:
@@ -9,9 +11,7 @@ class MetricsResource:
         self._client = client
         self.root_path = root_path
         self.input = InputResource(client, root_path)
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     def get(self, broadcast_id: str):
         """
@@ -21,12 +21,26 @@ class MetricsResource:
             broadcast_id (str): The unique identifier of the broadcast.
             
         Returns:
-            dict: The API response.
+            GetBroadcastMetricsResponse: A Pydantic model containing detailed metrics for the broadcast campaign,
+            including:
+                - total: Total number of calls attempted
+                - completed: Number of calls successfully completed
+                - delivered: Number of calls successfully delivered
+                - failed: Number of failed calls
+                - canceled: Number of canceled calls
+                - paused: Number of paused calls
+                - invalid: Number of invalid call attempts
+                - in_progress: Number of calls currently being executed
+                - transferred: Number of transferred calls
+                - calls: Total number of call attempts made
             
         Example:
-            >>> metrics_result = client.voice.broadcasts.metrics.get(
+            >>> metrics = client.voice.broadcasts.metrics.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Total recipients: {metrics.total}")
+            >>> print(f"Completed: {metrics.completed} ({metrics.completed/metrics.total*100:.1f}%)")
+            >>> print(f"Failed: {metrics.failed}")
         """
 
-        return self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics", headers=self.headers)
+        return GetBroadcastMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics", headers=self.headers)))

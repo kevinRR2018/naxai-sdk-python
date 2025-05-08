@@ -5,11 +5,9 @@ class BouncesResource:
     """ bounces resource for email.suppression_lists resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/bounces"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/bounces"
+        self.headers = {"Content-Type": "application/json"}
     
     #TODO: email validation
     @validate_call

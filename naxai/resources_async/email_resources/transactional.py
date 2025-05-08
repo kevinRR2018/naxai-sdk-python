@@ -4,11 +4,9 @@ class TransactionalResource:
     """ transactional resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path
+        self.headers = {"Content-Type": "application/json"}
             
     async def send(self, data: SendTransactionalEmailModel):
           """Send a transactional email"""

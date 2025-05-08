@@ -1,16 +1,14 @@
 from typing import Optional
-from pydantic import Field
+from pydantic import Field, validate_call
 from naxai.models.email.create_email_template import CreateEmailTemplateRequest
 
 class TemplatesResource:
     " templates resource for email resource "
     def __init__(self, client, root_path):
-            self._client = client
-            self.previous_root = root_path
-            self.root_path = root_path + "/templates"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.previous_root = root_path
+        self.root_path = root_path + "/templates"
+        self.headers = {"Content-Type": "application/json"}
             
     def get_shared(self, template_id: str):
         """
@@ -26,7 +24,8 @@ class TemplatesResource:
             >>> response = client.email.templates.get_shared(template_id="XXX")
         """
         return self._client._request("GET", self.previous_root + "/shared-templates/" + template_id, headers=self.headers)
-            
+
+    @validate_call      
     def list_shared(self,
                     page: int = Field(default=1),
                     page_size: int = Field(default=25, ge=1, le=100),
@@ -103,7 +102,9 @@ class TemplatesResource:
             >>> response = client.email.templates.get(template_id="XXX")
         """
         return self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)
-            
+
+
+    @validate_call
     def list(self,
             page: int = Field(default=1),
             page_size: int = Field(default=25, ge=1, le=100)

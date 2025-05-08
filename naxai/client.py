@@ -8,29 +8,29 @@ from naxai.base.exceptions import (NaxaiAuthenticationError,
                                    NaxaiResourceNotFound,
                                    NaxaiRateLimitExceeded,
                                    NaxaiAPIRequestError,
-                                   NaxaiValueError)
+                                   NaxaiValueError,
+                                   NaxaiInvalidRequestError)
 from naxai.models.token_response import TokenResponse
-from naxai.resources import RESOURCE_CLASSES
 from naxai.resources.voice import VoiceResource
 from naxai.resources.calendars import CalendarsResource
 from naxai.resources.email import EmailResource
+from naxai.resources.sms import SMSResource
 from .config import API_BASE_URL
 
 
 class NaxaiClient(BaseClient):
     """
-    Naxai Client for interacting with Voice, SMS, Email, and RCS APIs.
+    Naxai Client for interacting with Voice, SMS, Email, Calendars and People API.
     """
-
-    voice: Optional[VoiceResource]
 
     def __init__(self,
                  api_client_id: str = None,
                  api_client_secret: str = None,
+                 api_version: str = None,
                  auth_url: str = None,
                  api_base_url: str = None,
                  logger=None):
-        super().__init__(api_client_id, api_client_secret, auth_url, logger)
+        super().__init__(api_client_id, api_client_secret, api_version, auth_url, logger)
 
         if not api_base_url:
             self.api_base_url = os.getenv("NAXAI_API_URL", API_BASE_URL)
@@ -42,10 +42,8 @@ class NaxaiClient(BaseClient):
         self._http = httpx.Client()
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
-        self.email = EmailResource(self)
-        # Dynamically load resources
-        for resource_name, resource_class in RESOURCE_CLASSES.items():
-            setattr(self, resource_name, resource_class(self))
+        #self.email = EmailResource(self)
+        self.sms = SMSResource(self)
 
     def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
@@ -73,7 +71,8 @@ class NaxaiClient(BaseClient):
         self._authenticate()
 
         headers = kwargs.pop("headers", {})
-        headers.update({"Authorization": f"Bearer {self.token}"})
+        headers.update({"Authorization": f"Bearer {self.token}",
+                        "X-version": self.api_version})
 
         url = f"{self.api_base_url.rstrip('/')}/{path.lstrip('/')}"
         response = self._http.request(method, url, headers=headers, **kwargs)
@@ -104,6 +103,8 @@ class NaxaiClient(BaseClient):
             raise NaxaiAuthorizationError(**exc_args)
         elif response.status_code == 404:
             raise NaxaiResourceNotFound(**exc_args)
+        elif response.status_code == 422:
+            raise NaxaiInvalidRequestError(**exc_args)
         elif response.status_code == 429:
             raise NaxaiRateLimitExceeded(**exc_args)
         else:

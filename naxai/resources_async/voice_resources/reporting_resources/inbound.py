@@ -1,5 +1,7 @@
+import json
 from typing import Literal, Optional
 from naxai.base.exceptions import NaxaiValueError
+from naxai.models.voice.responses.reporting_responses import ListInboundMetricsResponse
 
 class InboundResource:
     """
@@ -9,9 +11,7 @@ class InboundResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/inbound"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     async def list(self,
                     group: Literal["hour", "day", "month"],
@@ -20,12 +20,53 @@ class InboundResource:
                     number: Optional[str] = None
                     ):
         """
-        List inbound calls
-        :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
-        :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param number: The number to filter the report by. Optional
-        :return: The report
+        Retrieve a list of inbound call metrics grouped by the specified time interval.
+        
+        This method fetches inbound call statistics from the API, allowing filtering by date range
+        and specific phone numbers. The results are grouped according to the specified time interval.
+        
+        Args:
+            group (Literal["hour", "day", "month"]): The time interval for grouping the metrics.
+                - "hour": Group metrics by hour (requires precise timestamp in start_date)
+                - "day": Group metrics by day
+                - "month": Group metrics by month
+            start_date (Optional[str]): The start date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for all grouping types
+            stop_date (Optional[str]): The end date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for "day" and "month" grouping, optional for "hour"
+            number (Optional[str]): Phone number to filter the metrics by. If provided,
+                only metrics for this specific number will be returned.
+        
+        Returns:
+            ListInboundMetricsResponse: A Pydantic model containing the inbound call metrics.
+            The response includes:
+                - start_date: Start timestamp of the reporting period
+                - stop_date: End timestamp of the reporting period
+                - direction: Call direction (always "inbound" for this endpoint)
+                - number: The phone number associated with these metrics
+                - group: The time interval grouping used
+                - stats: List of InboundStats objects with detailed metrics
+        
+        Raises:
+            NaxaiValueError: If required parameters are missing or in incorrect format:
+                - When start_date is not provided
+                - When stop_date is not provided for "day" or "month" grouping
+                - When date formats don't match the required format for the specified grouping
+        
+        Example:
+            >>> metrics = await client.voice.reporting.inbound.list(
+            ...     group="day",
+            ...     start_date="2023-01-01",
+            ...     stop_date="2023-01-31",
+            ...     number="+1234567890"
+            ... )
+            >>> print(f"Found {len(metrics.stats)} daily records")
+            >>> for stat in metrics.stats:
+            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Received: {stat.received}")
         """
         #TODO: verify the validation of start_date and stop_date
         if group == "hour":
@@ -58,4 +99,4 @@ class InboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return ListInboundMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))

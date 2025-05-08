@@ -1,5 +1,5 @@
-from typing import Optional
 from pydantic import BaseModel, Field
+from typing import Optional
 
 HOUR_PATTERN = r'^\d{2}:\d{2}$'
 
@@ -18,13 +18,9 @@ class ScheduleObject(BaseModel):
         validate_by_name = True
         populate_by_name = True
 
-class CreateCalendarRequest(BaseModel):
-    """Request object for creating a calendar"""
+class CreateCalendarResponse(BaseModel):
+    id: str
     name: str
     timezone: Optional[str] = None
-    schedule: list[ScheduleObject] = Field(max_length=7, min_length=7)
-
-    class Config:
-        """Pydantic config class to enable populating by field name"""
-        validate_by_name = True
-        populate_by_name = True
+    schedule: list[ScheduleObject]
+    exclusions: Optional[list] = None

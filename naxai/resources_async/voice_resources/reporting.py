@@ -11,6 +11,3 @@ class ReportingResource:
         self.outbound: OutboundResource = OutboundResource(self._client, self.root_path)
         self.inbound: InboundResource = InboundResource(self._client, self.root_path)
         self.transfer: TransferResource = TransferResource(self._client, self.root_path)
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}

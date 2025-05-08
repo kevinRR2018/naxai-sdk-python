@@ -1,10 +1,17 @@
-from typing import Optional, Annotated, Literal
-from pydantic import Field
-from naxai.models.voice.create_broadcast_request import CreateBroadcastRequest
+import json
+from typing import Optional, Annotated
+from pydantic import Field, validate_call
+from naxai.models.voice.requests.broadcasts_requests import CreateBroadcastRequest
+from naxai.models.voice.responses.broadcasts_responses import (ListBroadcastResponse,
+                                                               CreateBroadcastResponse,
+                                                               GetBroadcastResponse,
+                                                               UpdateBroadcastResponse,
+                                                               StartBroadcastResponse,
+                                                               PauseBroadcastResponse,
+                                                               ResumeBroadcastResponse,
+                                                               CancelBroadcastResponse)
 from .broadcast_resources.metrics import MetricsResource
 from .broadcast_resources.recipients import RecipientsResource
-from .broadcast_resources.settings import SettingsResource
-
 
 
 class BroadcastsResource:
@@ -15,25 +22,35 @@ class BroadcastsResource:
         self.root_path = root_path + "/broadcasts"
         self.metrics = MetricsResource(self._client, self.root_path)
         self.recipients = RecipientsResource(self._client, self.root_path)
-        self.settings = SettingsResource(self._client, self.root_path)
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
 
+    @validate_call
     def list(self,
             page: Optional[int] = 1,
             page_size: Annotated[Optional[int], Field(ge=1, le=100)] = 25):
         """
         Retrieves a list of all broadcasts.
 
+        Args:
+            page (Optional[int]): Page number to retrieve. Defaults to 1.
+            page_size (Optional[int]): Number of items to list per page (1-100). Defaults to 25.
+
         Returns:
-            dict: The API response containing the list of broadcasts.
+            ListBroadcastResponse: A Pydantic model containing a paginated list of broadcasts.
+            The response includes:
+                - items: List of BroadcastResponseItem objects with details about each broadcast
+                - pagination: Information about the current page, total pages, and total items
 
         Example:
-            >>> broadcasts = client.voice.broadcasts.list()
+            >>> response = client.voice.broadcasts.list(page=1, page_size=50)
+            >>> print(f"Found {len(response.items)} broadcasts")
+            >>> print(f"Page {response.pagination.page} of {response.pagination.total_pages}")
+            >>> for broadcast in response.items:
+            ...     print(f"Broadcast: {broadcast.name} ({broadcast.state})")
+            ...     print(f"Progress: {broadcast.completed_count}/{broadcast.total_count}")
         """
         params = {"page": page, "pagesize": page_size}
-        return self._client._request("GET", self.root_path, headers=self.headers, params=params)
+        return ListBroadcastResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers, params=params)))
     
     def create(self, data: CreateBroadcastRequest):
         """
@@ -43,20 +60,25 @@ class BroadcastsResource:
             data (CreateBroadcastRequest): The request body containing the details of the broadcast to be created.
 
         Returns:
-            dict: The API response containing the details of the created broadcast.
+            CreateBroadcastResponse: A Pydantic model containing the details of the created broadcast,
+            including the broadcast_id, name, configuration, and other metadata.
 
         Example:
             >>> new_broadcast = client.voice.broadcasts.create(
             ...     CreateBroadcastRequest(
             ...         name="My Broadcast",
             ...         from_="123456789",
-            ...         to="1234567890",
-            ...         ...
+            ...         segment_ids=["seg_abc123"],
+            ...         voice_flow=voice_flow_obj
             ...     )
             ... )
+            >>> print(f"Created broadcast with ID: {new_broadcast.broadcast_id}")
         """
-        return self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
-    
+        return CreateBroadcastResponse.model_validate_json(json.dumps(self._client._request("POST",
+                                                                                            self.root_path,
+                                                                                            json=data.model_dump(by_alias=True, exclude_none=True),
+                                                                                            headers=self.headers)))
+
     def get(self, broadcast_id: str):
         """
         Retrieves a specific broadcast by its ID.
@@ -65,15 +87,18 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to retrieve.
 
         Returns:
-            dict: The API response containing the details of the broadcast.
+            GetBroadcastResponse: A Pydantic model containing the complete details of the broadcast,
+            including configuration, metrics, and status information.
 
         Example:
-            >>> broadcast_details = client.voice.broadcasts.get(
+            >>> broadcast = client.voice.broadcasts.get(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Broadcast: {broadcast.name}")
+            >>> print(f"Progress: {broadcast.completed_count}/{broadcast.total_count}")
         """
-        return self._client._request("GET", self.root_path + "/" + broadcast_id, headers=self.headers)
-    
+        return GetBroadcastResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + broadcast_id, headers=self.headers)))
+
     def delete(self, broadcast_id: str):
         """
         Deletes a specific broadcast by its ID.
@@ -82,7 +107,7 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to delete.
 
         Returns:
-            dict: The API response confirming the deletion of the broadcast.
+            None
 
         Example:
             >>> deletion_result = client.voice.broadcasts.delete(
@@ -100,19 +125,22 @@ class BroadcastsResource:
             data (CreateBroadcastRequest): The request body containing the updated details of the broadcast.
 
         Returns:
-            dict: The API response containing the details of the updated broadcast.
+            UpdateBroadcastResponse: A Pydantic model containing the details of the updated broadcast,
+            including any modified fields and metadata.
 
         Example:
             >>> updated_broadcast = client.voice.broadcasts.update(
             ...     broadcast_id="XXXXXXXXX",
             ...     CreateBroadcastRequest(
             ...         name="Updated Broadcast",
-            ...         message="Hello, world!",
-            ...         to="+1234567890"
+            ...         from_="123456789",
+            ...         segment_ids=["seg_abc123"],
+            ...         voice_flow=voice_flow_obj
             ...     )
             ... )
+            >>> print(f"Updated broadcast: {updated_broadcast.name}")
         """
-        return self._client._request("PUT", self.root_path + "/" + broadcast_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        return UpdateBroadcastResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + broadcast_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     def start(self, broadcast_id: str):
         """
@@ -122,15 +150,17 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to start.
 
         Returns:
-            dict: The API response confirming the start of the broadcast.
+            StartBroadcastResponse: A Pydantic model confirming the broadcast is starting,
+            containing the broadcast_id and state ("starting").
 
         Example:
-            >>> start_result = client.voice.broadcasts.start(
+            >>> result = client.voice.broadcasts.start(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/start", headers=self.headers)
-    
+        return StartBroadcastResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + broadcast_id + "/start", headers=self.headers)))
+
     def pause(self, broadcast_id: str):
         """
         Pauses a broadcast.
@@ -139,15 +169,17 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to pause.
 
         Returns:
-            dict: The API response confirming the pause of the broadcast.
+            PauseBroadcastResponse: A Pydantic model confirming the broadcast is pausing,
+            containing the broadcast_id and state ("pausing").
 
         Example:
-            >>> pause_result = client.voice.broadcasts.pause(
+            >>> result = client.voice.broadcasts.pause(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/pause", headers=self.headers)
-    
+        return PauseBroadcastResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + broadcast_id + "/pause", headers=self.headers)))
+
     def resume(self, broadcast_id: str):
         """
         Resumes a broadcast.
@@ -156,15 +188,17 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to resume.
 
         Returns:
-            dict: The API response confirming the resume of the broadcast.
+            ResumeBroadcastResponse: A Pydantic model confirming the broadcast is resuming,
+            containing the broadcast_id and state ("resuming").
 
         Example:
-            >>> resume_result = client.voice.broadcasts.resume(
+            >>> result = client.voice.broadcasts.resume(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/resume", headers=self.headers)
-    
+        return ResumeBroadcastResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + broadcast_id + "/resume", headers=self.headers)))
+
     def cancel(self, broadcast_id: str):
         """
         Cancels a broadcast.
@@ -173,12 +207,13 @@ class BroadcastsResource:
             broadcast_id (str): The unique identifier of the broadcast to cancel.
 
         Returns:
-            dict: The API response confirming the cancellation of the broadcast.
+            CancelBroadcastResponse: A Pydantic model confirming the broadcast is canceling,
+            containing the broadcast_id and state ("canceling").
 
         Example:
-            >>> cancel_result = client.voice.broadcasts.cancel(
+            >>> result = client.voice.broadcasts.cancel(
             ...     broadcast_id="XXXXXXXXX"
             ... )
+            >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return self._client._request("POST", self.root_path + "/" + broadcast_id + "/cancel", headers=self.headers)
-    
+        return CancelBroadcastResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + broadcast_id + "/cancel", headers=self.headers)))

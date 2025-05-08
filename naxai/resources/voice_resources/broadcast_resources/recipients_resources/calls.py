@@ -1,3 +1,6 @@
+import json
+from naxai.models.voice.responses.broadcasts_responses import GetBroadcastRecipientCallsResponse
+
 class CallsResource:
     """
     This class represents the CallsResource, which provides methods to interact with the broadcast recipients calls API.
@@ -6,26 +9,35 @@ class CallsResource:
     def __init__(self, client, root_path: str):
         self._client = client
         self.root_path = root_path
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     def list(self, broadcast_id: str, recipient_id: str):
         """
         Get the recipient calls for a voice broadcast by broadcast id and recipient id.
 
         Args:
-            broadcast_id (str): The unique identifier of the broadcast to cancel.
-            recipients_id (str): The unique identifier of the recipient
+            broadcast_id (str): The unique identifier of the broadcast.
+            recipient_id (str): The unique identifier of the recipient.
 
         Returns:
-            dict: The API response containing the calls.
+            GetBroadcastRecipientCallsResponse: A Pydantic model containing a list of call attempts 
+            for the specified recipient. Each call attempt includes details such as:
+                - callId: Unique identifier for the call
+                - status: Call status (delivered, failed, scheduled, canceled)
+                - reason: Detailed reason for the call outcome
+                - attemptOrder: Sequential number of the call attempt
+                - duration: Duration of the call in seconds
+                - callAt: Timestamp when the call was made/scheduled
 
         Example:
-            >>> recipients_result = client.voice.broadcasts.recipients.calls.list(
+            >>> calls = client.voice.broadcasts.recipients.calls.list(
             ...     broadcast_id="XXXXXXXXX",
             ...     recipient_id="XXXXXXXXX"
             ... )
+            >>> print(f"Total call attempts: {len(calls)}")
+            >>> if len(calls) > 0:
+            ...     print(f"Last call status: {calls[-1].status}")
+            ...     print(f"Call duration: {calls[-1].duration} seconds")
         """
 
-        return self._client._request("GET", self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id + "/calls", headers=self.headers)
+        return GetBroadcastRecipientCallsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id + "/calls", headers=self.headers)))

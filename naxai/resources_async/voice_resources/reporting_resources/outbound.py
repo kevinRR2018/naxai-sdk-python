@@ -1,5 +1,7 @@
+import json
 from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
+from naxai.models.voice.responses.reporting_responses import ListOutboundMetricsResponse, ListOutboundCallsByCountryMetricsResponse
 
 class OutboundResource:
     """
@@ -10,9 +12,7 @@ class OutboundResource:
         self._client = client
         self.previous_path = root_path
         self.root_path = root_path + "/outbound"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     async def list(self,
              group: Literal["hour", "day", "month"],
@@ -21,12 +21,54 @@ class OutboundResource:
              number: Optional[str] = None
              ):
         """
-        List outbound calls
-        :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
-        :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param number: The number to filter the report by. Optional
-        :return: The report
+        Retrieve a list of outbound call metrics grouped by the specified time interval.
+        
+        This method fetches outbound call statistics from the API, allowing filtering by date range
+        and specific phone numbers. The results are grouped according to the specified time interval.
+        
+        Args:
+            group (Literal["hour", "day", "month"]): The time interval for grouping the metrics.
+                - "hour": Group metrics by hour (requires precise timestamp in start_date)
+                - "day": Group metrics by day
+                - "month": Group metrics by month
+            start_date (Optional[str]): The start date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for all grouping types
+            stop_date (Optional[str]): The end date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for "day" and "month" grouping, optional for "hour"
+            number (Optional[str]): Phone number to filter the metrics by. If provided,
+                only metrics for this specific number will be returned.
+        
+        Returns:
+            ListOutboundMetricsResponse: A Pydantic model containing the outbound call metrics.
+            The response includes:
+                - start_date: Start timestamp of the reporting period
+                - stop_date: End timestamp of the reporting period
+                - direction: Call direction (always "outbound" for this endpoint)
+                - number: The phone number associated with these metrics
+                - group: The time interval grouping used
+                - stats: List of BaseStats objects with detailed metrics including delivery status
+        
+        Raises:
+            NaxaiValueError: If required parameters are missing or in incorrect format:
+                - When start_date is not provided
+                - When stop_date is not provided for "day" or "month" grouping
+                - When date formats don't match the required format for the specified grouping
+        
+        Example:
+            >>> metrics = await client.voice.reporting.outbound.list(
+            ...     group="day",
+            ...     start_date="2023-01-01",
+            ...     stop_date="2023-01-31",
+            ...     number="+1234567890"
+            ... )
+            >>> print(f"Found {len(metrics.stats)} daily records")
+            >>> for stat in metrics.stats:
+            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Delivered: {stat.delivered}")
+            ...     print(f"Success rate: {stat.delivered/stat.calls*100:.1f}% if stat.calls > 0 else 'N/A'")
         """
         #TODO: verify the validation of start_date and stop_date
         if group == "hour":
@@ -60,18 +102,48 @@ class OutboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return ListOutboundMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
     
     async def list_by_country(self,
                               start_date: str,
                               stop_date: str,
                               number: Optional[str] = None
                               ):
-        """List country, nbr of outbound calls
-        :param start_date: The start date for the report. 'YYYY-MM-DD'
-        :param stop_date: The stop date for the report. 'YYYY-MM-DD'
-        :param number: The number to filter the report by. Optional
-        :return: The report
+        """
+        Retrieve outbound call metrics grouped by country.
+        
+        This method fetches outbound call statistics organized by country from the API,
+        allowing filtering by date range and specific phone numbers.
+        
+        Args:
+            start_date (str): The start date for the reporting period in 'YYYY-MM-DD' format.
+                Must be exactly 10 characters.
+            stop_date (str): The end date for the reporting period in 'YYYY-MM-DD' format.
+                Must be exactly 10 characters.
+            number (Optional[str]): Phone number to filter the metrics by. If provided,
+                only metrics for this specific number will be returned.
+        
+        Returns:
+            ListOutboundCallsByCountryMetricsResponse: A Pydantic model containing the outbound call metrics by country.
+            The response includes:
+                - start_date: Start timestamp of the reporting period
+                - stop_date: End timestamp of the reporting period
+                - direction: Call direction (always "outbound" for this endpoint)
+                - number: The phone number associated with these metrics
+                - stats: List of CountryStats objects with detailed metrics for each country
+        
+        Raises:
+            NaxaiValueError: If date parameters are not in the correct format 'YYYY-MM-DD'
+        
+        Example:
+            >>> country_metrics = await client.voice.reporting.outbound.list_by_country(
+            ...     start_date="2023-01-01",
+            ...     stop_date="2023-01-31",
+            ...     number="+1234567890"
+            ... )
+            >>> print(f"Found metrics for {len(country_metrics.stats)} countries")
+            >>> for stat in country_metrics.stats:
+            ...     print(f"Country: {stat.country}, Calls: {stat.calls}, Delivered: {stat.delivered}")
         """
         if len(start_date) != 10:
             raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD'")
@@ -84,4 +156,4 @@ class OutboundResource:
         if number:
             params["number"] = number
 
-        return await self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)
+        return ListOutboundCallsByCountryMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)))

@@ -1,15 +1,14 @@
+from pydantic import Field
 from naxai.models.email.create_email_newsletter import CreateEmailNewsletterRequest
-from pydantic import Field, validate_call
+
 
 class NewslettersResource:
     """ newsletters resource for email resource """
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/newsletters"
-            self.version = "2023-03-25"
-            self.headers = {"X-version": self.version,
-                            "Content-Type": "application/json"}
+        self._client = client
+        self.root_path = root_path + "/newsletters"
+        self.headers = {"Content-Type": "application/json"}
             
     def create(self, data:CreateEmailNewsletterRequest):
         """

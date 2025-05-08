@@ -1,10 +1,10 @@
 from uuid import UUID
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
-from .voice_flow import (VoiceMail,
-                         Welcome,
-                         Menu,
-                         End)
+from naxai.models.voice.voice_flow import (VoiceMail,
+                                           Welcome,
+                                           Menu,
+                                           End)
 
 class CreateCallRequest(BaseModel):
     """
@@ -28,5 +28,3 @@ class CreateCallRequest(BaseModel):
         """Pydantic configuration for the CreateCallRequest model."""
         validate_by_name = True
         populate_by_name = True
-
-

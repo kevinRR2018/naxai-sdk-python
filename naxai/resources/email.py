@@ -16,16 +16,12 @@ class EmailResource:
 
     def __init__(self, client):
         self._client = client
-        self.transactional: TransactionalResource
-        self.activity_logs: ActivityLogsResource
-        self.domains: DomainsResource
-        self.newsletters: NewslettersResource
-        self.reporting: ReportingResource
-        self.sender_identities: SenderIdentitiesResource
-        self.suppression_lists: SuppressionListsResource
-        self.templates: TemplatesResource
-        
-
-        for name, cls in RESOURCE_CLASSES.items():
-            self._client.logger.debug("Setting up resource %s. Resource class: %s", name, cls)
-            setattr(self, name, cls(client, "/email"))
+        self.root_path = "/email"
+        self.transactional: TransactionalResource = TransactionalResource(self._client, self.root_path)
+        self.activity_logs: ActivityLogsResource = ActivityLogsResource(self._client, self.root_path)
+        self.domains: DomainsResource = DomainsResource(self._client, self.root_path)
+        self.newsletters: NewslettersResource = NewslettersResource(self._client, self.root_path)
+        self.reporting: ReportingResource = ReportingResource(self._client, self.root_path)
+        self.sender_identities: SenderIdentitiesResource = SenderIdentitiesResource(self._client, self.root_path)
+        self.suppression_lists: SuppressionListsResource = SuppressionListsResource(self._client, self.root_path)
+        self.templates: TemplatesResource = TemplatesResource(self._client, self.root_path)

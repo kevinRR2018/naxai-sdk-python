@@ -1,5 +1,7 @@
+import json
 from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
+from naxai.models.voice.responses.reporting_responses import ListTransferredMetricsResponse
 
 class TransferResource:
     """ Transfer resource for reporting resource """
@@ -8,9 +10,7 @@ class TransferResource:
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/transfer"
-        self.version = "2023-03-25"
-        self.headers = {"X-version": self.version,
-                        "Content-Type": "application/json"}
+        self.headers = {"Content-Type": "application/json"}
         
     def list(self,
              group: Literal["hour", "day", "month"],
@@ -19,12 +19,55 @@ class TransferResource:
              number: Optional[str] = None
              ):
         """
-        List transfer calls
-        :param group: The group by period for the report. Possible values are 'hour', 'day', 'month'
-        :param start_date: The start date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param stop_date: The stop date for the report. Required if group is 'hour' or 'day'. Format: 'YYYY-MM-DD' or 'YY-MM-DD'
-        :param number: The number to filter the report by. Optional
-        :return: The report
+        Retrieve a list of transferred call metrics grouped by the specified time interval.
+        
+        This method fetches statistics for calls that were transferred from the API, allowing 
+        filtering by date range and specific phone numbers. The results are grouped according 
+        to the specified time interval.
+        
+        Args:
+            group (Literal["hour", "day", "month"]): The time interval for grouping the metrics.
+                - "hour": Group metrics by hour (requires precise timestamp in start_date)
+                - "day": Group metrics by day
+                - "month": Group metrics by month
+            start_date (Optional[str]): The start date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for all grouping types
+            stop_date (Optional[str]): The end date for the reporting period.
+                - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
+                - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
+                - Required for "day" and "month" grouping, optional for "hour"
+            number (Optional[str]): Phone number to filter the metrics by. If provided,
+                only metrics for this specific number will be returned.
+        
+        Returns:
+            ListTransferredMetricsResponse: A Pydantic model containing the transferred call metrics.
+            The response includes:
+                - start_date: Start timestamp of the reporting period
+                - stop_date: End timestamp of the reporting period
+                - direction: Call direction
+                - number: The phone number associated with these metrics
+                - group: The time interval grouping used
+                - stats: List of BaseStats objects with detailed metrics for transferred calls
+        
+        Raises:
+            NaxaiValueError: If required parameters are missing or in incorrect format:
+                - When start_date is not provided
+                - When stop_date is not provided for "day" or "month" grouping
+                - When date formats don't match the required format for the specified grouping
+        
+        Example:
+            >>> metrics = client.voice.reporting.transfer.list(
+            ...     group="day",
+            ...     start_date="2023-01-01",
+            ...     stop_date="2023-01-31",
+            ...     number="+1234567890"
+            ... )
+            >>> print(f"Found {len(metrics.stats)} daily records")
+            >>> for stat in metrics.stats:
+            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Transferred: {stat.transferred}")
+            ...     print(f"Average duration: {stat.duration/stat.calls:.1f} seconds" if stat.calls > 0 else "No calls")
         """
         #TODO: verify the validation of start_date and stop_date
         if group == "hour":
@@ -57,4 +100,4 @@ class TransferResource:
         if number:
             params["number"] = number
 
-        return self._client._request("GET", self.root_path, params=params, headers=self.headers)
+        return ListTransferredMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
