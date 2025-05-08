@@ -23,8 +23,6 @@ class NaxaiClient(BaseClient):
     Naxai Client for interacting with Voice, SMS, Email, Calendars and People API.
     """
 
-    voice: Optional[VoiceResource]
-
     def __init__(self,
                  api_client_id: str = None,
                  api_client_secret: str = None,

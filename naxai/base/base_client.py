@@ -1,7 +1,7 @@
 import logging
 import time
 import os
-from naxai.config import AUTH_URL
+from naxai.config import AUTH_URL, NAXAI_API_VERSION
 from naxai.base.exceptions import NaxaiValueError
 
 class BaseClient:
@@ -38,7 +38,7 @@ class BaseClient:
 
         if not api_version:
             self.logger.info("api_version not provided, attempting to read from environment variable NAXAI_API_VERSION")
-            self.api_version = os.getenv("NAXAI_API_VERSION", None)
+            self.api_version = os.getenv("NAXAI_API_VERSION", NAXAI_API_VERSION)
             if not self.api_version:
                 self.logger.warning("api_version not provided and could not be read from environment variable NAXAI_API_VERSION")
                 raise NaxaiValueError("api_version is required")

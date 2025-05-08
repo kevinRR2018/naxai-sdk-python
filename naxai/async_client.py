@@ -11,7 +11,6 @@ from naxai.base.exceptions import (NaxaiAuthenticationError,
                                    NaxaiValueError,
                                    NaxaiInvalidRequestError)
 from naxai.models.token_response import TokenResponse
-from naxai.resources_async import RESOURCE_CLASSES
 from naxai.resources_async.voice import VoiceResource
 from naxai.resources_async.calendars import CalendarsResource
 from naxai.resources_async.email import EmailResource
@@ -21,10 +20,8 @@ from .config import API_BASE_URL
 
 class NaxaiAsyncClient(BaseClient):
     """
-    Async Naxai Client for interacting with Voice, SMS, Email and RCS APIs.
+    Async Naxai Client for interacting with Voice, SMS, Email, Calendars and People APIs.
     """
-
-    voice: Optional[VoiceResource]
 
     def __init__(self,
                  api_client_id: str = None,
