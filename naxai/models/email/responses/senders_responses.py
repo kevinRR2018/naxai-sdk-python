@@ -224,7 +224,6 @@ class CreateSenderResponse(BaseSenderResponse):
         ListSendersResponse: For retrieving multiple senders
     """
 
-
 class GetSenderResponse(BaseSenderResponse):
     """
     Model representing the response from retrieving a specific sender identity in the Naxai email system.

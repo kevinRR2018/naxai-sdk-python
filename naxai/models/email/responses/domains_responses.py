@@ -540,3 +540,4 @@ class VerifyDomainResponse(BaseModel):
     tracking_record: BaseRecord = Field(alias="trackingRecord", default=None)
     mx_record: BaseRecord = Field(alias="mxRecord", default=None)
     verification_token: BaseRecord = Field(alias="verificationToken", default=None)
+
