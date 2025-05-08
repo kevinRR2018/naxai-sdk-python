@@ -1,6 +1,6 @@
 import time
 import os
-from typing import Any, Optional
+from typing import Any
 import httpx
 from naxai.base.base_client import BaseClient
 from naxai.base.exceptions import (NaxaiAuthenticationError,
@@ -42,7 +42,7 @@ class NaxaiClient(BaseClient):
         self._http = httpx.Client()
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
-        #self.email = EmailResource(self)
+        self.email = EmailResource(self)
         self.sms = SMSResource(self)
 
     def _authenticate(self):

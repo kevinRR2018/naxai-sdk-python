@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel, Field
 
 class BaseDomainResponse(BaseModel):
@@ -104,7 +104,7 @@ class ExtendedDomainResponse(BaseDomainResponse):
         ListDomainsResponse: For responses when listing domains
         CreateDomainResponse: For responses when creating new domains
     """
-    shared_with_subaccounts: bool = Field(alias="sharedWithSubaccounts")
+    shared_with_subaccounts: Optional[bool] = Field(alias="sharedWithSubaccounts", default=None)
     verification_token: str = Field(alias="verificationToken", default=None)
     dkim_name: str = Field(alias="dkimName", default=None)
     dkim_value: str = Field(alias="dkimValue", default=None)
@@ -117,7 +117,7 @@ class ExtendedDomainResponse(BaseDomainResponse):
     modified_at: int = Field(alias="modifiedAt", default=None)
     modified_by: str = Field(alias="modifiedBy", default=None)
 
-class ListSharedDomainsResponse(BaseDomainResponse):
+class ListSharedDomainsResponse(BaseModel):
     """
     Model representing a shared domain in the Naxai email system.
     
@@ -143,6 +143,42 @@ class ListSharedDomainsResponse(BaseDomainResponse):
     See Also:
         BaseDomainResponse: For the base domain information structure
     """
+    root: List[BaseDomainResponse] = Field(default_factory=list)
+    
+    def __len__(self) -> int:
+        """Return the number of domains in the list."""
+        return len(self.root)
+    
+    def __getitem__(self, index):
+        """Access domains by index."""
+        return self.root[index]
+    
+    def __iter__(self):
+        """Iterate through domains."""
+        return iter(self.root)
+    
+    @classmethod
+    def model_validate_json(cls, json_data: str, **kwargs):
+        """Parse JSON data into the model.
+        
+        This method handles both array-style JSON and object-style JSON with a root field.
+        
+        Args:
+            json_data (str): The JSON string to parse
+            **kwargs: Additional arguments to pass to the standard model_validate_json method
+            
+        Returns:
+            ListDomainsResponse: A validated instance of the class
+        """
+        import json
+        data = json.loads(json_data)
+        
+        # If the data is a list, wrap it in a dict with the root field
+        if isinstance(data, list):
+            return cls(root=data)
+        
+        # Otherwise, use the standard Pydantic validation
+        return super().model_validate_json(json_data, **kwargs)
 
 class ListDomainsResponse(BaseModel):
     """
