@@ -42,7 +42,7 @@ class NaxaiAsyncClient(BaseClient):
         self._http = httpx.AsyncClient()
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
-        #self.email = EmailResource(self)
+        self.email = EmailResource(self)
         #self.people = PeopleResource(self)
         self.sms = SMSResource(self)
 

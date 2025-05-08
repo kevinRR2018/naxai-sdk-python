@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class CreateEmailResponse(BaseModel):
+class SendTransactionalEmailResponse(BaseModel):
     """
     Model representing the response from creating a new email in the Naxai email system.
     
@@ -13,7 +13,7 @@ class CreateEmailResponse(BaseModel):
             to track the email's delivery status or retrieve details about the email.
     
     Example:
-        >>> response = CreateEmailResponse(id="email_123abc456def")
+        >>> response = SendTransactionalEmailResponse(id="email_123abc456def")
         >>> print(f"Email created with ID: {response.id}")
         >>> print(f"You can track this email using the ID: {response.id}")
         Email created with ID: email_123abc456def
