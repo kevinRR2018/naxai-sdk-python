@@ -14,7 +14,7 @@ class EventsResource:
     async def send(self,
                 identifier: str,
                 name: Optional[str] = None,
-                type_: Optional[Literal["event"]] = Field(default=None, alias="type"),
+                type_: Optional[Literal["event"]] = Field(default=None),
                 timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
                 idempotency_key: Optional[str] = Field(default=None, max_length=200),
                 data: Optional[dict[str,str]] = None):
