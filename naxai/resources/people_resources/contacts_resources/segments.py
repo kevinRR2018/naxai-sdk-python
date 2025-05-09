@@ -9,7 +9,7 @@ class SegmentsResource:
         self.root_path = root_path
         self.headers = {"Content-Type": "application/json"}
 
-    async def list(self, identifier: str):
+    def list(self, identifier: str):
         """
         Retrieve all segments that a specific contact belongs to in the Naxai People API.
         
@@ -36,10 +36,10 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Get all segments for a specific contact
                 contact_id = "john.doe@example.com"  # Using email as identifier
-                response = await client.people.contacts.segments.list(identifier=contact_id)
+                response = client.people.contacts.segments.list(identifier=contact_id)
                 
                 # Display the segments the contact belongs to
                 print(f"Contact {contact_id} belongs to {len(response.segments)} segments:")
@@ -64,4 +64,4 @@ class SegmentsResource:
             - For dynamic segments, membership is recalculated periodically based on the segment conditions
         """
 
-        return ListSegmentsOfContactResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + identifier + "/segments", headers=self.headers)))
+        return ListSegmentsOfContactResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + identifier + "/segments", headers=self.headers)))

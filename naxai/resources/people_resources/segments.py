@@ -21,10 +21,10 @@ class SegmentsResource:
         self.contacts = SegmentsContactsResource(client, self.root_path)
 
     @validate_call
-    async def list(self,
-                   type_: Optional[str] = Field(default=None, alias="type"),
-                   exclude_predefined: Optional[bool] = False,
-                   attribute: Optional[str] = None ):
+    def list(self,
+            type_: Optional[str] = Field(default=None, alias="type"),
+            exclude_predefined: Optional[bool] = False,
+            attribute: Optional[str] = None ):
         """
         Retrieve a list of segments from the Naxai People API.
         
@@ -50,25 +50,25 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # List all segments
-                    all_segments = await client.people.segments.list()
+                    all_segments = client.people.segments.list()
                     print(f"Found {len(all_segments)} total segments")
                     
                     # List only dynamic segments
-                    dynamic_segments = await client.people.segments.list(type_="dynamic")
+                    dynamic_segments = client.people.segments.list(type_="dynamic")
                     print(f"Found {len(dynamic_segments)} dynamic segments")
                     
                     # List only manual segments, excluding predefined ones
-                    manual_segments = await client.people.segments.list(
+                    manual_segments = client.people.segments.list(
                         type_="manual",
                         exclude_predefined=True
                     )
                     print(f"Found {len(manual_segments)} custom manual segments")
                     
                     # List segments that use a specific attribute
-                    attribute_segments = await client.people.segments.list(attribute="country")
+                    attribute_segments = client.people.segments.list(attribute="country")
                     print(f"Found {len(attribute_segments)} segments using the 'country' attribute")
                     
                     # Display segment details
@@ -97,9 +97,9 @@ class SegmentsResource:
             params["type"] = type_
         if attribute:
             params["attribute"] = attribute
-        return ListSegmentsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers, params=params)))
+        return ListSegmentsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers, params=params)))
 
-    async def get(self, segment_id: str):
+    def get(self, segment_id: str):
         """
         Retrieve detailed information about a specific segment in the Naxai People API.
         
@@ -121,11 +121,11 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Retrieve a specific segment
                     segment_id = "seg_123abc"
-                    segment = await client.people.segments.get(segment_id=segment_id)
+                    segment = client.people.segments.get(segment_id=segment_id)
                     
                     # Display basic segment information
                     segment_type = "Manual" if segment.type_ == "manual" else "Dynamic"
@@ -160,7 +160,7 @@ class SegmentsResource:
                                 print(f"- {cond}")
                     
                     # Get the number of contacts in this segment
-                    count_response = await client.people.segments.contacts.count(segment_id=segment_id)
+                    count_response = client.people.segments.contacts.count(segment_id=segment_id)
                     print(f"\nThis segment contains {count_response.count} contacts")
                     
                 except Exception as e:
@@ -175,9 +175,9 @@ class SegmentsResource:
             - The condition structure for dynamic segments can be complex and may require
             custom parsing logic to display or analyze
         """
-        return GetSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id, headers=self.headers)))
+        return GetSegmentResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id, headers=self.headers)))
 
-    async def delete(self, segment_id: str):
+    def delete(self, segment_id: str):
         """
         Delete a segment from the Naxai People API.
         
@@ -201,13 +201,13 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Check if the segment is in use before deleting
                     segment_id = "seg_123abc"
                     
                     # Get segment details
-                    segment = await client.people.segments.get(segment_id=segment_id)
+                    segment = client.people.segments.get(segment_id=segment_id)
                     print(f"Found segment: {segment.name} (ID: {segment.id})")
                     
                     # Check if the segment is predefined (cannot be deleted)
@@ -215,7 +215,7 @@ class SegmentsResource:
                         print("Cannot delete predefined segments")
                     else:
                         # Check if the segment is used in campaigns or broadcasts
-                        usage = await client.people.segments.usage(segment_id=segment_id)
+                        usage = client.people.segments.usage(segment_id=segment_id)
                         
                         if usage.campaign_ids or usage.broadcast_ids:
                             print("Warning: This segment is in use:")
@@ -229,7 +229,7 @@ class SegmentsResource:
                         print("Proceeding with deletion...")
                         
                         # Delete the segment
-                        response = await client.people.segments.delete(segment_id=segment_id)
+                        response = client.people.segments.delete(segment_id=segment_id)
                         print(f"Segment deleted successfully: {response}")
                         
                 except Exception as e:
@@ -244,9 +244,9 @@ class SegmentsResource:
             using the segments.usage method
             - If a segment is in use, deleting it may affect active campaigns or automations
         """
-        return await self._client._request("DELETE", self.root_path + "/" + segment_id, headers=self.headers)
+        return self._client._request("DELETE", self.root_path + "/" + segment_id, headers=self.headers)
 
-    async def update(self, segment_id: str, data: CreateSegmentRequest):
+    def update(self, segment_id: str, data: CreateSegmentRequest):
         """
         Update an existing segment in the Naxai People API.
         
@@ -275,13 +275,13 @@ class SegmentsResource:
             from naxai.models.people.requests.segments_requests import CreateSegmentRequest
             from naxai.models.people.search_condition import Condition, AttributeCondSimple, AttributeObject
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Update a segment's name and description
                     segment_id = "seg_123abc"
                     
                     # First, get the current segment data
-                    current_segment = await client.people.segments.get(segment_id=segment_id)
+                    current_segment = client.people.segments.get(segment_id=segment_id)
                     
                     # Create an update request with the fields to change
                     update_data = CreateSegmentRequest(
@@ -314,7 +314,7 @@ class SegmentsResource:
                         update_data.condition = condition
                     
                     # Update the segment
-                    updated_segment = await client.people.segments.update(
+                    updated_segment = client.people.segments.update(
                         segment_id=segment_id,
                         data=update_data
                     )
@@ -340,9 +340,9 @@ class SegmentsResource:
             methods to modify segment membership
             - Only include the fields you want to update in the CreateSegmentRequest object
         """
-        return UpdateSegmentResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + segment_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return UpdateSegmentResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + segment_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
-    async def create(self, data: CreateSegmentRequest):
+    def create(self, data: CreateSegmentRequest):
         """
         Create a new segment in the Naxai People API.
         
@@ -368,7 +368,7 @@ class SegmentsResource:
             from naxai.models.people.requests.segments_requests import CreateSegmentRequest
             from naxai.models.people.search_condition import Condition, AttributeCondSimple, AttributeObject
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Create a manual segment
                     manual_segment = CreateSegmentRequest(
@@ -377,12 +377,12 @@ class SegmentsResource:
                         type_="manual"
                     )
                     
-                    manual_result = await client.people.segments.create(data=manual_segment)
+                    manual_result = client.people.segments.create(data=manual_segment)
                     print(f"Manual segment created: {manual_result.name} (ID: {manual_result.id})")
                     
                     # Now add contacts to the manual segment
                     contact_ids = ["cnt_123", "cnt_456", "cnt_789"]
-                    await client.people.segments.contacts.add(
+                    client.people.segments.contacts.add(
                         segment_id=manual_result.id,
                         contact_ids=contact_ids
                     )
@@ -416,7 +416,7 @@ class SegmentsResource:
                         condition=condition
                     )
                     
-                    dynamic_result = await client.people.segments.create(data=dynamic_segment)
+                    dynamic_result = client.people.segments.create(data=dynamic_segment)
                     print(f"Dynamic segment created: {dynamic_result.name} (ID: {dynamic_result.id})")
                     print(f"Current state: {dynamic_result.state}")
                     
@@ -438,9 +438,9 @@ class SegmentsResource:
             the initial calculation of segment membership is complete
             - Segment names should be descriptive and unique within your account
         """
-        return CreateSegmentResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return CreateSegmentResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
-    async def history(self, segment_id: str,
+    def history(self, segment_id: str,
                       start: int = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=30),
                       stop: int = datetime.datetime.now(tz=datetime.timezone.utc)):
         """
@@ -470,14 +470,14 @@ class SegmentsResource:
             import datetime
             from datetime import timedelta
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Get segment history for the last 90 days
                     segment_id = "seg_123abc"
                     now = datetime.datetime.now(tz=datetime.timezone.utc)
                     start_date = now - timedelta(days=90)
                     
-                    history = await client.people.segments.history(
+                    history = client.people.segments.history(
                         segment_id=segment_id,
                         start=start_date,
                         stop=now
@@ -534,9 +534,9 @@ class SegmentsResource:
             - The default time range is the last 30 days
         """
         params = {"start": start, "stop": stop}
-        return GetSegmentsHistoryResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/history", headers=self.headers, params=params)))
+        return GetSegmentsHistoryResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/history", headers=self.headers, params=params)))
 
-    async def usage(self, segment_id: str):
+    def usage(self, segment_id: str):
         """
         Retrieve information about where a segment is being used in the Naxai People API.
         
@@ -560,29 +560,17 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Check where a segment is being used
                     segment_id = "seg_123abc"
                     
                     # First, get the segment details for context
-                    segment = await client.people.segments.get(segment_id=segment_id)
+                    segment = client.people.segments.get(segment_id=segment_id)
                     print(f"Checking usage for segment: {segment.name} (ID: {segment.id})")
                     
                     # Get usage information
-                    usage = await client.people.segments.usage(segment_id=segment_id)
-                    
-                    # Check if the segment is used in campaigns
-                    if usage.campaign_ids:
-                        print(f"This segment is used in {len(usage.campaign_ids)} campaigns:")
-                        for campaign_id in usage.campaign_ids:
-                            print(f"- Campaign ID: {campaign_id}")
-                            
-                            # In a real application, you might fetch campaign details
-                            # campaign = await client.campaigns.get(campaign_id)
-                            # print(f"  Campaign name: {campaign.name}")
-                    else:
-                        print("This segment is not used in any campaigns")
+                    usage = client.people.segments.usage(segment_id=segment_id)
                     
                     # Check if the segment is used in broadcasts
                     if usage.broadcast_ids:
@@ -591,7 +579,7 @@ class SegmentsResource:
                             print(f"- Broadcast ID: {broadcast_id}")
                             
                             # In a real application, you might fetch broadcast details
-                            # broadcast = await client.broadcasts.get(broadcast_id)
+                            # broadcast = client.broadcasts.get(broadcast_id)
                             # print(f"  Broadcast name: {broadcast.name}")
                     else:
                         print("This segment is not used in any broadcasts")
@@ -617,4 +605,4 @@ class SegmentsResource:
             - The response includes only the IDs of campaigns and broadcasts; to get detailed
             information about them, you would need to make additional API calls
         """
-        return GetSegmentUsageResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/usage", headers=self.headers)))
+        return GetSegmentUsageResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/usage", headers=self.headers)))

@@ -12,7 +12,7 @@ class AttributesResource:
         self.root_path = root_path + "/attributes"
         self.headers = {"Content-Type": "application/json"}
 
-    async def delete(self, name: str):
+    def delete(self, name: str):
         """
         Delete an attribute from the Naxai People API.
         
@@ -36,12 +36,12 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Delete a custom attribute
                 attribute_name = "loyalty_points"
                 
                 try:
-                    response = await client.people.attributes.delete(name=attribute_name)
+                    response = client.people.attributes.delete(name=attribute_name)
                     print(f"Attribute '{attribute_name}' deleted successfully")
                     print(f"Response: {response}")
                 except Exception as e:
@@ -55,9 +55,9 @@ class AttributesResource:
             - If the attribute is used in segment conditions, those segments may need to be updated
             - Consider the impact on integrations or automations that rely on this attribute
         """
-        return await self._client._request("DELETE", self.root_path + "/" + name, headers=self.headers)
+        return self._client._request("DELETE", self.root_path + "/" + name, headers=self.headers)
 
-    async def get(self, name: str):
+    def get(self, name: str):
         """
         Retrieve information about a specific attribute in the Naxai People API.
         
@@ -80,12 +80,12 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Get information about a specific attribute
                 attribute_name = "loyalty_tier"
                 
                 try:
-                    attribute = await client.people.attributes.get(name=attribute_name)
+                    attribute = client.people.attributes.get(name=attribute_name)
                     
                     print(f"Attribute: {attribute.name}")
                     
@@ -105,9 +105,9 @@ class AttributesResource:
             - The segment_ids field shows which segments use this attribute in their conditions
             - This information is useful for understanding attribute usage and dependencies
         """
-        return GetAttributeResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + name, headers=self.headers)))
+        return GetAttributeResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + name, headers=self.headers)))
 
-    async def list(self):
+    def list(self):
         """
         Retrieve all attributes defined in the Naxai People API.
         
@@ -126,10 +126,10 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Retrieve all attributes
-                    attributes = await client.people.attributes.list()
+                    attributes = client.people.attributes.list()
                     
                     # Display the total number of attributes
                     print(f"Found {len(attributes)} attributes:")
@@ -171,9 +171,9 @@ class AttributesResource:
             - The response is list-like and supports operations like len(), indexing, and iteration
             - There is no pagination for attributes as the total number is typically manageable
         """
-        return ListAttributesResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        return ListAttributesResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
 
-    async def create(self, name: str):
+    def create(self, name: str):
         """
         Create a new custom attribute in the Naxai People API.
         
@@ -199,18 +199,18 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Create a new custom attribute
                     attribute_name = "loyalty_tier"
                     
-                    response = await client.people.attributes.create(name=attribute_name)
+                    response = client.people.attributes.create(name=attribute_name)
                     
                     print(f"Attribute '{response.name}' created successfully")
                     
                     # Now that the attribute is created, you can use it when updating contacts
                     contact_id = "cnt_123abc"
-                    await client.people.contacts.update(
+                    client.people.contacts.update(
                         identifier=contact_id,
                         data={attribute_name: "Gold"}  # Set the new attribute value
                     )
@@ -229,4 +229,4 @@ class AttributesResource:
             - Creating an attribute does not automatically populate it with values for existing contacts
             - New attributes can be used immediately for updating contacts and creating segments
         """
-        return CreateAttributeResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json={"name": name}, headers=self.headers)))
+        return CreateAttributeResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json={"name": name}, headers=self.headers)))

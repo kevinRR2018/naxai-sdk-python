@@ -11,7 +11,7 @@ class IdentifierResource:
         self.headers = {"Content-Type": "application/json"}
 
     #TODO: check this method ... and get information
-    async def get(self):
+    def get(self):
         """
         Retrieve the current primary identifier type for contacts in the Naxai People API.
         
@@ -30,9 +30,9 @@ class IdentifierResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Get the current primary identifier type
-                response = await client.people.contacts.identifier.get()
+                response = client.people.contacts.identifier.get()
                 
                 # Display the current identifier type
                 print(f"Current primary identifier type: {response.identifier}")
@@ -52,10 +52,10 @@ class IdentifierResource:
             - Understanding the current identifier type is important when creating or updating contacts
         """
 
-        return GetContactIdentifierResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        return GetContactIdentifierResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
 
     #TODO: check this method ... and get information
-    async def update(self):
+    def update(self):
         """
         Update the primary identifier type for contacts in the Naxai People API.
         
@@ -74,15 +74,15 @@ class IdentifierResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Update the primary identifier type
-                response = await client.people.contacts.identifier.update()
+                response = client.people.contacts.identifier.update()
                 
                 # Confirm the change
                 print(f"Primary identifier type updated to: {response.identifier}")
                 
                 # Verify the change by getting the current setting
-                current = await client.people.contacts.identifier.get()
+                current = client.people.contacts.identifier.get()
                 assert current.identifier == response.identifier, "Update failed"
                 print("Update confirmed")
             ```
@@ -95,4 +95,4 @@ class IdentifierResource:
             - Consider the impact on any integrations or automations that rely on the current identifier type
         """
 
-        return UpdateContactIdentifierResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path, headers=self.headers)))
+        return UpdateContactIdentifierResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path, headers=self.headers)))

@@ -15,6 +15,7 @@ from naxai.resources.voice import VoiceResource
 from naxai.resources.calendars import CalendarsResource
 from naxai.resources.email import EmailResource
 from naxai.resources.sms import SMSResource
+from naxai.resources.people import PeopleResource
 from .config import API_BASE_URL
 
 
@@ -44,6 +45,7 @@ class NaxaiClient(BaseClient):
         self.calendars = CalendarsResource(self)
         self.email = EmailResource(self)
         self.sms = SMSResource(self)
+        self.people = PeopleResource(self)
 
     def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")

@@ -43,7 +43,7 @@ class NaxaiAsyncClient(BaseClient):
         self.voice = VoiceResource(self)
         self.calendars = CalendarsResource(self)
         self.email = EmailResource(self)
-        #self.people = PeopleResource(self)
+        self.people = PeopleResource(self)
         self.sms = SMSResource(self)
 
     async def _authenticate(self):

@@ -242,7 +242,7 @@ response = await client.sms.send(to=["123456789"],
                                  body="Hello from Naxai SDK!")
 ```
 
-### Email API ( Coming soon )
+### Email API
 
 The Email API allows you to send emails:
 
@@ -458,7 +458,7 @@ async def make_voice_call():
 asyncio.run(make_voice_call())
 ```
 
-### Calendar Event Example ( Coming soon )
+### Calendar Event Example
 
 ```python
 from naxai import NaxaiClient
@@ -506,12 +506,12 @@ finally:
 
 - ✅ Add Voice resource
 - ✅ Add Calendars resource
-- 🚧 Add Email resource (partially implemented)
+- ✅ Add Email resource (partially implemented. Some methods are not working)
 - ✅ Add SMS resource
-- 🚧 Add People resource
+- ✅ Add People resource
 - ✅ Provide a client for synchronous code
 - ✅ Publish SDK on PyPI
-- 🚧 Improve type hints for auto-completion and IDE support
+- ✅ Improve type hints for auto-completion and IDE support
 - 🚧 Add comprehensive test suite
 - 🚧 Add more examples and use cases
 
