@@ -11,13 +11,13 @@ class EventsResource:
         self.headers = {"Content-Type": "application/json"}
 
     @validate_call
-    async def send(self,
-                identifier: str,
-                name: Optional[str] = None,
-                type_: Optional[Literal["event"]] = Field(default=None, alias="type"),
-                timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
-                idempotency_key: Optional[str] = Field(default=None, max_length=200),
-                data: Optional[dict[str,str]] = None):
+    def send(self,
+            identifier: str,
+            name: Optional[str] = None,
+            type_: Optional[Literal["event"]] = Field(default=None, alias="type"),
+            timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
+            idempotency_key: Optional[str] = Field(default=None, max_length=200),
+            data: Optional[dict[str,str]] = None):
          
         """
         Send an event for a specific contact in the Naxai People API.
@@ -53,8 +53,8 @@ class EventsResource:
         Example:
             ```python
             # Send a purchase event with product details
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
-                response = await client.people.contacts.events.send(
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+                response = client.people.contacts.events.send(
                     identifier="john.doe@example.com",  # Using email as identifier
                     name="purchase_completed",
                     timestamp=int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000),
@@ -84,4 +84,4 @@ class EventsResource:
             "data": data
         }
 
-        return await self._client._request("POST", self.root_path + "/" + identifier + "/events", json=data, headers=self.headers)
+        return self._client._request("POST", self.root_path + "/" + identifier + "/events", json=data, headers=self.headers)

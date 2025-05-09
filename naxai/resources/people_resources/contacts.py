@@ -22,11 +22,11 @@ class ContactsResource:
         self.segments: SegmentsResource = SegmentsResource(client, self.root_path)
 
     @validate_call
-    async def search(self,
-                     page: Optional[int] = Field(default=1, gt=1),
-                     page_size: Optional[int] = Field(default=50, gt=1),
-                     sort: Optional[str] = Field(default="createdAt:desc"),
-                     condition: Optional[Union[dict, SearchCondition]] = Field(default=None)):
+    def search(self,
+                page: Optional[int] = Field(default=1, gt=1),
+                page_size: Optional[int] = Field(default=50, gt=1),
+                sort: Optional[str] = Field(default="createdAt:desc"),
+                condition: Optional[Union[dict, SearchCondition]] = Field(default=None)):
         """
         Search for contacts in the Naxai People API based on specified criteria.
         
@@ -61,10 +61,10 @@ class ContactsResource:
             ```python
             from naxai.models.people.search_condition import SearchCondition
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Simple search with default parameters (first page, sorted by creation date)
-                    basic_results = await client.people.contacts.search()
+                    basic_results = client.people.contacts.search()
                     print(f"Found {basic_results.pagination.total_items} total contacts")
                     
                     # Advanced search with conditions
@@ -76,7 +76,7 @@ class ContactsResource:
                     )
                     
                     # Search with pagination, sorting, and conditions
-                    results = await client.people.contacts.search(
+                    results = client.people.contacts.search(
                         page=1,
                         page_size=25,
                         sort="email:asc",  # Sort alphabetically by email
@@ -98,7 +98,7 @@ class ContactsResource:
                     
                     # If there are more pages, fetch the next one
                     if results.pagination.has_more_pages:
-                        next_page = await client.people.contacts.search(
+                        next_page = client.people.contacts.search(
                             page=results.pagination.next_page,
                             page_size=25,
                             sort="email:asc",
@@ -123,13 +123,13 @@ class ContactsResource:
         body_params = condition.model_dump(by_alias=True, exclude_none=True) if isinstance(condition, SearchCondition) else condition
         if body_params:
             json_body = {"condition": condition}
-            results = await self._client._request("POST", self.root_path, params=params, json=json_body, headers=self.headers)
+            results = self._client._request("POST", self.root_path, params=params, json=json_body, headers=self.headers)
         else:
-            results = await self._client._request("POST", self.root_path, params=params, headers=self.headers)
+            results = self._client._request("POST", self.root_path, params=params, headers=self.headers)
         return SearchContactsResponse.model_validate_json(json.dumps(results))
 
 
-    async def count(self):
+    def count(self):
         """
         Count the total number of contacts in your Naxai People API account.
         
@@ -147,10 +147,10 @@ class ContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Get the total number of contacts
-                    response = await client.people.contacts.count()
+                    response = client.people.contacts.count()
                     
                     total_contacts = response.count
                     print(f"Total contacts in account: {total_contacts}")
@@ -174,18 +174,18 @@ class ContactsResource:
             and check the pagination.total_items value
             - The count represents the current state and may change as contacts are added or removed
         """
-        return CountContactsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/count", headers=self.headers)))
+        return CountContactsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/count", headers=self.headers)))
 
     #TODO: email validation, phone validation
     @validate_call
-    async def create_or_update(self,
-                               identifier: str,
-                               email: Optional[str] = None,
-                               external_id: Optional[str] = None,
-                               unsubscribe: Optional[bool] = None,
-                               language: Optional[str] = None,
-                               created_at: Optional[int] = Field(ge=2208988800, le=4102444800, default=None),
-                               **kwargs):
+    def create_or_update(self,
+                        identifier: str,
+                        email: Optional[str] = None,
+                        external_id: Optional[str] = None,
+                        unsubscribe: Optional[bool] = None,
+                        language: Optional[str] = None,
+                        created_at: Optional[int] = Field(ge=2208988800, le=4102444800, default=None),
+                        **kwargs):
         """
         Create a new contact or update an existing one in the Naxai People API.
         
@@ -223,10 +223,10 @@ class ContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Create or update a contact using email as the identifier
-                    response = await client.people.contacts.create_or_update(
+                    response = client.people.contacts.create_or_update(
                         identifier="john.doe@example.com",
                         email="john.doe@example.com",  # Same as identifier in this case
                         external_id="cust_12345",
@@ -278,9 +278,9 @@ class ContactsResource:
             "createdAt": created_at,
             **kwargs
         }
-        return CreateOrUpdateContactResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + identifier, json=data, headers=self.headers)))
+        return CreateOrUpdateContactResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + identifier, json=data, headers=self.headers)))
 
-    async def get(self, identifier: str):
+    def get(self, identifier: str):
         """
         Retrieve a specific contact from the Naxai People API.
         
@@ -304,11 +304,11 @@ class ContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Retrieve a contact by email
                     contact_id = "john.doe@example.com"
-                    contact = await client.people.contacts.get(identifier=contact_id)
+                    contact = client.people.contacts.get(identifier=contact_id)
                     
                     # Display standard contact information
                     print(f"Contact: {contact.email or 'No email'} (ID: {contact.nx_id})")
@@ -350,9 +350,9 @@ class ContactsResource:
             - The primary identifier used in your account determines which field can be used as the identifier
             - For retrieving multiple contacts, use the search method with appropriate conditions
         """
-        return GetContactResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + identifier, headers=self.headers)))
+        return GetContactResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + identifier, headers=self.headers)))
 
-    async def delete(self, identifier: str):
+    def delete(self, identifier: str):
         """
         Delete a contact from the Naxai People API.
         
@@ -376,21 +376,21 @@ class ContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Delete a contact by email
                     contact_id = "john.doe@example.com"
                     
                     # Optionally, verify the contact exists before deleting
                     try:
-                        contact = await client.people.contacts.get(identifier=contact_id)
+                        contact = client.people.contacts.get(identifier=contact_id)
                         print(f"Found contact: {contact.email} (ID: {contact.nx_id})")
                         
                         # Confirm deletion (in a real application, you might prompt the user)
                         print("Proceeding with deletion...")
                         
                         # Delete the contact
-                        response = await client.people.contacts.delete(identifier=contact_id)
+                        response = client.people.contacts.delete(identifier=contact_id)
                         print(f"Contact deleted successfully: {response}")
                         
                     except Exception as e:
@@ -413,4 +413,4 @@ class ContactsResource:
             - For compliance with privacy regulations like GDPR, you may need to delete
             contacts upon request
         """
-        return await self._client._request("DELETE", self.root_path + "/" + identifier, headers=self.headers)
+        return self._client._request("DELETE", self.root_path + "/" + identifier, headers=self.headers)

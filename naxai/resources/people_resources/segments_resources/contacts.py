@@ -15,7 +15,7 @@ class SegmentsContactsResource:
         self.headers = {"Content-Type": "application/json"}
 
     @validate_call
-    async def add(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
+    def add(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
         """
         Add contacts to a manual segment in the Naxai People API.
         
@@ -41,13 +41,13 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Add multiple contacts to a manual segment
                 segment_id = "seg_123abc"
                 contacts_to_add = ["cnt_456def", "cnt_789ghi", "cnt_012jkl"]
                 
                 try:
-                    response = await client.people.segments.contacts.add(
+                    response = client.people.segments.contacts.add(
                         segment_id=segment_id,
                         contact_ids=contacts_to_add
                     )
@@ -63,10 +63,10 @@ class SegmentsContactsResource:
             - This operation is idempotent - calling it multiple times with the same parameters
             will not result in duplicate contacts in the segment
         """
-        return await self._client._request("POST", self.root_path + "/" + segment_id + "/addContacts", json={"ids": contact_ids}, headers=self.headers)
+        return self._client._request("POST", self.root_path + "/" + segment_id + "/addContacts", json={"ids": contact_ids}, headers=self.headers)
 
     @validate_call
-    async def delete(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
+    def delete(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
         """
         Remove contacts from a manual segment in the Naxai People API.
         
@@ -92,13 +92,13 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Remove contacts from a manual segment
                 segment_id = "seg_123abc"
                 contacts_to_remove = ["cnt_456def", "cnt_789ghi"]
                 
                 try:
-                    response = await client.people.segments.contacts.delete(
+                    response = client.people.segments.contacts.delete(
                         segment_id=segment_id,
                         contact_ids=contacts_to_remove
                     )
@@ -116,9 +116,9 @@ class SegmentsContactsResource:
             - The operation is idempotent - calling it multiple times with the same parameters
             will not result in an error
         """
-        return await self._client._request("POST", self.root_path + "/" + segment_id + "/deleteContacts", json={"ids": contact_ids}, headers=self.headers)
+        return self._client._request("POST", self.root_path + "/" + segment_id + "/deleteContacts", json={"ids": contact_ids}, headers=self.headers)
 
-    async def count(self, segment_id: str):
+    def count(self, segment_id: str):
         """
         Count the number of contacts in a segment in the Naxai People API.
         
@@ -142,12 +142,12 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # Count contacts in a segment
                 segment_id = "seg_123abc"
                 
                 try:
-                    response = await client.people.segments.contacts.count(segment_id=segment_id)
+                    response = client.people.segments.contacts.count(segment_id=segment_id)
                     
                     print(f"Segment {segment_id} contains {response.count} contacts")
                     
@@ -168,15 +168,15 @@ class SegmentsContactsResource:
             - The count represents the current state and may change as contacts are added/removed
             or as they meet/no longer meet the criteria for dynamic segments
         """
-        return CountContactsInSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/countContacts", headers=self.headers)))
+        return CountContactsInSegmentResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/countContacts", headers=self.headers)))
 
     @validate_call
-    async def list(self,
-                   segment_id: str,
-                   page: Optional[int] = Field(default=1),
-                   page_size: Optional[int] = Field(default=50),
-                   sort: Optional[str] = Field(default="createdAt:desc")
-                   ):
+    def list(self,
+            segment_id: str,
+            page: Optional[int] = Field(default=1),
+            page_size: Optional[int] = Field(default=50),
+            sort: Optional[str] = Field(default="createdAt:desc")
+            ):
         """
         Retrieve contacts that belong to a specific segment in the Naxai People API.
         
@@ -206,12 +206,12 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 # List contacts in a segment with pagination
                 segment_id = "seg_123abc"
                 
                 # Get the first page of contacts
-                first_page = await client.people.segments.contacts.list(
+                first_page = client.people.segments.contacts.list(
                     segment_id=segment_id,
                     page=1,
                     page_size=25,
@@ -227,7 +227,7 @@ class SegmentsContactsResource:
                 
                 # If there are more pages, fetch the next one
                 if first_page.pagination.has_more_pages:
-                    second_page = await client.people.segments.contacts.list(
+                    second_page = client.people.segments.contacts.list(
                         segment_id=segment_id,
                         page=2,
                         page_size=25,
@@ -245,5 +245,4 @@ class SegmentsContactsResource:
             the total number of contacts before retrieving them
         """
         params = {"page": page, "pageSize": page_size, "sort": sort}
-        self._client.logger.debug("params: %s", params)
-        return ListContactsOfSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/members", headers=self.headers, params=params)))
+        return ListContactsOfSegmentResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/members", headers=self.headers, params=params)))

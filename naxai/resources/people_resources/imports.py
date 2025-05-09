@@ -10,7 +10,7 @@ class ImportsResource:
         self.root_path = root_path + "/imports"
         self.headers = {"Content-Type": "application/json"}
 
-    async def list(self):
+    def list(self):
         """
         Retrieve a list of import jobs from the Naxai People API.
         
@@ -28,10 +28,10 @@ class ImportsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # List all import jobs
-                    imports = await client.people.imports.list()
+                    imports = client.people.imports.list()
                     
                     print(f"Found {len(imports)} import jobs")
                     
@@ -75,7 +75,7 @@ class ImportsResource:
                             
                             # For imports in progress, show how to check status
                             if import_job.state in ["preparing", "importing"]:
-                                print(f"   To check status: await client.people.imports.get('{import_job.id}')")
+                                print(f"   To check status: client.people.imports.get('{import_job.id}')")
                     
                 except Exception as e:
                     print(f"Error listing imports: {str(e)}")
@@ -89,9 +89,9 @@ class ImportsResource:
             - The rows_imported and rows_to_import fields can be used to calculate progress
             - Import jobs remain in the list even after completion for historical reference
         """
-        return ListImportsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        return ListImportsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
 
-    async def get(self, import_id: str):
+    def get(self, import_id: str):
         """
         Retrieve information about a specific import job in the Naxai People API.
         
@@ -113,11 +113,11 @@ class ImportsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Get information about a specific import job
                     import_id = "imp_123abc"
-                    import_job = await client.people.imports.get(import_id=import_id)
+                    import_job = client.people.imports.get(import_id=import_id)
                     
                     # Display basic import information
                     print(f"Import job: {import_job.name} (ID: {import_job.id})")
@@ -146,7 +146,7 @@ class ImportsResource:
                         # import asyncio
                         # print("Waiting 10 seconds to check progress again...")
                         # await asyncio.sleep(10)
-                        # updated_import = await client.people.imports.get(import_id=import_id)
+                        # updated_import = client.people.imports.get(import_id=import_id)
                         # updated_progress = (updated_import.rows_imported / updated_import.rows_to_import) * 100
                         # print(f"Updated progress: {updated_progress:.1f}%")
                         
@@ -192,4 +192,4 @@ class ImportsResource:
             - For failed imports, check the failed_reason field for more information
             - Import jobs remain accessible even after completion for historical reference
         """
-        return GetImportResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + import_id, headers=self.headers)))
+        return GetImportResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + import_id, headers=self.headers)))

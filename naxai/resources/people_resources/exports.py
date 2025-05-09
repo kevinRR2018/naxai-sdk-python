@@ -13,7 +13,7 @@ class ExportsResource:
         self.root_path = root_path + "/exports"
         self.headers = {"Content-Type": "application/json"}
 
-    async def list(self):
+    def list(self):
         """
         Retrieve a list of export jobs from the Naxai People API.
         
@@ -31,10 +31,10 @@ class ExportsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # List all export jobs
-                    exports = await client.people.exports.list()
+                    exports = client.people.exports.list()
                     
                     print(f"Found {len(exports)} export jobs")
                     
@@ -66,7 +66,7 @@ class ExportsResource:
                             
                             # For completed exports, show how to get the download URL
                             if export.state == "done":
-                                print(f"   To download: await client.people.exports.get_download_url('{export.id}')")
+                                print(f"   To download: client.people.exports.get_download_url('{export.id}')")
                     
                 except Exception as e:
                     print(f"Error listing exports: {str(e)}")
@@ -80,9 +80,9 @@ class ExportsResource:
             get_download_url method
             - Export files are typically available for a limited time after completion
         """
-        return ListExportsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        return ListExportsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
 
-    async def create(self, condition: SearchCondition):
+    def create(self, condition: SearchCondition):
         """
         Create a new export job in the Naxai People API.
         
@@ -110,7 +110,7 @@ class ExportsResource:
             ```python
             from naxai.models.people.helper_models.search_condition import SearchCondition
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Create a search condition for active US customers
                     condition = SearchCondition(
@@ -121,7 +121,7 @@ class ExportsResource:
                     )
                     
                     # Create an export job
-                    response = await client.people.exports.create(condition=condition)
+                    response = client.people.exports.create(condition=condition)
                     
                     # Display information about the export
                     print(f"Export job created for {response.pagination.total_items} contacts")
@@ -136,7 +136,7 @@ class ExportsResource:
                     
                     # Example of checking export status (assuming you have the export ID)
                     # export_id = "exp_123abc"  # This would come from the response headers
-                    # export_status = await client.people.exports.get(export_id=export_id)
+                    # export_status = client.people.exports.get(export_id=export_id)
                     # print(f"Export status: {export_status.state}")
                     
                 except Exception as e:
@@ -152,9 +152,9 @@ class ExportsResource:
             - Large exports may take significant time to process depending on the amount of data
             - The exported file format is typically CSV for contacts exports
         """
-        return CreateExportResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json=condition.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return CreateExportResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=condition.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
-    async def get(self, export_id: str):
+    def get(self, export_id: str):
         """
         Retrieve information about a specific export job in the Naxai People API.
         
@@ -176,11 +176,11 @@ class ExportsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # Get information about a specific export job
                     export_id = "exp_123abc"
-                    export = await client.people.exports.get(export_id=export_id)
+                    export = client.people.exports.get(export_id=export_id)
                     
                     # Display export information
                     print(f"Export job: {export.id}")
@@ -193,7 +193,7 @@ class ExportsResource:
                         print("Getting download URL...")
                         
                         # Get the download URL
-                        download_response = await client.people.exports.get_download_url(export_id=export_id)
+                        download_response = client.people.exports.get_download_url(export_id=export_id)
                         print(f"Download URL: {download_response.url}")
                         
                         # In a real application, you might download the file
@@ -210,7 +210,7 @@ class ExportsResource:
                         # import asyncio
                         # print("Waiting 10 seconds...")
                         # await asyncio.sleep(10)
-                        # export = await client.people.exports.get(export_id=export_id)
+                        # export = client.people.exports.get(export_id=export_id)
                         # print(f"Updated state: {export.state}")
                         
                     elif export.failed or export.state == "failed":
@@ -229,9 +229,9 @@ class ExportsResource:
             using the get_download_url method
             - Export files are typically available for a limited time after completion
         """
-        return GetExportResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + export_id, headers=self.headers)))
+        return GetExportResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + export_id, headers=self.headers)))
 
-    async def get_download_url(self, export_id: str):
+    def get_download_url(self, export_id: str):
         """
         Retrieve the download URL for a completed export job in the Naxai People API.
         
@@ -257,11 +257,11 @@ class ExportsResource:
             import aiohttp
             import aiofiles
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
                     # First, check if the export is complete
                     export_id = "exp_123abc"
-                    export = await client.people.exports.get(export_id=export_id)
+                    export = client.people.exports.get(export_id=export_id)
                     
                     if export.state != "done" or export.failed:
                         print(f"Export is not ready for download. Current state: {export.state}")
@@ -271,7 +271,7 @@ class ExportsResource:
                             print("Export is still being processed. Try again later.")
                     else:
                         # Get the download URL
-                        download_response = await client.people.exports.get_download_url(export_id=export_id)
+                        download_response = client.people.exports.get_download_url(export_id=export_id)
                         print(f"Download URL obtained: {download_response.url}")
                         
                         # Download the file asynchronously
@@ -302,4 +302,4 @@ class ExportsResource:
             - For very large files, consider implementing chunked downloading or streaming
             - In production applications, you might want to implement retry logic for downloads
         """
-        return GetExportDownloadUrlResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + export_id + "/download", headers=self.headers)))
+        return GetExportDownloadUrlResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + export_id + "/download", headers=self.headers)))
