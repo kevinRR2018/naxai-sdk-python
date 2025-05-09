@@ -20,7 +20,7 @@ class ActivityLogsResource:
             stop: Optional[int] = None,
             direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,
             status: Optional[Literal["delivered", "failed"]] = None,
-            from_: Annotated[Optional[str], Field(alias="from")] = None,
+            from_: Optional[str] = None,
             to: Optional[str] = None,
             client_id: Optional[str] = None,
             campaign_id: Optional[str] = None,
