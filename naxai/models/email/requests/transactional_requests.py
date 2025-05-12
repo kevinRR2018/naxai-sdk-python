@@ -251,5 +251,4 @@ class SendTransactionalEmailRequest(BaseModel):
     attachments: Optional[list[Attachment]] = Field(max_length=10, default=None)
     enable_tracking: Optional[bool] = Field(alias="enableTracking", default=None)
 
-    class Config:
-        populate_by_name = True
+    model_config = {"populate_by_name": True}

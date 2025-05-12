@@ -23,7 +23,5 @@ class CreateCallRequest(BaseModel):
     menu: Optional[Menu] = Field(alias="menu", default=None)
     end: Optional[End] = Field(alias="end", default=None)
 
-    class Config:
-        """Pydantic configuration for the CreateCallRequest model."""
-        validate_by_name = True
-        populate_by_name = True
+    model_config = {"populate_by_name": True,
+                    "validate_by_name": True}

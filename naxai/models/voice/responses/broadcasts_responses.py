@@ -745,8 +745,7 @@ class BroadcastRecipient(BaseModel):
     transferred: bool
     last_updated_at: int = Field(alias="lastUpdatedAt")
 
-    class Config:
-        populate_by_name = True
+    model_config = {"populate_by_name": True}
 
 class ListBroadcastRecipientsResponse(BaseModel):
     """Model representing a paginated list of broadcast recipients.

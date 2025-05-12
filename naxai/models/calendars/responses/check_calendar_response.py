@@ -48,6 +48,5 @@ class CheckCalendarResponse(BaseModel):
     match_: bool = Field(alias="match")
     next_: Optional[int] = Field(alias="next", default=None)
 
-    class Config:
-        populate_by_name = True
-        validate_by_name = True
+    model_config = {"populate_by_name": True,
+                    "validate_by_name": True}

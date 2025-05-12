@@ -65,7 +65,4 @@ class Pagination(BaseModel):
     last: Optional[str] = Field(default=None)
     previous: Optional[str] = Field(default=None)
 
-
-    class Config:
-        populate_by_name = True
-
+    model_config = {"populate_by_name": True}

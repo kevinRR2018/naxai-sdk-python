@@ -205,15 +205,5 @@ class CreateBroadcastRequest(BaseModel):
     voice_flow: VoiceFlow = Field(alias="voiceFlow")
     actions: Optional[Actions] = Field(alias="actions", default=None)
 
-    class Config:
-        """Pydantic config class to enable populating by field name.
-
-        This configuration enables both alias and field name based population
-        of model attributes.
-
-        Attributes:
-            validate_by_name (bool): Enable validation using field names
-            populate_by_name (bool): Enable population using field names
-        """
-        validate_by_name = True
-        populate_by_name = True
+    model_config = {"populate_by_name": True,
+                    "validate_by_name": True}

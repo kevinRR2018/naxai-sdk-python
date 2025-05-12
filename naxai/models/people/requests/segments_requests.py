@@ -361,6 +361,4 @@ class CreateSegmentRequest(BaseModel):
     condition: Optional[Condition] = None
     type_: Literal["manual", "dynamic"] = Field(default="manual", alias="type")
 
-    class Config:
-        populate_by_name = True
-
+    model_config = {"populate_by_name": True}
