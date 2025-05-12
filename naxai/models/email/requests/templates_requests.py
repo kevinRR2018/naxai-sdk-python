@@ -94,4 +94,4 @@ class CreateEmailTemplateRequest(BaseModel):
     body_design: Optional[dict] = Field(default=None, alias="bodyDesign")
     thumbnail: Optional[str] = Field(default=None)
 
-    
+    model_config = {"populate_by_name": True}

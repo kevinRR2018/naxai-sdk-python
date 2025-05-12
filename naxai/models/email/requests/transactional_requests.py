@@ -164,6 +164,8 @@ class Attachment(BaseModel):
     content_type: str = Field(alias="contentType")
     data: str
 
+    model_config = {"populate_by_name": True}
+
 class SendTransactionalEmailRequest(BaseModel):
     """
     Model representing a request to send a transactional email in the Naxai email system.
