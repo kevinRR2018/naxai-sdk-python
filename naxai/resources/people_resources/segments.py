@@ -22,7 +22,7 @@ class SegmentsResource:
 
     @validate_call
     def list(self,
-            type_: Optional[str] = Field(default=None, alias="type"),
+            type_: Optional[str] = Field(default=None),
             exclude_predefined: Optional[bool] = False,
             attribute: Optional[str] = None ):
         """
