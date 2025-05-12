@@ -125,7 +125,7 @@ class NewslettersResource:
             update: For modifying an existing newsletter
             delete: For removing a newsletter
         """
-        return CreateNewsletterResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, data=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return CreateNewsletterResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     @validate_call
     async def list(self, page: int = 1, page_size: int = Field(default=25, le=100, ge=1)):
@@ -207,7 +207,7 @@ class NewslettersResource:
         """
         params = {
             "page": page,
-            "pagesize": page_size
+            "pageSize": page_size
         }
         return ListNewsLettersResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
 
@@ -425,7 +425,7 @@ class NewslettersResource:
             get: For retrieving a specific newsletter by ID
             delete: For removing a newsletter
         """
-        return UpdateNewsletterResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + newsletter_id, data=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return UpdateNewsletterResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + newsletter_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     async def delete(self, newsletter_id: str):
         """

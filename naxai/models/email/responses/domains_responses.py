@@ -117,6 +117,8 @@ class ExtendedDomainResponse(BaseDomainResponse):
     modified_at: int = Field(alias="modifiedAt", default=None)
     modified_by: str = Field(alias="modifiedBy", default=None)
 
+    model_config = {"populate_by_name": True}
+
 class ListSharedDomainsResponse(BaseModel):
     """
     Model representing a shared domain in the Naxai email system.
@@ -501,6 +503,8 @@ class BaseRecord(BaseModel):
     current_value: str = Field(alias="currentValue", default=None)    
     verified: bool = Field(default=None)
 
+    model_config = {"populate_by_name": True}
+
 class VerifyDomainResponse(BaseModel):
     """
     Model representing the response from verifying a domain's DNS configuration in the Naxai email system.
@@ -576,4 +580,6 @@ class VerifyDomainResponse(BaseModel):
     tracking_record: BaseRecord = Field(alias="trackingRecord", default=None)
     mx_record: BaseRecord = Field(alias="mxRecord", default=None)
     verification_token: BaseRecord = Field(alias="verificationToken", default=None)
+
+    model_config = {"populate_by_name": True}
 
