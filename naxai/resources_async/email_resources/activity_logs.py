@@ -261,7 +261,7 @@ class ActivityLogsResource:
 
         params = {
             "page": page,
-            "pagesize": page_size,
+            "pageSize": page_size,
             "sort": sort
         }
 

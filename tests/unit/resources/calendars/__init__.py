@@ -1,0 +1,3 @@
+"""
+Calendars resource tests package.
+"""

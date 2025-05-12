@@ -163,9 +163,10 @@ class TemplatesResource:
         """
         params = {
             "page": page,
-            "pagesize": page_size,
-            "tags": tags
+            "pageSize": page_size,
         }
+        if tags:
+            params["tags"] = tags
 
         return ListSharedTemplatesRespone.model_validate_json(json.dumps(await self._client._request("GET", self.previous_root + "/shared-templates", params=params, headers=self.headers)))
 
@@ -302,7 +303,7 @@ class TemplatesResource:
             get: For retrieving a specific template by ID
             delete: For removing a template
         """
-        return UpdateTemplateResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + template_id, data=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return UpdateTemplateResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + template_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     async def get(self, template_id: str):
         """
@@ -453,7 +454,7 @@ class TemplatesResource:
         """
         params = {
             "page": page,
-            "pagesize": page_size
+            "pageSize": page_size
         }
 
         return ListTemplatesResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
@@ -560,4 +561,4 @@ class TemplatesResource:
             delete: For removing a template
             list_shared: For browsing shared templates that can be used as starting points
         """
-        return CreateTemplateResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, data=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return CreateTemplateResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))

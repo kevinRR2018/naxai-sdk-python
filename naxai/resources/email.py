@@ -2,7 +2,9 @@ from typing import List, Optional
 from pydantic import Field, validate_call
 from naxai.models.email.requests.transactional_requests import (SendTransactionalEmailRequest,
                                                                 DestinationObject,
-                                                                Attachment)
+                                                                Attachment,
+                                                                CCObject,
+                                                                BCCObject)
 from .email_resources.transactional import TransactionalResource
 from .email_resources.activity_logs import ActivityLogsResource
 from .email_resources.domains import DomainsResource
@@ -37,8 +39,8 @@ class EmailResource:
             sender_name: str,
             subject: str,
             to: List[DestinationObject] = Field(max_length=1000, min_length=1),
-            cc: Optional[List[DestinationObject]] = Field(default=None, max_length=50),
-            bcc: Optional[List[DestinationObject]] = Field(default=None, max_length=50),
+            cc: Optional[List[CCObject]] = Field(default=None, max_length=50),
+            bcc: Optional[List[BCCObject]] = Field(default=None, max_length=50),
             reply_to: Optional[str] = Field(default=None),
             text: Optional[str] = Field(default=None),
             html: Optional[str] = Field(default=None),

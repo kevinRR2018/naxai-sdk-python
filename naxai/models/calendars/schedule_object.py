@@ -13,7 +13,5 @@ class ScheduleObject(BaseModel):
     extension_start: Optional[str] = Field(alias="extensionStart", pattern=HOUR_PATTERN, default=None)
     extension_stop: Optional[str] = Field(alias="extensionStop", pattern=HOUR_PATTERN, default=None)
 
-    class Config:
-        """Pydantic config class to enable populating by field name"""
-        validate_by_name = True
-        populate_by_name = True
+    model_config = {"populate_by_name": True,
+                    "validate_by_name": True}

@@ -1,0 +1,3 @@
+"""
+Email resource tests package.
+"""

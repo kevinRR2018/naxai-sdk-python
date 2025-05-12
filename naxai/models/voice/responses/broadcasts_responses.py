@@ -356,6 +356,7 @@ class GetBroadcastResponse(BroadcastResponseBase):
         - All timestamp fields are in milliseconds since epoch
         - Inherits all validation rules from parent classes
     """
+    state: Literal["draft", "started", "paused", "canceled", "completed", "scheduled", "pausing", "resuming", "canceling"]
 
 class StartBroadcastResponse(BroadcastStatusResponse):
     """Model for broadcast start operation response.
@@ -492,7 +493,7 @@ class BroadcastResponseItem(BaseModel):
     broadcast_id: str = Field(alias="broadcastId")
     name: str
     source: str = Field(default="people")
-    state: Literal["draft", "started", "paused", "completed", "canceled", "scheduled"]
+    state: Literal["draft", "started", "paused", "completed", "canceled", "scheduled", "processing"]
     started_at: Optional[int] = Field(alias="startedAt", default=None)
     paused_at: Optional[int] = Field(alias="pausedAt", default=None)
     canceled_at: Optional[int] = Field(alias="canceledAt", default=None)
@@ -744,8 +745,7 @@ class BroadcastRecipient(BaseModel):
     transferred: bool
     last_updated_at: int = Field(alias="lastUpdatedAt")
 
-    class Config:
-        populate_by_name = True
+    model_config = {"populate_by_name": True}
 
 class ListBroadcastRecipientsResponse(BaseModel):
     """Model representing a paginated list of broadcast recipients.

@@ -5,5 +5,4 @@ class CreateEmailSuppressionListsUnsubscribe(BaseModel):
     email: str
     domain_name: str = Field(alias="domainName")
 
-    class Config:
-        populate_by_name = True
+    model_config = {"populate_by_name": True}
