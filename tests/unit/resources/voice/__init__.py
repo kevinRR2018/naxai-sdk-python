@@ -1,0 +1,3 @@
+"""
+Voice resource tests package.
+"""
