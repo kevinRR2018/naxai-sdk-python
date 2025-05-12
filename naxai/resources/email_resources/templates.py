@@ -454,7 +454,7 @@ class TemplatesResource:
         """
         params = {
             "page": page,
-            "pagesize": page_size
+            "pageSize": page_size
         }
 
         return ListTemplatesResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
