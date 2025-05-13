@@ -429,3 +429,14 @@ class TestNaxaiAsyncClient:
         await client.aclose()
         
         mock_httpx_client.aclose.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_async_context_manager(self, client_params, mock_httpx_client):
+        """Test using the client as an async context manager."""
+        async with NaxaiAsyncClient(**client_params) as client:
+            assert isinstance(client, NaxaiAsyncClient)
+            # The client should be usable within the context
+            assert client.api_client_id == "test_client_id"
+        
+        # After exiting the context, aclose should have been called
+        mock_httpx_client.aclose.assert_called_once()
