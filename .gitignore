@@ -1,0 +1,7 @@
+build/*
+dist
+*egg-info*
+.pypirc
+README.md.new
+README.me.generated
+__pycache__
