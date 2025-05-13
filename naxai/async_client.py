@@ -46,6 +46,12 @@ class NaxaiAsyncClient(BaseClient):
         self.people = PeopleResource(self)
         self.sms = SMSResource(self)
 
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        await self.aclose()
+
     async def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
         if self._is_token_valid():
