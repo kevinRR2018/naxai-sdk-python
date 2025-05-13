@@ -23,8 +23,8 @@ class ContactsResource:
 
     @validate_call
     def search(self,
-                page: Optional[int] = Field(default=1, gt=1),
-                page_size: Optional[int] = Field(default=50, gt=1),
+                page: Optional[int] = Field(default=1, ge=1),
+                page_size: Optional[int] = Field(default=50, ge=1),
                 sort: Optional[str] = Field(default="createdAt:desc"),
                 condition: Optional[Union[dict, SearchCondition]] = Field(default=None)):
         """

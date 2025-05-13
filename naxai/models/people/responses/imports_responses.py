@@ -201,7 +201,7 @@ class Import(BaseModel):
     mapping: Optional[list[MappingObject]] = Field(default=None)
     rows_to_import: Optional[int] = Field(default=None, alias="rowToImport")
     rows_imported: Optional[int] = Field(default=None, alias="rowsImported")
-    failed_reason: Optional[int] = Field(default=None, alias="failedReason")
+    failed_reason: Optional[str] = Field(default=None, alias="failedReason")
     created_at: Optional[int] = Field(default=None, alias="createdAt")
     modified_at: Optional[int] = Field(default=None, alias="modifiedAt")
 

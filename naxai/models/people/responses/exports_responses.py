@@ -80,7 +80,7 @@ class Export(BaseModel):
         email (Optional[str]): The email address where export notifications will be sent.
             Defaults to None.
         export (Optional[Literal["Contacts"]]): The type of data being exported.
-            Currently only "Contacts" is supported. Defaults to None.
+            Currently only "Contacts" or "contacts" is supported. Defaults to None.
         state (Optional[Literal["pending", "done", "failed"]]): The current state of the export job.
             - "pending": The export is being processed
             - "done": The export has completed successfully
@@ -117,7 +117,7 @@ class Export(BaseModel):
     id: str
     user_id: str = Field(alias="userId")
     email: Optional[str] = Field(default=None)
-    export: Optional[Literal["Contacts"]] = Field(default=None)
+    export: Optional[Literal["Contacts", "contacts"]] = Field(default=None)
     state: Optional[Literal["pending", "done", "failed"]] = Field(default=None)
     failed: Optional[bool] = Field(default=None)
     rows: Optional[int] = Field(default=None)
