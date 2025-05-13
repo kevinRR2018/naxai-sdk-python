@@ -47,6 +47,12 @@ class NaxaiClient(BaseClient):
         self.sms = SMSResource(self)
         self.people = PeopleResource(self)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def _authenticate(self):
         self.logger.debug(f"Authenticating using auth_url: {getattr(self, 'auth_url', 'MISSING')}")
         if self._is_token_valid():
