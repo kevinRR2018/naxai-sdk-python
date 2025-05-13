@@ -4,11 +4,11 @@ setup(
     name='naxai',
     packages=find_packages(),
     description='Python sdk for Naxai\'s API',
-    version='0.0.13',
+    version='0.0.14',
     url='https://github.com/kevinRR2018/naxai-sdk-python',
     author='kevin',
     author_email='k.bertin@ringring.be',
-    keywords=['voice','naxai','sdk', "sms", "rcs", "email", "communication"],
+    keywords=['voice','naxai','sdk', "sms", "email", "communication"],
     install_requires=['pydantic',
                       'httpx'],
     )

@@ -17,8 +17,8 @@ class ReportingResource:
 
     async def list_outgoing_metrics(self,
                                     group: Literal["hour", "day", "month"],
-                                    start_date: str = Field(default=None),
-                                    stop_date: str = Field(default=None)
+                                    start_date: str = None,
+                                    stop_date: str = None
                                     ):
         """
         Retrieves time-based metrics for outgoing SMS messages.
