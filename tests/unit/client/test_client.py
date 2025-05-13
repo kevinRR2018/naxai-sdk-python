@@ -409,3 +409,13 @@ class TestNaxaiClient:
         client.close()
         
         mock_httpx_client.close.assert_called_once()
+
+    def test_context_manager(self, client_params, mock_httpx_client):
+        """Test using the client as a context manager."""
+        with NaxaiClient(**client_params) as client:
+            assert isinstance(client, NaxaiClient)
+            # The client should be usable within the context
+            assert client.api_client_id == "test_client_id"
+        
+        # After exiting the context, close should have been called
+        mock_httpx_client.close.assert_called_once()
