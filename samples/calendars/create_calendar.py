@@ -4,6 +4,8 @@ from naxai.models.calendars.responses import CreateCalendarResponse
 from naxai.models.calendars.schedule_object import ScheduleObject
 from naxai.models.calendars.calendar import Calendar
 
+# Assuming NAXAI_CLIENT_ID and NAXAI_SECRET are set in environment.
+
 with NaxaiClient() as client:
 
     # Open every work day from 8AM to 4PM
@@ -12,7 +14,7 @@ with NaxaiClient() as client:
             day=1,
             open=True,
             start="08:00",
-            stop="16:00" 
+            stop="16:00"
         ),
         ScheduleObject(
             day=2,

@@ -2,6 +2,8 @@ import asyncio
 from naxai.async_client import NaxaiAsyncClient
 from naxai.models.voice.responses.call_responses import CreateCallResponse
 
+# Assuming NAXAI_CLIENT_ID and NAXAI_SECRET are set in environment.
+
 DESTINATION = "123456789"
 FROM_NUMBER = "123456789"
 
