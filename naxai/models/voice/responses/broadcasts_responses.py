@@ -907,12 +907,14 @@ class RecipientCall(BaseModel):
         GetBroadcastRecipientResponse: For list of call attempts
         BroadcastRecipient: For recipient information
     """
-    callId: str
+    call_id: str = Field(alias="callId")
     status: Literal["delivered", "failed", "scheduled", "canceled"]
     reason: Literal["success", "rejected", "busy", "canceled-by-contact", "no-answer", "canceled-by-user", "canceled-by-system", "scheduled", "inbound", "voicemail"]
     attempt_order: int = Field(alias="attemptOrder")
     duration: int
     call_at: int = Field(alias="callAt")
+
+    model_config = {"populate_by_name": True}
 
 class GetBroadcastRecipientCallsResponse(BaseModel):
     root: list[RecipientCall] = Field(default_factory=list)
