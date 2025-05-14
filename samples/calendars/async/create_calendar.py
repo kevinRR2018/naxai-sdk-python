@@ -5,6 +5,8 @@ from naxai.models.calendars.responses import CreateCalendarResponse
 from naxai.models.calendars.schedule_object import ScheduleObject
 from naxai.models.calendars.calendar import Calendar
 
+# Assuming NAXAI_CLIENT_ID and NAXAI_SECRET are set in environment.
+
 async def main():
 
     async with NaxaiAsyncClient() as client:

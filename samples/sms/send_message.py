@@ -1,8 +1,10 @@
 from naxai.client import NaxaiClient
 from naxai.models.sms.responses.send_responses import SendSMSResponse
 
-DESTINATION = "123456789"
-FROM_NUMBER = "8810"
+# Assuming NAXAI_CLIENT_ID and NAXAI_SECRET are set in environment.
+
+DESTINATION = "destination_of_the_sms"
+FROM_NUMBER = "originating_number_of_sms"
 
 with NaxaiClient() as client:
 
