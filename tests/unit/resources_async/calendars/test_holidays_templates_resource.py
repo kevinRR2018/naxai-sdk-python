@@ -1,11 +1,10 @@
 """
 Unit tests for the asynchronous HolidaysTemplatesResource class.
 """
-import json
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock
 from naxai.resources_async.calendars_resources.holidays_templates import HolidaysTemplatesResource
-from naxai.models.calendars.holiday_template import HolidayTemplate
+from naxai.models.calendars.responses.holidays_template_responses import ListHolidaysTemplatesResponse, GetHolidaysTemplateResponse, HolidaysTemplate
 
 
 class TestHolidaysTemplatesResource:
@@ -58,9 +57,9 @@ class TestHolidaysTemplatesResource:
         result = await holidays_templates_resource.list()
 
         # Verify the result
-        assert isinstance(result, list)
+        assert isinstance(result, ListHolidaysTemplatesResponse)
         assert len(result) == 2
-        assert all(isinstance(template, HolidayTemplate) for template in result)
+        assert all(isinstance(template, HolidaysTemplate) for template in result)
         assert result[0].id == "ht_123"
         assert result[0].name == "US Federal Holidays 2024"
         assert len(result[0].dates) == 3
@@ -103,7 +102,7 @@ class TestHolidaysTemplatesResource:
         result = await holidays_templates_resource.get(template_id)
 
         # Verify the result
-        assert isinstance(result, HolidayTemplate)
+        assert isinstance(result, GetHolidaysTemplateResponse)
         assert result.id == "ht_123"
         assert result.name == "US Federal Holidays 2024"
         assert len(result.dates) == 11
