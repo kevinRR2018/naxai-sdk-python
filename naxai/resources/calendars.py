@@ -1,15 +1,16 @@
 import datetime
 import json
 from typing import Optional
-from naxai.models.calendars.requests.create_calendars_request import CreateCalendarRequest
+from naxai.models.calendars.responses.calendars_responses import (CreateCalendarResponse,
+                                                                  AddExclusionsResponse,
+                                                                  DeleteExclusionsResponse,
+                                                                  CheckCalendarResponse,
+                                                                  UpdateCalendarResponse,
+                                                                  GetCalendarResponse,
+                                                                  ListCalendarsResponse)
+from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
 from naxai.base.exceptions import NaxaiValueError
-from naxai.models.calendars.responses.create_calendar_response import CreateCalendarResponse
-from naxai.models.calendars.responses.exclusion_response import ExclusionResponse
-from naxai.models.calendars.responses.check_calendar_response import CheckCalendarResponse
-from naxai.models.calendars.calendar import Calendar
 from .calendars_resources.holidays_templates import HolidaysTemplatesResource
-
-
 
 class CalendarsResource:
     """
@@ -124,7 +125,7 @@ class CalendarsResource:
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only delete up to 1000 exclusions at a time.")
 
-        return ExclusionResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/remove", json={"exclusions": exclusions}, headers=self.headers)))
+        return DeleteExclusionsResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/remove", json={"exclusions": exclusions}, headers=self.headers)))
 
     def add_exclusions(self, calendar_id: str, exclusions: list[str]):
         """Adds new exclusion dates to an existing calendar.
@@ -169,7 +170,7 @@ class CalendarsResource:
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only add up to 1000 exclusions at a time.")
         
-        return ExclusionResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/add", json={"exclusions": exclusions}, headers=self.headers)))
+        return AddExclusionsResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/add", json={"exclusions": exclusions}, headers=self.headers)))
 
     def delete(self, calendar_id):
         """
@@ -213,7 +214,7 @@ class CalendarsResource:
                 - exclusions (Optional[list[str]]): List of dates to exclude
 
         Returns:
-            Calendar: The updated calendar object containing all calendar properties
+            UpdateCalendarResponse: The updated calendar object containing all calendar properties
                 including the modifications made.
 
         Raises:
@@ -250,7 +251,7 @@ class CalendarsResource:
             ScheduleObject: The model class for daily schedule configuration
             CreateCalendarRequest: The model class for update request data
         """
-        return Calendar.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + calendar_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        return UpdateCalendarResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + calendar_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
 
     def get(self, calendar_id: str):
         """Retrieves a specific calendar by its ID.
@@ -262,7 +263,7 @@ class CalendarsResource:
             calendar_id (str): The unique identifier of the calendar to retrieve.
 
         Returns:
-            Calendar: An object containing the calendar's details including:
+            GetCalendarResponse: An object containing the calendar's details including:
                 - id (Optional[str]): The calendar's unique identifier
                 - name (str): The calendar's name
                 - timezone (Optional[str]): The calendar's timezone
@@ -302,7 +303,7 @@ class CalendarsResource:
             ScheduleObject: The model class for daily schedule configuration
         """
 
-        return Calendar.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id, headers=self.headers)))
+        return GetCalendarResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id, headers=self.headers)))
 
     def list(self):
         """Retrieve a list of all calendars.
@@ -332,13 +333,7 @@ class CalendarsResource:
         See Also:
             Calendar: The model class used for representing calendar data
         """
-        results_list = []
-        results = self._client._request("GET", self.root_path, headers=self.headers)
-
-        for result in results:
-            results_list.append(Calendar.model_validate_json(json.dumps(result)))
-
-        return results_list
+        return ListCalendarsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
 
     def create(self,
                data: CreateCalendarRequest):
@@ -359,9 +354,4 @@ class CalendarsResource:
             ...     )
             ... )
         """
-        response = self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
-
-        if response:
-            return CreateCalendarResponse.model_validate_json(json.dumps(response))
-        
-        return response
+        return CreateCalendarResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))

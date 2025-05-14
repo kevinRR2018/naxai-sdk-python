@@ -1,16 +1,18 @@
 """
 Unit tests for the asynchronous CalendarsResource class.
 """
-import json
-import datetime
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
+from unittest.mock import MagicMock, AsyncMock
 from naxai.resources_async.calendars import CalendarsResource
-from naxai.models.calendars.calendar import Calendar, ScheduleObject
-from naxai.models.calendars.requests.create_calendars_request import CreateCalendarRequest
-from naxai.models.calendars.responses.create_calendar_response import CreateCalendarResponse
-from naxai.models.calendars.responses.check_calendar_response import CheckCalendarResponse
-from naxai.models.calendars.responses.exclusion_response import ExclusionResponse
+from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
+from naxai.models.calendars.calendar import Calendar
+from naxai.models.calendars.responses.calendars_responses import (CreateCalendarResponse,
+                                                                  CheckCalendarResponse,
+                                                                  AddExclusionsResponse,
+                                                                  DeleteExclusionsResponse,
+                                                                  UpdateCalendarResponse,
+                                                                  GetCalendarResponse,
+                                                                  ListCalendarsResponse)
 from naxai.base.exceptions import NaxaiValueError
 
 
@@ -90,7 +92,7 @@ class TestCalendarsResource:
         result = await calendars_resource.list()
 
         # Verify the result
-        assert isinstance(result, list)
+        assert isinstance(result, ListCalendarsResponse)
         assert len(result) == 2
         assert all(isinstance(calendar, Calendar) for calendar in result)
         assert result[0].id == "cal_123"
@@ -131,7 +133,7 @@ class TestCalendarsResource:
         result = await calendars_resource.get(calendar_id)
 
         # Verify the result
-        assert isinstance(result, Calendar)
+        assert isinstance(result, GetCalendarResponse)
         assert result.id == "cal_123"
         assert result.name == "Business Hours"
         assert result.timezone == "Europe/Brussels"
@@ -228,7 +230,7 @@ class TestCalendarsResource:
         result = await calendars_resource.update(calendar_id, request_data)
 
         # Verify the result
-        assert isinstance(result, Calendar)
+        assert isinstance(result, UpdateCalendarResponse)
         assert result.id == "cal_123"
         assert result.name == "Updated Calendar"
         assert result.timezone == "Europe/London"
@@ -333,7 +335,7 @@ class TestCalendarsResource:
         result = await calendars_resource.add_exclusions(calendar_id, exclusions)
 
         # Verify the result
-        assert isinstance(result, ExclusionResponse)
+        assert isinstance(result, AddExclusionsResponse)
         assert result.exclusions == ["2023-12-25", "2024-01-01", "2024-12-25"]
 
         # Verify the client was called correctly
@@ -371,7 +373,7 @@ class TestCalendarsResource:
         result = await calendars_resource.delete_exclusions(calendar_id, exclusions)
 
         # Verify the result
-        assert isinstance(result, ExclusionResponse)
+        assert isinstance(result, DeleteExclusionsResponse)
         assert result.exclusions == ["2024-01-01"]
 
         # Verify the client was called correctly

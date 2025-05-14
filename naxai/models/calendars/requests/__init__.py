@@ -1,3 +1,3 @@
-from .create_calendars_request import CreateCalendarRequest
+from .calendar_requests import CreateCalendarRequest
 
 __all__ = ["CreateCalendarRequest"]

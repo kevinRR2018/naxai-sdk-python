@@ -1,5 +1,21 @@
-from .create_calendar_response import CreateCalendarResponse
-from .exclusion_response import ExclusionResponse
-from .check_calendar_response import CheckCalendarResponse
+from .calendars_responses import (CreateCalendarResponse,
+                                  ListCalendarsResponse,
+                                  GetCalendarResponse,
+                                  UpdateCalendarResponse,
+                                  AddExclusionsResponse,
+                                  DeleteExclusionsResponse,
+                                  CheckCalendarResponse)
+from .holidays_template_responses import (ListHolidaysTemplatesResponse,
+                                          GetHolidaysTemplateResponse,
+                                          HolidaysTemplate)
 
-__all__ = ["CreateCalendarResponse", "ExclusionResponse", "CheckCalendarResponse"]
+__all__ = ["CreateCalendarResponse",
+           "ListCalendarsResponse",
+           "GetCalendarResponse",
+           "UpdateCalendarResponse",
+           "AddExclusionsResponse",
+           "DeleteExclusionsResponse",
+           "CheckCalendarResponse",
+           "ListHolidaysTemplatesResponse",
+           "GetHolidaysTemplateResponse",
+           "HolidaysTemplate"]

@@ -1,5 +1,5 @@
 import json
-from naxai.models.calendars.holiday_template import HolidayTemplate
+from naxai.models.calendars.responses.holidays_template_responses import ListHolidaysTemplatesResponse, GetHolidaysTemplateResponse
 
 class HolidaysTemplatesResource:
     """ holidays_template resource for calendars resource"""
@@ -19,7 +19,7 @@ class HolidaysTemplatesResource:
             template_id (str): The unique identifier of the holiday template to retrieve.
 
         Returns:
-            HolidayTemplate: An object containing the template's details:
+            GetHolidaysTemplateResponse: An object containing the template's details:
                 - id (str): The template's unique identifier
                 - name (str): The template's name (max 60 characters)
                 - dates (list[str]): List of dates included in this template
@@ -49,7 +49,7 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             list: Method to retrieve all holiday templates
         """
-        return HolidayTemplate.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)))
+        return GetHolidaysTemplateResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)))
             
     def list(self):
         """Retrieves a list of all available holiday templates.
@@ -58,7 +58,7 @@ class HolidaysTemplatesResource:
         including their IDs, names, and associated dates.
 
         Returns:
-            list[HolidayTemplate]: A list of holiday template objects, each containing:
+            ListHolidaysTemplatesResponse: A list of holiday template objects, each containing:
                 - id (str): The template's unique identifier
                 - name (str): The template's name (max 60 characters)
                 - dates (list[str]): List of dates included in this template
@@ -88,8 +88,4 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             get: Method to retrieve a specific holiday template
         """
-        results_list = []
-        results = self._client._request("GET", self.root_path, headers=self.headers)
-        for result in results:
-            results_list.append(HolidayTemplate.model_validate(result))
-        return results_list
+        return ListHolidaysTemplatesResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
