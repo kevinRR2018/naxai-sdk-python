@@ -1,5 +1,15 @@
+"""
+Import response models for the Naxai SDK.
+
+This module defines the data structures for responses from import-related API operations,
+including status retrieval.
+"""
+
+import json
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
+
+STATES = Literal["preparing", "importing", "imported", "failed", "canceled"]
 
 class FileObject(BaseModel):
     """
@@ -96,7 +106,8 @@ class MappingObject(BaseModel):
         - Standard attributes include: email, phone, externalId, firstName, lastName, etc.
         - Custom attributes must exist in your account before they can be used in mappings
         - Setting skip=True will cause the column to be ignored during import
-        - If attribute is not specified, the system will try to match the header to a known attribute
+        - If attribute is not specified, the system will try to match the header to a known
+          attribute
     """
     header: Optional[str] = Field(default=None)
     skip: Optional[bool] = Field(default=None)
@@ -193,7 +204,7 @@ class Import(BaseModel):
     description: Optional[str] = Field(default=None)
     user_id: Optional[str] = Field(default=None)
     type_: Optional[Literal["manual", "ftp-template"]] = Field(alias="type", default=None)
-    state: Optional[Literal["preparing", "importing", "imported", "failed", "canceled"]] = Field(default=None)
+    state: Optional[STATES] = Field(default=None)
     file: Optional[FileObject] = Field(default=None)
     import_mode: Optional[Literal["contacts", "events"]] = Field(default=None)
     event_name: Optional[str] = Field(alias="eventName", default=None)
@@ -236,7 +247,12 @@ class ListImportsResponse(BaseModel):
         Import February Import is in state: importing
         >>> 
         >>> # Parsing from JSON
-        >>> json_data = '[{"id": "imp_123", "name": "January Import", "state": "imported"}, {"id": "imp_456", "name": "February Import", "state": "importing"}]'
+        >>> json_data = '[{"id": "imp_123",
+        >>>                "name": "January Import",
+        >>>                "state": "imported"},
+        >>>               {"id": "imp_456",
+        >>>                "name": "February Import",
+        >>>                "state": "importing"}]'
         >>> response = ListImportsResponse.model_validate_json(json_data)
         >>> len(response)  # Returns 2
         >>> 
@@ -283,13 +299,12 @@ class ListImportsResponse(BaseModel):
         Returns:
             ListAttributesResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
@@ -319,8 +334,10 @@ class GetImportResponse(Import):
         >>> if response.state == "imported":
         ...     print(f"Import complete! {response.rows_imported} contacts imported.")
         ... elif response.state == "importing":
-        ...     progress = (response.rows_imported / response.rows_to_import) * 100 if response.rows_to_import else 0
-        ...     print(f"Import in progress: {progress:.1f}% complete ({response.rows_imported}/{response.rows_to_import})")
+        ...     progress = (response.rows_imported / response.rows_to_import) * 100 \
+        ...                 if response.rows_to_import else 0
+        ...     print(f"Import in progress: {progress:.1f}% complete \
+        ...           ({response.rows_imported}/{response.rows_to_import})")
         ... elif response.state == "failed":
         ...     print(f"Import failed. Reason code: {response.failed_reason}")
         ... elif response.state == "preparing":

@@ -1,3 +1,10 @@
+"""
+Transactional email response models for the Naxai SDK.
+
+This module defines the data structures for responses from transactional email API operations,
+providing models for tracking email creation and delivery status.
+"""
+
 from pydantic import BaseModel
 
 class SendTransactionalEmailResponse(BaseModel):

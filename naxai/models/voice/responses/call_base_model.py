@@ -1,3 +1,11 @@
+"""
+Voice call base model for the Naxai SDK.
+
+This module defines the core data structure for representing voice calls,
+including call details, status information, and transfer-related attributes
+used throughout the voice API responses.
+"""
+
 from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
@@ -11,6 +19,8 @@ LITERAL_REASONS = Literal["success",
                           "scheduled",
                           "inbound",
                           "voicemail"]
+TRANSFER_REASONS = Literal["success", "busy", "no-answer", "rejected"]
+CALL_TYPES = Literal["default", "marketing", "transactional", "otp", "crisis"]
 
 class CallBaseModel(BaseModel):
     """
@@ -24,7 +34,8 @@ class CallBaseModel(BaseModel):
         call_id (str): Unique identifier for the call. Mapped from JSON key 'callId'.
         from_ (str): The originating phone number or identifier. Mapped from JSON key 'from'.
         to (str): The destination phone number or identifier.
-        from_app (Optional[str]): The application or service that initiated the call. Mapped from JSON key 'fromApp'.
+        from_app (Optional[str]): The application or service that initiated the call.
+            Mapped from JSON key 'fromApp'.
         direction (Literal["outbound", "transfer", "inbound"]): The direction of the call.
             - "outbound": Call initiated from the system to an external number
             - "transfer": Call transferred to another destination
@@ -102,7 +113,7 @@ class CallBaseModel(BaseModel):
     to: str
     from_app: Optional[str] = Field(alias="fromApp", default=None)
     direction: Literal["outbound", "transfer", "inbound"]
-    call_type: Literal["default", "marketing", "transactional", "otp", "crisis"] = Field(alias="callType")
+    call_type: CALL_TYPES = Field(alias="callType")
     call_date: int = Field(alias="callDate")
     status: Literal["delivered", "failed"]
     reason: LITERAL_REASONS
@@ -113,9 +124,11 @@ class CallBaseModel(BaseModel):
     network: Literal["landline", "mobile"]
     transferred: bool
     transfer_call_id: Optional[str] = Field(alias="transferCallId", default=None)
-    transfer_status: Optional[Literal["delivered", "failed"]] = Field(alias="transferStatus", default=None)
+    transfer_status: Optional[Literal["delivered", "failed"]] = Field(alias="transferStatus",
+                                                                      default=None)
     transfer_duration: Optional[int] = Field(alias="transferDuration", default=None)
-    transfer_reason: Optional[Literal["success", "busy", "no-answer", "rejected"]] = Field(alias="transferReason", default=None)
+    transfer_reason: Optional[TRANSFER_REASONS] = Field(alias="transferReason",
+                                                        default=None)
     transfer_details: Optional[str] = Field(alias="transferDetails", default=None)
     transfer_attempts: Optional[int] = Field(alias="transferAttempts", default=None)
     client_id: Optional[str] = Field(alias="clientId", default=None)

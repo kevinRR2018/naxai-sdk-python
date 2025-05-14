@@ -1,3 +1,11 @@
+"""
+SMS activity logs response models for the Naxai SDK.
+
+This module defines the data structures for responses from SMS activity log API operations,
+providing models for tracking message delivery status, content, and metadata for both
+outbound and inbound SMS messages.
+"""
+
 from typing import Literal, Optional
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination
@@ -23,7 +31,8 @@ class BaseMessage(BaseModel):
         body (str): The text content of the SMS message.
         parts (int): Number of message parts/segments used to deliver the SMS.
             May be None if not applicable or not determined.
-        encoding (Literal["unicode", "text", "binary"]): The character encoding used for the message:
+        encoding (Literal["unicode", "text", "binary"]): 
+            The character encoding used for the message:
             - "unicode": Unicode encoding (UTF-16) for messages with special characters
             - "text": Standard GSM 7-bit encoding for basic Latin characters
             - "binary": Binary encoding for data messages
@@ -103,7 +112,8 @@ class BaseMessage(BaseModel):
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
         - The message_id is the primary identifier for tracking and querying messages
-        - Timestamps (sent_at, submitted_at, delivered_at, received_at) are in milliseconds since epoch
+        - Timestamps (sent_at, submitted_at, delivered_at, received_at) are in milliseconds
+          since epoch
         - For outbound messages, the typical flow is: sent_at -> submitted_at -> delivered_at
         - For inbound messages, received_at is the primary timestamp
         - The encoding field affects how many characters can fit in a single message part:
@@ -192,7 +202,8 @@ class ListSMSActivityLogsResponse(BaseModel):
         ...     ]
         ... )
         >>> print(f"Showing page {response.pagination.page} of {response.pagination.total_pages}")
-        >>> print(f"Displaying {len(response.messages)} of {response.pagination.total_items} total messages")
+        >>> print(f"Displaying {len(response.messages)} of \
+        >>>         {response.pagination.total_items} total messages")
         >>> 
         >>> # Count messages by status
         >>> status_counts = {"delivered": 0, "failed": 0, "pending": 0}
@@ -234,7 +245,8 @@ class ListSMSActivityLogsResponse(BaseModel):
 
 class GetSMSActivityLogsResponse(BaseMessage):
     """
-    Model representing the response from retrieving a specific SMS message in the Naxai messaging system.
+    Model representing the response from retrieving a specific SMS message in the Naxai
+    messaging system.
     
     This class extends BaseMessage to represent the API response when fetching detailed
     information about an individual SMS message by its ID. It includes comprehensive
@@ -248,7 +260,8 @@ class GetSMSActivityLogsResponse(BaseMessage):
         - mnc (str): Mobile Network Code identifying the recipient's specific mobile network
         - body (str): The text content of the SMS message
         - parts (int): Number of message parts/segments used to deliver the SMS
-        - encoding (Literal["unicode", "text", "binary"]): The character encoding used for the message
+        - encoding (Literal["unicode", "text", "binary"]):
+            The character encoding used for the message
         - direction (Literal["outbound", "inbound"]): The direction of the message
         - sent_at (int): Timestamp when the message was sent
         - submitted_at (int): Timestamp when the message was submitted to the carrier
@@ -320,7 +333,8 @@ class GetSMSActivityLogsResponse(BaseMessage):
     
     Note:
         - This response provides the complete details of a single SMS message
-        - All timestamps (sent_at, submitted_at, delivered_at, received_at) are in milliseconds since epoch
+        - All timestamps (sent_at, submitted_at, delivered_at, received_at) are in milliseconds
+          since epoch
         - For outbound messages, the typical flow is: sent_at -> submitted_at -> delivered_at
         - For inbound messages, received_at is the primary timestamp
         - The status field indicates the final delivery outcome, while status_code, status_reason,
@@ -338,5 +352,4 @@ class GetSMSActivityLogsResponse(BaseMessage):
         BaseMessage: For the base structure of message information
         ListSMSActivityLogsResponse: For retrieving multiple messages with pagination
     """
-
     

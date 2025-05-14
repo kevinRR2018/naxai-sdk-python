@@ -1,3 +1,11 @@
+"""
+Sender identity response models for the Naxai SDK.
+
+This module defines the data structures for responses from sender-related API operations,
+including sender creation, verification, listing, and management for email sending.
+"""
+
+import json
 from pydantic import BaseModel, Field
 
 class BaseSenderResponse(BaseModel):
@@ -103,14 +111,25 @@ class ListSendersResponse(BaseModel):
         ... )
         >>> print(f"Found {len(senders_list)} senders")
         >>> for sender in senders_list:
-        ...     print(f"Sender: {sender.name} <{sender.email}> - {'Verified' if sender.verified else 'Not verified'}")
+        ...     print(f"Sender: {sender.name} <{sender.email}> - \
+        ...             {'Verified' if sender.verified else 'Not verified'}")
         >>> 
         >>> # Parsing from JSON with a direct array
-        >>> json_array = '[{"id": "snd_123", "domainId": "dom_456", "domainName": "example.com", "name": "Support", "email": "support@example.com", "verified": true}]'
+        >>> json_array = '[{"id": "snd_123",
+        >>>                 "domainId": "dom_456",
+        >>>                 "domainName": "example.com",
+        >>>                 "name": "Support",
+        >>>                 "email": "support@example.com",
+        >>>                 "verified": true}]'
         >>> parsed = ListSendersResponse.model_validate_json(json_array)
         >>> 
         >>> # Parsing from JSON with a root element
-        >>> json_data = '{"root": [{"id": "snd_123", "domainId": "dom_456", "domainName": "example.com", "name": "Support", "email": "support@example.com", "verified": true}]}'
+        >>> json_data = '{"root": [{"id": "snd_123",
+        >>>                         "domainId": "dom_456",
+        >>>                         "domainName": "example.com",
+        >>>                         "name": "Support",
+        >>>                         "email": "support@example.com",
+        >>>                         "verified": true}]}'
         >>> parsed = ListSendersResponse.model_validate_json(json_data)
         >>> 
         >>> # Finding verified senders
@@ -139,14 +158,14 @@ class ListSendersResponse(BaseModel):
     def __len__(self) -> int:
         """Return the number of senders in the list."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access senders by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
@@ -160,16 +179,15 @@ class ListSendersResponse(BaseModel):
         Returns:
             ListDomainsResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
-    
+
 class CreateSenderResponse(BaseSenderResponse):
     """
     Model representing the response from creating a new sender identity in the Naxai email system.
@@ -184,7 +202,8 @@ class CreateSenderResponse(BaseSenderResponse):
         - domain_name (str): The fully qualified domain name associated with this sender
         - name (str): The display name for the sender (e.g., "Company Support")
         - email (str): The email address for the sender (e.g., "support@example.com")
-        - verified (bool): Whether the sender identity has been verified (typically false for new senders)
+        - verified (bool): Whether the sender identity has been verified
+          (typically false for new senders)
         - modified_by (str): Identifier of the user who created the sender
         - modified_at (int): Timestamp when the sender was created, in milliseconds since epoch
     
@@ -226,7 +245,8 @@ class CreateSenderResponse(BaseSenderResponse):
 
 class GetSenderResponse(BaseSenderResponse):
     """
-    Model representing the response from retrieving a specific sender identity in the Naxai email system.
+    Model representing the response from retrieving a specific sender identity in the Naxai
+    email system.
     
     This class extends BaseSenderResponse to represent the API response when fetching
     detailed information about an existing sender identity. It includes comprehensive
@@ -240,7 +260,8 @@ class GetSenderResponse(BaseSenderResponse):
         - email (str): The email address for the sender (e.g., "support@example.com")
         - verified (bool): Whether the sender identity has been verified
         - modified_by (str): Identifier of the user who last modified the sender
-        - modified_at (int): Timestamp when the sender was last modified, in milliseconds since epoch
+        - modified_at (int): 
+            Timestamp when the sender was last modified, in milliseconds since epoch
     
     Example:
         >>> response = GetSenderResponse(
@@ -325,7 +346,8 @@ class UpdateSenderResponse(BaseSenderResponse):
         - If the email address was changed, the sender's verification status may be reset to False,
           requiring re-verification before the sender can be used
         - Updates to the display name (name) do not affect verification status
-        - The domain associated with the sender cannot be changed; a new sender must be created instead
+        - The domain associated with the sender cannot be changed; a new sender must be
+          created instead
     
     See Also:
         BaseSenderResponse: For the base structure of sender identity information

@@ -1,3 +1,11 @@
+"""
+Authentication token response model for the Naxai SDK.
+
+This module defines the data structure for OAuth2 authentication responses,
+providing a model for parsing and validating token information received
+from the authentication endpoint.
+"""
+
 from pydantic import BaseModel
 
 class TokenResponse(BaseModel):

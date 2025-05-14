@@ -1,3 +1,10 @@
+"""
+Email activity logs response models for the Naxai SDK.
+
+This module defines the data structures for responses from email activity log API operations,
+providing models for tracking email delivery status, engagement metrics, and event history.
+"""
+
 from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination
@@ -19,18 +26,22 @@ class BaseActivityLogs(BaseModel):
             Mapped from JSON key 'toEmail'.
         subject (Optional[str]): The subject line of the email.
             May be None if not available or not provided.
-        status (Optional[Literal["sent", "delivered", "failed"]]): Current delivery status of the email.
+        status (Optional[Literal["sent", "delivered", "failed"]]): 
+            Current delivery status of the email.
             - "sent": Email has been sent but delivery confirmation is pending
             - "delivered": Email has been successfully delivered to the recipient's inbox
             - "failed": Email delivery has failed
             May be None if the status is unknown or not provided.
-        created_at (Optional[int]): Timestamp when the email was created/sent, in milliseconds since epoch.
+        created_at (Optional[int]): 
+            Timestamp when the email was created/sent, in milliseconds since epoch.
             Mapped from JSON key 'createdAt'. May be None if not available.
-        updated_at (Optional[int]): Timestamp when the email status was last updated, in milliseconds since epoch.
+        updated_at (Optional[int]): 
+            Timestamp when the email status was last updated, in milliseconds since epoch.
             Mapped from JSON key 'updatedAt'. May be None if not available.
         opens (Optional[int]): Number of times the email has been opened by the recipient.
             May be None if not available or not tracked.
-        clicks (Optional[int]): Number of times links within the email have been clicked by the recipient.
+        clicks (Optional[int]): 
+            Number of times links within the email have been clicked by the recipient.
             May be None if not available or not tracked.
     
     Example:
@@ -98,9 +109,11 @@ class EmailEvents(BaseModel):
     specific events that occur during an email's journey from sending to recipient interaction.
     
     Attributes:
-        name (Optional[str]): The name or type of the event (e.g., "sent", "delivered", "opened", "clicked").
+        name (Optional[str]): 
+            The name or type of the event (e.g., "sent", "delivered", "opened", "clicked").
             May be None if not available.
-        processed (Optional[str]): Timestamp when the event was processed, typically in ISO 8601 format.
+        processed (Optional[str]):
+            Timestamp when the event was processed, typically in ISO 8601 format.
             May be None if not available.
         reason (Optional[str]): Additional information or reason associated with the event,
             particularly useful for failure events. May be None if not applicable or not provided.
@@ -196,7 +209,8 @@ class ListEmailActivityLogsResponse(BaseModel):
         ...     ]
         ... )
         >>> print(f"Showing page {response.pagination.page} of {response.pagination.total_pages}")
-        >>> print(f"Displaying {len(response.messages)} of {response.pagination.total_items} total emails")
+        >>> print(f"Displaying {len(response.messages)} of \
+        ... {response.pagination.total_items} total emails")
         >>> 
         >>> # Count emails by status
         >>> status_counts = {"sent": 0, "delivered": 0, "failed": 0, "unknown": 0}
@@ -228,7 +242,8 @@ class ListEmailActivityLogsResponse(BaseModel):
     Note:
         - Use pagination parameters when making API requests to navigate through large result sets
         - The messages list contains email activity logs as defined in BaseActivityLogs
-        - Each email in the list contains its unique message_id, which can be used for detailed queries
+        - Each email in the list contains its unique message_id, which can be used for detailed
+          queries
         - For large collections, request additional pages by incrementing the page parameter
         - This response provides a high-level overview of email activity
         - For detailed event history of a specific email, use the GetEmailActivityLogsResponse class
@@ -261,11 +276,14 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
             May be None if not available or if to_email is used instead.
         subject (Optional[str]): The subject line of the email.
             May be None if not available.
-        status (Optional[Literal["sent", "delivered", "failed"]]): Current delivery status of the email.
+        status (Optional[Literal["sent", "delivered", "failed"]]):
+            Current delivery status of the email.
             May be None if the status is unknown.
-        created_at (Optional[int]): Timestamp when the email was created/sent, in milliseconds since epoch.
+        created_at (Optional[int]):
+            Timestamp when the email was created/sent, in milliseconds since epoch.
             Mapped from JSON key 'createdAt'. May be None if not available.
-        updated_at (Optional[int]): Timestamp when the email status was last updated, in milliseconds since epoch.
+        updated_at (Optional[int]): 
+            Timestamp when the email status was last updated, in milliseconds since epoch.
             Mapped from JSON key 'updatedAt'. May be None if not available.
         client_id (Optional[str]): Identifier of the client associated with this email.
             Mapped from JSON key 'clientId'. May be None if not applicable.
@@ -277,7 +295,8 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
             Mapped from JSON key 'toEmail'.
         opens (Optional[int]): Number of times the email has been opened by the recipient.
             May be None if not available or not tracked.
-        clicks (Optional[int]): Number of times links within the email have been clicked by the recipient.
+        clicks (Optional[int]): 
+            Number of times links within the email have been clicked by the recipient.
             May be None if not available or not tracked.
     
     Example:
@@ -298,9 +317,13 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
         ...         EmailEvents(name="sent", processed="2023-12-20T14:20:00Z"),
         ...         EmailEvents(name="delivered", processed="2023-12-20T14:21:30Z"),
         ...         EmailEvents(name="opened", processed="2023-12-20T15:05:12Z"),
-        ...         EmailEvents(name="clicked", processed="2023-12-20T15:05:45Z", reason="https://example.com/link1"),
+        ...         EmailEvents(name="clicked",
+        ...                     processed="2023-12-20T15:05:45Z",
+        ...                     reason="https://example.com/link1"),
         ...         EmailEvents(name="opened", processed="2023-12-21T10:15:22Z"),
-        ...         EmailEvents(name="clicked", processed="2023-12-21T10:16:03Z", reason="https://example.com/link2")
+        ...         EmailEvents(name="clicked",
+        ...                     processed="2023-12-21T10:16:03Z",
+        ...                     reason="https://example.com/link2")
         ...     ]
         ... )
         >>> print(f"Email: {response.message_id}")
@@ -337,12 +360,14 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
     
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
-        - The events list provides a chronological history of the email's journey and recipient interactions
+        - The events list provides a chronological history of the email's journey and recipient
+          interactions
         - The message_id is the primary identifier for tracking and querying emails
         - Timestamps (created_at, updated_at) are in milliseconds since epoch
         - Event timestamps (in the events list) may use a different format, typically ISO 8601
         - The to_email and email fields may contain the same information (recipient's address)
-        - The client_id and campaign_id fields help associate the email with broader marketing efforts
+        - The client_id and campaign_id fields help associate the email
+          with broader marketing efforts
         - This response provides the most comprehensive view of an individual email's activity
     
     See Also:

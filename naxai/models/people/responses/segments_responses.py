@@ -1,3 +1,12 @@
+"""
+Segment response models for the Naxai SDK.
+
+This module defines the data structures for responses from segment-related API operations,
+including segment creation, retrieval, updates, and membership management for
+targeted audience segmentation.
+"""
+
+import json
 from typing import Optional, Literal, List
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination
@@ -170,7 +179,8 @@ class ListSegmentsResponse(BaseModel):
         High Value Customers
         >>> 
         >>> # Parsing from JSON
-        >>> json_data = '[{"id": "seg_123", "name": "US Customers"}, {"id": "seg_456", "name": "High Value Customers"}]'
+        >>> json_data = '[{"id": "seg_123","name": "US Customers"},
+        >>>               {"id": "seg_456", "name": "High Value Customers"}]'
         >>> response = ListSegmentsResponse.model_validate_json(json_data)
         >>> len(response)  # Returns 2
     
@@ -184,19 +194,19 @@ class ListSegmentsResponse(BaseModel):
           list when no data is provided
     """
     root: List[SegmentBaseModel] = Field(default_factory=list)
-    
+
     def __len__(self) -> int:
         """Return the number of segments in the list."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access segment by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through segments."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
@@ -210,13 +220,12 @@ class ListSegmentsResponse(BaseModel):
         Returns:
             ListAttributesResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
@@ -307,8 +316,16 @@ class GetSegmentsHistoryResponse(BaseModel):
     Example:
         >>> response = GetSegmentsHistoryResponse(
         ...     history=[
-        ...         SegmentHistoryDay(date=1703066400000, added=25, removed=10, change=15, current=1250),
-        ...         SegmentHistoryDay(date=1703152800000, added=18, removed=5, change=13, current=1263)
+        ...         SegmentHistoryDay(date=1703066400000,
+        ...                           added=25,
+        ...                           removed=10,
+        ...                           change=15,
+        ...                           current=1250),
+        ...         SegmentHistoryDay(date=1703152800000,
+        ...                           added=18,
+        ...                           removed=5,
+        ...                           change=13,
+        ...                           current=1263)
         ...     ]
         ... )
         >>> print(f"History entries: {len(response.history)}")
@@ -351,7 +368,8 @@ class GetSegmentUsageResponse(BaseModel):
         ...     campaignIds=["cmp_123", "cmp_456"],
         ...     broadcastIds=["brd_789"]
         ... )
-        >>> print(f"Used in {len(response.campaign_ids)} campaigns and {len(response.broadcast_ids)} broadcasts")
+        >>> print(f"Used in {len(response.campaign_ids)} campaigns and\
+        >>>        {len(response.broadcast_ids)} broadcasts")
         Used in 2 campaigns and 1 broadcasts
     
     Note:

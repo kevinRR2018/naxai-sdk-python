@@ -1,10 +1,43 @@
+"""
+Calendar response models for the Naxai SDK.
+
+This module defines the data structures for responses from calendar-related API operations,
+including calendar creation, retrieval, updates, and exclusion management.
+"""
+
+import json
 from typing import Optional
 from pydantic import BaseModel, Field
 from naxai.models.calendars.schedule_object import ScheduleObject
 from naxai.models.calendars.calendar import Calendar
 
 class CreateCalendarResponse(BaseModel):
-    """Model for the response of calendars.create"""
+    """
+    Model representing the response from creating a calendar in the Naxai API.
+    
+    This class defines the structure for the API response when a new calendar is created,
+    containing the calendar's unique identifier and all its configured properties.
+    
+    Attributes:
+        id (str): Unique identifier for the newly created calendar.
+        name (str): The name of the calendar as specified in the creation request.
+        timezone (Optional[str]): The timezone associated with the calendar.
+            Defaults to None if not specified.
+        schedule (list[ScheduleObject]): List of schedule objects defining when the calendar
+            is active, typically containing operating hours for each day of the week.
+        exclusions (Optional[list]): List of dates or periods when the calendar is inactive,
+            such as holidays. Defaults to None if not specified.
+    
+    Example:
+        >>> response = CreateCalendarResponse(
+        ...     id="cal_123abc",
+        ...     name="Business Hours",
+        ...     timezone="America/New_York",
+        ...     schedule=[...],  # List of ScheduleObject instances
+        ...     exclusions=["2023-12-25"]
+        ... )
+        >>> print(f"Created calendar with ID: {response.id}")
+    """
     id: str
     name: str
     timezone: Optional[str] = None
@@ -16,7 +49,8 @@ class ListCalendarsResponse(BaseModel):
     Model representing the response from listing calendars in the Naxai API.
     
     This class defines the structure for the API response when retrieving a list of calendars.
-    It provides list-like behavior for accessing the calendars, including length, indexing, and iteration.
+    It provides list-like behavior for accessing the calendars, including length,
+    indexing, and iteration.
     
     Attributes:
         root (list[CreateCalendarResponse]): List of calendar objects returned by the API.
@@ -50,28 +84,27 @@ class ListCalendarsResponse(BaseModel):
     def __len__(self) -> int:
         """Return the number of calendars."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access calendar by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through calendars."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
         
         This method handles both array-style JSON and object-style JSON with a root field.
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
@@ -86,7 +119,8 @@ class GetCalendarResponse(Calendar):
         id (str): Unique identifier for the calendar.
         name (str): The name of the calendar.
         timezone (Optional[str]): The timezone associated with the calendar.
-        schedule (list[ScheduleObject]): List of schedule objects defining when the calendar is active.
+        schedule (list[ScheduleObject]):
+                            List of schedule objects defining when the calendar is active.
         exclusions (Optional[list]): List of exclusion periods when the calendar is inactive.
     
     Example:
@@ -114,8 +148,10 @@ class UpdateCalendarResponse(Calendar):
         id (str): Unique identifier for the calendar.
         name (str): The updated name of the calendar.
         timezone (Optional[str]): The updated timezone associated with the calendar.
-        schedule (list[ScheduleObject]): Updated list of schedule objects defining when the calendar is active.
-        exclusions (Optional[list]): Updated list of exclusion periods when the calendar is inactive.
+        schedule (list[ScheduleObject]):
+                            Updated list of schedule objects defining when the calendar is active.
+        exclusions (Optional[list]):
+                            Updated list of exclusion periods when the calendar is inactive.
     
     Example:
         >>> response = UpdateCalendarResponse(
@@ -133,7 +169,8 @@ class ExclusionResponse(BaseModel):
     """Response model for calendar exclusion addition/deletion operations.
 
     This class represents the response received after adding/deleting exclusion dates to a calendar.
-    It contains the complete list of exclusions for the calendar after the addition/deletion operation.
+    It contains the complete list of exclusions for the calendar after the addition/deletion
+    operation.
 
     Attributes:
         exclusions (list[str]): A list of all exclusion dates for the calendar.
@@ -166,7 +203,8 @@ class AddExclusionsResponse(ExclusionResponse):
     to an existing calendar. It contains the complete list of exclusions after the addition.
     
     Attributes:
-        exclusions (list[str]): The complete list of exclusion periods for the calendar after the addition.
+        exclusions (list[str]):
+                    The complete list of exclusion periods for the calendar after the addition.
     
     Example:
         >>> response = AddExclusionsResponse(
@@ -184,7 +222,8 @@ class DeleteExclusionsResponse(ExclusionResponse):
     from an existing calendar. It contains the remaining list of exclusions after the deletion.
     
     Attributes:
-        exclusions (list[str]): The remaining list of exclusion periods for the calendar after the deletion.
+        exclusions (list[str]):
+                        The remaining list of exclusion periods for the calendar after the deletion.
     
     Example:
         >>> response = DeleteExclusionsResponse(
@@ -218,7 +257,8 @@ class CheckCalendarResponse(BaseModel):
     
     Note:
         This class uses Pydantic's alias feature to map the Python attributes 'match_' and 'next_'
-        to the JSON fields 'match' and 'next', respectively, since these are reserved keywords in Python.
+        to the JSON fields 'match' and 'next', respectively,
+        since these are reserved keywords in Python.
     """
     match_: bool = Field(alias="match")
     next_: Optional[int] = Field(alias="next", default=None)

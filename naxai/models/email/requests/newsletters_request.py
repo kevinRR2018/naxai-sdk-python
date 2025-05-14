@@ -1,3 +1,10 @@
+"""
+Newsletter request models for the Naxai SDK.
+
+This module defines the data structures used for creating and managing email newsletters,
+including content, scheduling, and recipient targeting options.
+"""
+
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
@@ -26,17 +33,20 @@ class CreateEmailNewsletterRequest(BaseModel):
             Defaults to None.
         segment_id (Optional[str]): Unique identifier of the recipient segment for this newsletter.
             Mapped from JSON key 'segmentId'. Defaults to None.
-        sender_id (Optional[str]): Unique identifier of the sender identity used for this newsletter.
+        sender_id (Optional[str]): 
+            Unique identifier of the sender identity used for this newsletter.
             Mapped from JSON key 'senderId'. Defaults to None.
         reply_to (Optional[str]): Email address where replies to this newsletter should be directed.
             Mapped from JSON key 'replyTo'. Defaults to None.
         subject (Optional[str]): The subject line of the newsletter email.
             Maximum 255 characters. Defaults to None.
-        pre_header (Optional[str]): Preview text that appears after the subject line in email clients.
+        pre_header (Optional[str]): 
+            Preview text that appears after the subject line in email clients.
             Maximum 255 characters. Mapped from JSON key 'preheader'. Defaults to None.
         body (Optional[str]): The HTML content of the newsletter.
             Required when source="html". Defaults to None.
-        body_design (Optional[dict]): The structured design data for newsletters created with the visual editor.
+        body_design (Optional[dict]):
+            The structured design data for newsletters created with the visual editor.
             Required when source="editor". Mapped from JSON key 'bodyDesign'. Defaults to None.
         thumbnail (Optional[str]): URL or base64 data of a thumbnail image for the newsletter.
             Defaults to None.
@@ -53,7 +63,8 @@ class CreateEmailNewsletterRequest(BaseModel):
         ...     reply_to="newsletter@example.com",
         ...     subject="Your January Newsletter Is Here!",
         ...     pre_header="Check out our latest updates and offers",
-        ...     body="<html><body><h1>January Newsletter</h1><p>Welcome to our monthly update...</p></body></html>",
+        ...     body="<html><body><h1>January Newsletter</h1> \\ 
+        ...     <p>Welcome to our monthly update...</p></body></html>",
         ...     thumbnail="https://example.com/thumbnails/jan-2023.png"
         ... )
         >>> print(f"Newsletter: {newsletter.name}")
@@ -92,8 +103,10 @@ class CreateEmailNewsletterRequest(BaseModel):
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
         - Required fields depend on the intended use:
-          * For draft newsletters: name, source, and either body (for HTML) or body_design (for editor)
-          * For scheduled newsletters: All of the above plus scheduled_at, segment_id, sender_id, and subject
+          * For draft newsletters: name, source, and either body (for HTML)
+            or body_design (for editor)
+          * For scheduled newsletters: All of the above plus scheduled_at, segment_id,
+            sender_id, and subject
         - The body and body_design fields are mutually exclusive based on the source field:
           * For source="html", the body field must contain the HTML content
           * For source="editor", the body_design field must contain the structured design data
@@ -102,11 +115,12 @@ class CreateEmailNewsletterRequest(BaseModel):
         - The pre_header is important for improving open rates as it appears in email previews
         - The scheduled_at timestamp is in milliseconds since epoch
         - If scheduled_at is provided, the newsletter will be automatically sent at that time
-        - If scheduled_at is not provided, the newsletter will be saved as a draft for later scheduling
+        - If scheduled_at is not provided, the newsletter will be saved as a draft
+          for later scheduling
     
     TODO:
         - Add URL validations for thumbnail and preview fields
-        - Verify required properties based on context (segment_id, source, sender_id, reply_to, etc.)
+        - Verify required properties based on context (segment_id, source, sender_id etc.)
         - Add email validation for reply_to field
     """
     name: str = Field(max_length=255)

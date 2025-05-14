@@ -1,3 +1,12 @@
+"""
+Export response models for the Naxai SDK.
+
+This module defines the data structures for responses from export-related API operations,
+including export job creation, status retrieval, and download URL generation for
+exporting contact data.
+"""
+
+import json
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination
@@ -154,7 +163,12 @@ class ListExportsResponse(BaseModel):
         Export exp_789 is in state: pending
         >>> 
         >>> # Parsing from JSON
-        >>> json_data = '[{"id": "exp_123", "userId": "usr_456", "state": "done"}, {"id": "exp_789", "userId": "usr_456", "state": "pending"}]'
+        >>> json_data = '[{"id": "exp_123",
+        >>>                "userId": "usr_456",
+        >>>                "state": "done"},
+        >>>               {"id": "exp_789",
+        >>>                "userId": "usr_456",
+        >>>                "state": "pending"}]'
         >>> response = ListExportsResponse.model_validate_json(json_data)
         >>> len(response)  # Returns 2
     
@@ -195,13 +209,12 @@ class ListExportsResponse(BaseModel):
         Returns:
             ListAttributesResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 

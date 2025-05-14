@@ -1,3 +1,11 @@
+"""
+SMS activity logs response models for the Naxai SDK.
+
+This module defines the data structures for responses from SMS activity log API operations,
+providing models for tracking message delivery status, content, and metadata for both
+outbound and inbound SMS messages.
+"""
+
 from typing import Literal, Optional
 from pydantic import BaseModel, Field
 
@@ -78,7 +86,8 @@ class BaseStats(BaseModel):
         Avg delivery time: 2500 ms
     
     Note:
-        - The sum of delivered, failed, expired, unknown, canceled, and rejected should equal the total sms count
+        - The sum of delivered, failed, expired, unknown, canceled, and rejected should
+          equal the total sms count
         - Timing metrics (avg_time_to_deliver, avg_time_to_submit) are in milliseconds
         - These statistics provide a high-level overview of messaging performance and reliability
     """
@@ -195,8 +204,10 @@ class OutgoingCountryStats(BaseStats):
     
     Note:
         - The country field typically contains ISO 3166-1 alpha-2 country codes (e.g., "US", "GB")
-        - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify a specific mobile network
-        - These statistics represent outgoing messages only, grouped by destination country and network
+        - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify a
+          specific mobile network
+        - These statistics represent outgoing messages only, grouped by destination
+          country and network
         - Performance metrics can vary significantly between countries and carriers
     """
     country: Optional[str] = Field(default=None)
@@ -266,7 +277,8 @@ class DeliveryErrorStats(BaseModel):
     
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
-        - The status_category field groups errors into broader categories (e.g., "carrier", "handset")
+        - The status_category field groups errors into broader categories
+          (e.g., "carrier", "handset")
         - The status_code field provides the specific error code for detailed troubleshooting
         - These statistics help identify common delivery issues and their impact
         - Error patterns can be used to improve message delivery strategies
@@ -422,7 +434,8 @@ class ListOutgoingSMSByCountryMetricsResponse(BaseResponse):
     Note:
         - The stats list contains one entry per country/network combination
         - Countries are typically identified by ISO 3166-1 alpha-2 codes (e.g., "US", "GB")
-        - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify a specific mobile network
+        - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify
+          a specific mobile network
         - These metrics provide insights into geographical performance differences
     """
     direction: Literal["outgoing"]

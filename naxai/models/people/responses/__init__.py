@@ -1,3 +1,10 @@
+"""
+People response models for the Naxai SDK.
+
+This module provides data structures for responses from people-related API operations,
+including contacts, segments, attributes, exports, and imports management.
+"""
+
 from .attributes_responses import (CreateAttributeResponse,
                                    ListAttributesResponse,
                                    GetAttributeResponse)

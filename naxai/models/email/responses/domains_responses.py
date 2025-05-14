@@ -1,3 +1,11 @@
+"""
+Email domain response models for the Naxai SDK.
+
+This module defines the data structures for responses from domain-related API operations,
+including domain creation, verification, listing, and configuration details for email sending.
+"""
+
+import json
 from typing import List, Optional
 from pydantic import BaseModel, Field
 
@@ -25,7 +33,8 @@ class BaseDomainResponse(BaseModel):
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
         - It serves as a base class for more specialized domain response models
-        - Domain names are typically fully qualified domain names without protocols (e.g., "example.com", not "https://example.com")
+        - Domain names are typically fully qualified domain names without protocols
+          (e.g., "example.com", not "https://example.com")
     """
     id: str
     domain_name: str = Field(alias="domainName")
@@ -146,19 +155,19 @@ class ListSharedDomainsResponse(BaseModel):
         BaseDomainResponse: For the base domain information structure
     """
     root: List[BaseDomainResponse] = Field(default_factory=list)
-    
+
     def __len__(self) -> int:
         """Return the number of domains in the list."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access domains by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through domains."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
@@ -172,13 +181,12 @@ class ListSharedDomainsResponse(BaseModel):
         Returns:
             ListDomainsResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
@@ -216,11 +224,15 @@ class ListDomainsResponse(BaseModel):
         ...     print(f"Domain: {domain.domain_name} (Verified: {domain.verified})")
         >>> 
         >>> # Parsing from JSON with a direct array
-        >>> json_array = '[{"id": "dom_123", "domainName": "example.com", "sharedWithSubaccounts": true}]'
+        >>> json_array = '[{"id": "dom_123",
+        >>>                 "domainName": "example.com",
+        >>>                 "sharedWithSubaccounts": true}]'
         >>> parsed = ListDomainsResponse.model_validate_json(json_array)
         >>> 
         >>> # Parsing from JSON with a root element
-        >>> json_data = '{"root": [{"id": "dom_123", "domainName": "example.com", "sharedWithSubaccounts": true}]}'
+        >>> json_data = '{"root": [{"id": "dom_123",
+        >>>                         "domainName": "example.com",
+        >>>                         "sharedWithSubaccounts": true}]}'
         >>> parsed = ListDomainsResponse.model_validate_json(json_data)
     
     Note:
@@ -229,19 +241,19 @@ class ListDomainsResponse(BaseModel):
         - All domains in the list are ExtendedDomainResponse objects with full configuration details
     """
     root: List[ExtendedDomainResponse] = Field(default_factory=list)
-    
+
     def __len__(self) -> int:
         """Return the number of domains in the list."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access domains by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through domains."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
@@ -255,13 +267,12 @@ class ListDomainsResponse(BaseModel):
         Returns:
             ListDomainsResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
@@ -434,14 +445,16 @@ class UpdateDomainResponse(ExtendedDomainResponse):
         >>> print(f"Tracking enabled: {response.tracking_enabled}")
         >>> print(f"Last modified: {response.modified_at} by {response.modified_by}")
         >>> if response.tracking_enabled and not response.tracking_validated:
-        ...     print(f"Add tracking CNAME record: {response.tracking_name} = {response.tracking_record}")
+        ...     print(f"Add tracking CNAME record: {response.tracking_name} = \
+        ...     {response.tracking_record}")
     
     Note:
         - The response reflects the domain's state after the update operation
         - The modified_at field will contain the timestamp of this update operation
         - The modified_by field will identify the user who performed this update
         - If tracking settings were changed (tracking_enabled=True), but tracking is not yet
-          validated (tracking_validated=False), the tracking_record should be added as a CNAME record
+          validated (tracking_validated=False), the tracking_record should be added as a
+          CNAME record
         - Changes to shared_with_subaccounts take effect immediately
         - The verification status (verified) is not affected by updates unless DNS records
           are changed, which may require re-verification
@@ -492,7 +505,8 @@ class BaseRecord(BaseModel):
     Note:
         - This class is typically used as a component in domain verification responses
         - A verified=True status indicates that the record exists and matches the expected value
-        - A verified=False status indicates that the record either doesn't exist or has an incorrect value
+        - A verified=False status indicates that the record either doesn't exist or has an
+          incorrect value
         - When current_value is None, it typically means the record couldn't be found in DNS
         - Different types of DNS records (SPF, DKIM, MX, etc.) use this same structure
           to report their verification status
@@ -500,14 +514,15 @@ class BaseRecord(BaseModel):
     See Also:
         VerifyDomainResponse: For the complete domain verification response structure
     """
-    current_value: str = Field(alias="currentValue", default=None)    
+    current_value: str = Field(alias="currentValue", default=None)
     verified: bool = Field(default=None)
 
     model_config = {"populate_by_name": True}
 
 class VerifyDomainResponse(BaseModel):
     """
-    Model representing the response from verifying a domain's DNS configuration in the Naxai email system.
+    Model representing the response from verifying a domain's DNS configuration in the Naxai 
+    email system.
     
     This class provides detailed information about the verification status of all required
     DNS records for a domain, including SPF, DKIM, tracking, MX, and verification token records.
@@ -567,7 +582,8 @@ class VerifyDomainResponse(BaseModel):
     Note:
         - Each record attribute contains both the current value and verification status
         - A domain is fully verified only when all required records are verified
-        - Records with verified=False need to be configured or corrected in the domain's DNS settings
+        - Records with verified=False need to be configured or corrected in the domain's
+          DNS settings
         - Some records may be optional depending on the domain's configuration
         - The verification process checks that the current values match the expected values
     
@@ -582,4 +598,3 @@ class VerifyDomainResponse(BaseModel):
     verification_token: BaseRecord = Field(alias="verificationToken", default=None)
 
     model_config = {"populate_by_name": True}
-
