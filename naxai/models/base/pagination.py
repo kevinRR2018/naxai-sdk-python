@@ -1,3 +1,10 @@
+"""
+Pagination models for the Naxai SDK.
+
+This module provides the data structures for handling paginated API responses,
+allowing for consistent navigation through multi-page results.
+"""
+
 from typing import Optional
 from pydantic import BaseModel, Field
 

@@ -1,3 +1,10 @@
+"""
+SMS sending response models for the Naxai SDK.
+
+This module defines the data structures for responses from SMS sending API operations,
+providing models for tracking message delivery, batch processing, and message identifiers.
+"""
+
 from pydantic import BaseModel, Field
 
 class BaseMessageModel(BaseModel):
@@ -29,7 +36,8 @@ class BaseMessageModel(BaseModel):
         >>> # Message without an ID (e.g., before sending)
         >>> draft_message = BaseMessageModel(to="+1234567890")
         >>> print(f"Draft message to: {draft_message.to}")
-        >>> print(f"Message ID not yet assigned" if draft_message.message_id is None else f"ID: {draft_message.message_id}")
+        >>> print(f"Message ID not yet assigned" if draft_message.message_id is None else\
+        >>>       f"ID: {draft_message.message_id}")
         Draft message to: +1234567890
         Message ID not yet assigned
     
@@ -92,7 +100,8 @@ class SendSMSResponse(BaseModel):
         - This ID can be used to track the status of the entire batch
         - The count field indicates how many messages were accepted for processing
         - Each message in the messages list has its own unique message_id for individual tracking
-        - Successful response means the messages were accepted for delivery, not that they were delivered
+        - Successful response means the messages were accepted for delivery, not that
+          they were delivered
         - Message delivery status must be checked separately using the message_id or batch_id
     
     See Also:

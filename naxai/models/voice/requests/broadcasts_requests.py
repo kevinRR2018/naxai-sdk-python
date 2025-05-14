@@ -1,3 +1,11 @@
+"""
+Voice broadcast request models for the Naxai SDK.
+
+This module defines the data structures used for creating voice broadcast campaigns,
+including call flow configuration, recipient targeting, scheduling options,
+and interactive response handling.
+"""
+
 from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field
 from naxai.models.voice.voice_flow import VoiceFlow
@@ -78,8 +86,10 @@ class Inputs(BaseModel):
     field_7: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="7", default=None)
     field_8: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="8", default=None)
     field_9: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="9", default=None)
-    field_star: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="star", default=None)
-    field_hash: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="hash", default=None)
+    field_star: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="star",
+                                                                          default=None)
+    field_hash: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="hash",
+                                                                          default=None)
 
 class Status(BaseModel):
     """Model representing status-based actions in a broadcast request.
@@ -198,7 +208,10 @@ class CreateBroadcastRequest(BaseModel):
     retries: Optional[int] = 0
     retry_on_no_input: Optional[bool] = Field(alias="retryOnNoInput", default=False)
     retry_on_failed: Optional[bool] = Field(alias="retryOnFailed", default=False)
-    retry_delays: Optional[list[int]] = Field(alias="retryDelays", default=None, min_length=0, max_length=3)
+    retry_delays: Optional[list[int]] = Field(alias="retryDelays",
+                                              default=None,
+                                              min_length=0,
+                                              max_length=3)
     calendar_id: Optional[str] = Field(alias="calendarId", default=None)
     distribution: Optional[Literal["none", "dynamic"]]= "none"
     dynamic_name: Optional[str] = Field(alias="dynamicName", default=None)

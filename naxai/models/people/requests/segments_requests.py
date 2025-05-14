@@ -1,3 +1,11 @@
+"""
+Segment request models for the Naxai SDK.
+
+This module defines the data structures used for segment-related API requests,
+including segment creation with conditions for filtering contacts based on
+attributes and behaviors.
+"""
+
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from naxai.models.people.helper_models.segments_condition import Condition
@@ -30,7 +38,9 @@ class CreateSegmentRequest(BaseModel):
         ...     type="dynamic",
         ...     condition=Condition(
         ...         all=[
-        ...             AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="US")),
+        ...             AttributeCondSimple(attribute=AttributeObject(operator="eq",
+        ...                                                           field="country",
+        ...                                                           value="US")),
         ...             EventCond(
         ...                 event=EventObject(
         ...                     name="login",

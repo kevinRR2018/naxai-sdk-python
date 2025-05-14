@@ -1,3 +1,10 @@
+"""
+Voice activity logs response models for the Naxai SDK.
+
+This module defines the data structures for responses from voice activity log API operations,
+providing models for tracking call history, status, and detailed call information.
+"""
+
 from pydantic import BaseModel
 from naxai.models.base.pagination import Pagination
 from naxai.models.voice.responses.call_base_model import CallBaseModel
@@ -55,7 +62,8 @@ class ListActivityLogsResponse(BaseModel):
         ...     ]
         ... )
         >>> print(f"Showing page {response.pagination.page} of {response.pagination.total_pages}")
-        >>> print(f"Displaying {len(response.calls)} of {response.pagination.total_items} total calls")
+        >>> print(f"Displaying {len(response.calls)} of \
+        >>>         {response.pagination.total_items} total calls")
         >>> for call in response.calls:
         ...     print(f"Call {call.call_id}: {call.status}, Duration: {call.call_duration}s")
     

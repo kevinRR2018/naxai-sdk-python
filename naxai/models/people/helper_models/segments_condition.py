@@ -1,44 +1,35 @@
-from typing import Union, Literal, Optional
+"""
+Segment condition models for the Naxai SDK.
+
+This module defines the data structures used for creating segment definitions,
+allowing for complex filtering of contacts based on attributes and events.
+These models support building sophisticated audience segments for targeting
+and analytics purposes.
+"""
+
+from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field
 
-CONDITIONS = Literal["eq",
-                     "not-eq",
-                     "gt",
-                     "lt",
-                     "exists",
-                     "not-exists",
-                     "contains",
-                     "not-contains",
-                     "is-true",
-                     "is-false",
-                     "is-timestamp",
-                     "is-timestamp-before",
-                     "is-timestamp-after",
-                     "is-mobile",
-                     "is-not-mobile"]
-
+CONDITIONS = Literal[
+    "eq", "not-eq", "gt", "lt", "exists", "not-exists", 
+    "contains", "not-contains", "is-true", "is-false",
+    "is-timestamp", "is-timestamp-before", "is-timestamp-after",
+    "is-mobile", "is-not-mobile"
+]
 
 class EventPropertiesCondObject(BaseModel):
     """
     Model representing a condition for event properties in segment definitions.
     
-    This class defines a single condition that can be applied to event properties
-    when creating segments based on event data.
+    This class defines a single condition to match event properties with specific 
+    operators when creating segments.
     
     Attributes:
         name (str): The name of the event property to evaluate.
-        operator (Literal): The comparison operator to use. Must be one of:
-            "eq", "not-eq", "gt", "lt", "is-true", "is-false".
+        operator (Literal): The comparison operator to use.
+            Supported values: "eq", "not-eq", "gt", "lt", "is-true", "is-false".
         value (Optional[Union[str, int, bool]]): The value to compare against.
-            Required for all operators except "is-true" and "is-false".
-    
-    Example:
-        >>> # Create a condition for event property "purchase_amount" greater than 100
-        >>> condition = EventPropertiesCondObject(
-        ...     name="purchase_amount",
-        ...     operator="gt",
-        ...     value=100
-        ... )
+            May be None for operators that don't require a value.
     """
     name: str
     operator: Literal["eq", "not-eq", "gt", "lt", "is-true", "is-false"]
@@ -46,54 +37,41 @@ class EventPropertiesCondObject(BaseModel):
 
 class EventProperties(BaseModel):
     """
-    Model representing property conditions for events in segment definitions.
+    Model representing logical groups of event property conditions.
     
-    This class defines a set of conditions that can be applied to event properties
-    when creating segments. It supports both "all" (AND) and "any" (OR) logical
-    combinations of conditions.
+    This class allows combining multiple event property conditions with AND/OR logic
+    when defining segments based on event properties.
     
     Attributes:
         all (Optional[list[EventPropertiesCondObject]]): List of conditions that must
-            all be satisfied (AND logic).
+            all be true (AND logic).
         any (Optional[list[EventPropertiesCondObject]]): List of conditions where at
-            least one must be satisfied (OR logic).
-    
-    Example:
-        >>> # Create event properties where purchase_amount > 100 AND currency = "USD"
-        >>> properties = EventProperties(
-        ...     all=[
-        ...         EventPropertiesCondObject(name="purchase_amount", operator="gt", value=100),
-        ...         EventPropertiesCondObject(name="currency", operator="eq", value="USD")
-        ...     ]
-        ... )
+            least one must be true (OR logic).
     """
     all: Optional[list[EventPropertiesCondObject]]
     any: Optional[list[EventPropertiesCondObject]]
 
 class EventObject(BaseModel):
     """
-    Model representing an event condition in segment definitions.
+    Model representing an event condition for segment definitions.
     
-    This class defines conditions related to events that contacts have triggered,
-    used when creating segments.
+    This class defines criteria for matching events with specific properties,
+    occurrence counts, and time boundaries when creating segments.
     
     Attributes:
-        name (str): The name of the event to evaluate.
-        count (int): The number of times the event should have occurred. Defaults to 1.
-        count_boundary (Literal): Whether the count should be at least or at most the specified value.
-            Must be either "at-least" or "at-most". Defaults to "at-least".
-            Mapped from JSON key 'countBoundary'.
-        time_boundary (Literal): The time frame to consider for the events.
-            Must be one of "all-time", "within-last", "before", "after". Defaults to "all-time".
-            Mapped from JSON key 'timeBoundary'.
+        name (str): The name of the event to match.
+        count (int): The number of occurrences to match. Defaults to 1.
+        count_boundary (Literal): Whether the count is a minimum or maximum.
+            Values: "at-least", "at-most". Defaults to "at-least".
+        time_boundary (Literal): The time frame to consider for events.
+            Values: "all-time", "within-last", "before", "after".
+            Defaults to "all-time".
         period_boundary (Literal): The unit of time for time_boundary.
-            Must be either "day" or "month". Defaults to "day".
-            Mapped from JSON key 'periodBoundary'.
-        interval_boundary (int): The number of time units for time_boundary.
-            Must be between 1 and 366. Defaults to 1.
-            Mapped from JSON key 'intervalBoundary'.
-        date (Optional[int]): A timestamp to use with "before" or "after" time boundaries.
-        properties (EventProperties): Additional conditions on the event properties.
+            Values: "day", "month". Defaults to "day".
+        interval_boundary (int): The number of period units for time_boundary.
+            Range: 1-366. Defaults to 1.
+        date (Optional[int]): Timestamp for before/after time boundaries.
+        properties (EventProperties): Property conditions on the event properties.
     
     Example:
         >>> # Create a condition for users who made at least 2 purchases in the last 30 days
@@ -105,16 +83,26 @@ class EventObject(BaseModel):
         ...     period_boundary="day",
         ...     interval_boundary=30,
         ...     properties=EventProperties(
-        ...         all=[EventPropertiesCondObject(name="status", operator="eq", value="completed")]
+        ...         all=[EventPropertiesCondObject(
+        ...             name="status", operator="eq", value="completed"
+        ...         )]
         ...     )
         ... )
     """
     name: str
     count: int = Field(default=1)
-    count_boundary: Literal["at-least", "at-most"] = Field(default="at-least", alias="countBoundary")
-    time_boundary: Literal["all-time", "within-last", "before", "after"] = Field(default="all-time", alias="timeBoundary")
-    period_boundary: Literal["day", "month"] = Field(default="day", alias="periodBoundary")
-    interval_boundary: int = Field(default=1, alias="intervalBoundary", ge=1, le=366)
+    count_boundary: Literal["at-least", "at-most"] = Field(
+        default="at-least", alias="countBoundary"
+    )
+    time_boundary: Literal["all-time", "within-last", "before", "after"] = Field(
+        default="all-time", alias="timeBoundary"
+    )
+    period_boundary: Literal["day", "month"] = Field(
+        default="day", alias="periodBoundary"
+    )
+    interval_boundary: int = Field(
+        default=1, alias="intervalBoundary", ge=1, le=366
+    )
     date: Optional[int] = None
     properties: EventProperties
 
@@ -186,7 +174,9 @@ class EventCond(BaseModel):
         >>> event_obj = EventObject(
         ...     name="purchase",
         ...     properties=EventProperties(
-        ...         all=[EventPropertiesCondObject(name="amount", operator="gt", value=50)]
+        ...         all=[EventPropertiesCondObject(
+        ...             name="amount", operator="gt", value=50
+        ...         )]
         ...     )
         ... )
         >>> condition = EventCond(event=event_obj)
@@ -250,12 +240,18 @@ class AllCondGroup(BaseModel):
         >>> # Create a condition group where country is "US" AND has made a purchase
         >>> all_group = AllCondGroup(
         ...     all=[
-        ...         AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="US")),
-        ...         EventCond(event=EventObject(name="purchase", properties=EventProperties(all=[])))
+        ...         AttributeCondSimple(attribute=AttributeObject(
+        ...             operator="eq", field="country", value="US"
+        ...         )),
+        ...         EventCond(event=EventObject(
+        ...             name="purchase", properties=EventProperties(all=[])
+        ...         ))
         ...     ]
         ... )
     """
-    all: list[Union[AttributeCondSimple, AttributeCondArray, EventCond]] = Field(min_length=1)
+    all: list[Union[AttributeCondSimple, AttributeCondArray, EventCond]] = Field(
+        min_length=1
+    )
 
 class AnyCondGroup(BaseModel):
     """
@@ -272,12 +268,18 @@ class AnyCondGroup(BaseModel):
         >>> # Create a condition group where country is either "US" OR "Canada"
         >>> any_group = AnyCondGroup(
         ...     any=[
-        ...         AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="US")),
-        ...         AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="Canada"))
+        ...         AttributeCondSimple(attribute=AttributeObject(
+        ...             operator="eq", field="country", value="US"
+        ...         )),
+        ...         AttributeCondSimple(attribute=AttributeObject(
+        ...             operator="eq", field="country", value="Canada"
+        ...         ))
         ...     ]
         ... )
     """
-    any: list[Union[AttributeCondSimple, AttributeCondArray, EventCond]] = Field(min_length=1)
+    any: list[Union[AttributeCondSimple, AttributeCondArray, EventCond]] = Field(
+        min_length=1
+    )
 
 class Condition(BaseModel):
     """
@@ -296,16 +298,26 @@ class Condition(BaseModel):
         >>> # Create a condition for active users who are from either US or Canada
         >>> condition = Condition(
         ...     all=[
-        ...         AttributeCondSimple(attribute=AttributeObject(operator="eq", field="status", value="active")),
+        ...         AttributeCondSimple(attribute=AttributeObject(
+        ...             operator="eq", field="status", value="active"
+        ...         )),
         ...         AnyCondGroup(
         ...             any=[
-        ...                 AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="US")),
-        ...                 AttributeCondSimple(attribute=AttributeObject(operator="eq", field="country", value="Canada"))
+        ...                 AttributeCondSimple(attribute=AttributeObject(
+        ...                     operator="eq", field="country", value="US"
+        ...                 )),
+        ...                 AttributeCondSimple(attribute=AttributeObject(
+        ...                     operator="eq", field="country", value="Canada"
+        ...                 ))
         ...             ]
         ...         )
         ...     ]
         ... )
     """
-    all: Optional[list[Union[AttributeCondSimple, AttributeCondArray, EventCond, AllCondGroup, AnyCondGroup]]] = Field(default=None, min_length=1)
-    any: Optional[list[Union[AttributeCondSimple, AttributeCondArray, EventCond, AllCondGroup, AnyCondGroup ]]] = Field(default=None, min_length=1)
+    all: Optional[list[Union[
+        AttributeCondSimple, AttributeCondArray, EventCond, AllCondGroup, AnyCondGroup
+    ]]] = Field(default=None, min_length=1)
 
+    any: Optional[list[Union[
+        AttributeCondSimple, AttributeCondArray, EventCond, AllCondGroup, AnyCondGroup
+    ]]] = Field(default=None, min_length=1)

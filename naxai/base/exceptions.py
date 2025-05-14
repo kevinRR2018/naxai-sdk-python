@@ -1,8 +1,18 @@
+"""
+Exception classes for the Naxai SDK.
+
+This module defines the exception hierarchy used throughout the SDK
+to provide consistent error handling and reporting.
+"""
+
 from typing import Optional, Any
 
 class NaxaiException(Exception):
     """Base exception for all Naxai SDK errors."""
-    def __init__(self, message: str, status_code: Optional[int] = None, error_code: Optional[str] = None, details: Optional[Any] = None):
+    def __init__(self, message: str,
+                 status_code: Optional[int] = None,
+                 error_code: Optional[str] = None,
+                 details: Optional[Any] = None):
         super().__init__(message)
         self.message = message
         self.status_code = status_code
@@ -10,7 +20,8 @@ class NaxaiException(Exception):
         self.details = details
 
     def __str__(self):
-        return f"{self.__class__.__name__}: {self.message} (status_code={self.status_code}, error_code={self.error_code})"
+        return (f"{self.__class__.__name__}: {self.message} "
+                f"(status_code={self.status_code}, error_code={self.error_code})")
 
 class NaxaiAuthenticationError(NaxaiException):
     """ Naxai authentication error """

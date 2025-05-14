@@ -1,7 +1,20 @@
+"""
+Voice broadcast response models for the Naxai SDK.
+
+This module defines the data structures for responses from voice broadcast API operations,
+including broadcast creation, management, recipient tracking, and call attempt details.
+"""
+
+import json
 from typing import Optional, Literal, Union
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination
 from naxai.models.voice.voice_flow import VoiceFlow
+
+REASONS = Literal["success", "rejected", "busy", "canceled-by-contact", "no-answer",
+                  "canceled-by-user", "canceled-by-system", "scheduled", "inbound", "voicemail"]
+STATES = Literal["draft", "started", "paused", "canceled", "completed", "scheduled",
+                 "pausing", "resuming", "canceling"]
 
 class ActionItem(BaseModel):
     """Model representing an action item in a broadcast response.
@@ -84,8 +97,10 @@ class Inputs(BaseModel):
     field_7: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="7", default=None)
     field_8: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="8", default=None)
     field_9: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="9", default=None)
-    field_star: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="star", default=None)
-    field_hash: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="hash", default=None)
+    field_star: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="star",
+                                                                          default=None)
+    field_hash: Optional[Union[list[ActionItem], dict[str, Sms]]] = Field(alias="hash",
+                                                                          default=None)
 
 class Status(BaseModel):
     """Model representing status-based actions in a broadcast.
@@ -200,7 +215,10 @@ class BroadcastBase(BaseModel):
     retries: Optional[int] = Field(default=0, ge=0, le=3)
     retry_on_no_input: Optional[bool] = Field(alias="retryOnNoInput", default=False)
     retry_on_failed: Optional[bool] = Field(alias="retryOnFailed", default=False)
-    retry_delays: Optional[list[int]] = Field(alias="retryDelays", default=None, min_length=0, max_length=3)
+    retry_delays: Optional[list[int]] = Field(alias="retryDelays",
+                                              default=None,
+                                              min_length=0,
+                                              max_length=3)
     calendar_id: Optional[str] = Field(alias="calendarId", default=None)
     distribution: Optional[Literal["none", "dynamic"]] = "none"
     dynamic_name: Optional[str] = Field(alias="dynamicName", default=None)
@@ -356,7 +374,7 @@ class GetBroadcastResponse(BroadcastResponseBase):
         - All timestamp fields are in milliseconds since epoch
         - Inherits all validation rules from parent classes
     """
-    state: Literal["draft", "started", "paused", "canceled", "completed", "scheduled", "pausing", "resuming", "canceling"]
+    state: STATES
 
 class StartBroadcastResponse(BroadcastStatusResponse):
     """Model for broadcast start operation response.
@@ -909,7 +927,7 @@ class RecipientCall(BaseModel):
     """
     call_id: str = Field(alias="callId")
     status: Literal["delivered", "failed", "scheduled", "canceled"]
-    reason: Literal["success", "rejected", "busy", "canceled-by-contact", "no-answer", "canceled-by-user", "canceled-by-system", "scheduled", "inbound", "voicemail"]
+    reason: REASONS
     attempt_order: int = Field(alias="attemptOrder")
     duration: int
     call_at: int = Field(alias="callAt")
@@ -917,33 +935,84 @@ class RecipientCall(BaseModel):
     model_config = {"populate_by_name": True}
 
 class GetBroadcastRecipientCallsResponse(BaseModel):
-    root: list[RecipientCall] = Field(default_factory=list)
+    """Model representing a list of call attempts for a broadcast recipient.
     
+    This class defines the structure for retrieving the call history for a specific
+    recipient in a broadcast campaign, providing details about each call attempt.
+    It implements list-like behavior for easy iteration through call attempts.
+    
+    Attributes:
+        root (list[RecipientCall]): List of call attempt objects containing
+            detailed information about each call made to the recipient.
+    
+    Example:
+        >>> response = GetBroadcastRecipientCallsResponse(
+        ...     root=[
+        ...         RecipientCall(
+        ...             callId="call_123",
+        ...             status="failed",
+        ...             reason="no-answer",
+        ...             attemptOrder=1,
+        ...             duration=0,
+        ...             callAt=1703066400000
+        ...         ),
+        ...         RecipientCall(
+        ...             callId="call_456",
+        ...             status="delivered",
+        ...             reason="success",
+        ...             attemptOrder=2,
+        ...             duration=45,
+        ...             callAt=1703066500000
+        ...         )
+        ...     ]
+        ... )
+        >>> print(f"Total call attempts: {len(response)}")
+        >>> print(f"First attempt: {response[0].status}")
+        >>> print(f"Last attempt: {response[-1].status}")
+        >>> for call in response:
+        ...     print(f"Attempt {call.attempt_order}: {call.status} - {call.reason}")
+        Total call attempts: 2
+        First attempt: failed
+        Last attempt: delivered
+        Attempt 1: failed - no-answer
+        Attempt 2: delivered - success
+    
+    Note:
+        - This class implements __len__, __getitem__, and __iter__ methods for list-like behavior
+        - Call attempts are typically sorted by attemptOrder (chronological order)
+        - The model_validate_json method handles both array-style JSON and object-style JSON
+        - Empty list indicates no call attempts have been made to this recipient
+        - Multiple attempts may be present based on retry configuration
+    
+    See Also:
+        RecipientCall: For detailed call attempt information
+        GetBroadcastRecipientResponse: For recipient information
+    """
+    root: list[RecipientCall] = Field(default_factory=list)
+
     def __len__(self) -> int:
         """Return the number of call attempts."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access call attempts by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through call attempts."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
         
         This method handles both array-style JSON and object-style JSON with a root field.
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
-

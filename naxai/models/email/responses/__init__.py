@@ -1,3 +1,11 @@
+"""
+Email response models for the Naxai SDK.
+
+This module provides data structures for responses from email-related API operations,
+including domains, activity logs, metrics, newsletters, senders, templates, and
+transactional emails.
+"""
+
 from .domains_responses import (ListSharedDomainsResponse,
                                 ListDomainsResponse,
                                 CreateDomainResponse,

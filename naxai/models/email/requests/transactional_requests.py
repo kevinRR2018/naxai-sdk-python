@@ -1,3 +1,10 @@
+"""
+Transactional email request models for the Naxai SDK.
+
+This module defines the data structures used for sending transactional emails,
+including sender information, recipients, attachments, and email content options.
+"""
+
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -31,7 +38,8 @@ class SenderObject(BaseObject):
     Inherits all attributes from BaseObject:
         - email (str): The sender's email address (e.g., "support@example.com").
             Must be a verified sender in your Naxai account.
-        - name (str): The sender's display name that appears in email clients (e.g., "Customer Support").
+        - name (str): 
+            The sender's display name that appears in email clients (e.g., "Customer Support").
     
     Example:
         >>> sender = SenderObject(email="support@example.com", name="Customer Support")
@@ -40,7 +48,8 @@ class SenderObject(BaseObject):
     
     Note:
         - The sender's email address must be a verified sender in your Naxai account
-        - For high deliverability, ensure the sender's domain is properly configured with SPF and DKIM
+        - For high deliverability, ensure the sender's domain is properly configured
+          with SPF and DKIM
         - The display name should be recognizable to recipients to reduce the chance of emails
           being marked as spam
     """
@@ -63,7 +72,8 @@ class DestinationObject(BaseObject):
     
     Note:
         - The name field is optional in practice but required by the model
-        - If you don't have a name for the recipient, you can use the email address or a generic name
+        - If you don't have a name for the recipient,
+          you can use the email address or a generic name
         - Primary recipients (To) can see each other's email addresses in most email clients
     """
 
@@ -176,7 +186,8 @@ class SendTransactionalEmailRequest(BaseModel):
     account registrations, password resets, order confirmations, and notifications.
     
     Attributes:
-        sender (SenderObject): Information about the email sender, including email address and display name.
+        sender (SenderObject): 
+            Information about the email sender, including email address and display name.
             Must be a verified sender in your Naxai account.
         to (list[DestinationObject]): List of primary recipients for the email.
             Maximum 1000 recipients allowed.
@@ -186,7 +197,8 @@ class SendTransactionalEmailRequest(BaseModel):
         bcc (Optional[list[BCCObject]]): List of blind carbon copy (BCC) recipients who will receive
             a copy of the email without their addresses being visible to other recipients.
             Maximum 50 BCC recipients allowed. Defaults to None.
-        reply_to (Optional[str]): Email address that will receive replies if recipients reply to the email.
+        reply_to (Optional[str]):
+            Email address that will receive replies if recipients reply to the email.
             Maximum 100 characters. Mapped from JSON key 'replyTo'. Defaults to None.
         subject (str): The subject line of the email.
         text (Optional[str]): Plain text version of the email content.
@@ -196,7 +208,8 @@ class SendTransactionalEmailRequest(BaseModel):
         attachments (Optional[list[Attachment]]): List of files to attach to the email.
             Maximum 10 attachments allowed. Defaults to None.
         enable_tracking (Optional[bool]): Whether to enable open and click tracking for this email.
-            Mapped from JSON key 'enableTracking'. Defaults to None (system default setting is used).
+            Mapped from JSON key 'enableTracking'.
+            Defaults to None (system default setting is used).
     
     Example:
         >>> # Basic email with HTML content
@@ -204,7 +217,8 @@ class SendTransactionalEmailRequest(BaseModel):
         ...     sender=SenderObject(email="sender@example.com", name="Sender Name"),
         ...     to=[DestinationObject(email="recipient@example.com", name="Recipient Name")],
         ...     subject="Your Account Verification",
-        ...     html="<html><body><h1>Verify Your Account</h1><p>Click the link to verify your account.</p></body></html>",
+        ...     html="<html><body><h1>Verify Your Account</h1> \
+        ...     <p>Click the link to verify your account.</p></body></html>",
         ...     text="Verify Your Account\n\nClick the link to verify your account.",
         ...     enable_tracking=True
         ... )
@@ -227,7 +241,8 @@ class SendTransactionalEmailRequest(BaseModel):
         - This class supports both alias-based and direct field name access through populate_by_name
         - At least one of text or html must be provided
         - The sender email must be a verified sender in your Naxai account
-        - For high deliverability, ensure your sender domain is properly configured with SPF and DKIM
+        - For high deliverability, ensure your sender domain is
+          properly configured with SPF and DKIM
         - When both text and html are provided, email clients will display the appropriate version
           based on their capabilities and user preferences
         - Attachments should be kept reasonably sized to avoid delivery issues

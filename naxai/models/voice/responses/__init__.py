@@ -1,3 +1,10 @@
+"""
+Voice response models for the Naxai SDK.
+
+This module provides data structures for responses from voice-related API operations,
+including broadcasts, calls, activity logs, and reporting metrics.
+"""
+
 from .broadcasts_responses import (
     ActionItem,
     Actions,
@@ -38,53 +45,44 @@ __all__ = [
     # Base classes
     "BroadcastBase",
     "BroadcastResponseBase",
-    
     # Core broadcast responses
     "CreateBroadcastResponse",
     "GetBroadcastResponse",
     "UpdateBroadcastResponse",
     "ListBroadcastResponse",
-    
     # Broadcast control responses
     "StartBroadcastResponse",
     "PauseBroadcastResponse",
     "ResumeBroadcastResponse",
     "CancelBroadcastResponse",
     "BroadcastStatusResponse",
-    
     # Broadcast metrics and analytics
     "GetBroadcastMetricsResponse",
     "GetBroadcastInputMetricsResponse",
     "BroadcastResponseItem",
-    
     # Recipient-related responses
     "BroadcastRecipient",
     "ListBroadcastRecipientsResponse",
     "GetBroadcastRecipientResponse",
     "RecipientCall",
-    
     # Component classes
     "ActionItem",
     "Actions",
     "Inputs",
     "Status",
     "Sms",
-
     # Call
     "CreateCallResponse",
     "Call",
-
     # Reporting
     "ListOutboundMetricsResponse",
     "ListTransferredMetricsResponse",
     "InboundStats",
     "CountryStats",
     "BaseMetricsResponse",
-    
     # ActivityLogs
     "CallBaseModel",
     "ListActivityLogsResponse",
     "GetActivityLogResponse"
 
 ]
-

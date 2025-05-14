@@ -1,3 +1,11 @@
+"""
+Voice reporting response models for the Naxai SDK.
+
+This module defines the data structures for responses from voice reporting API operations,
+providing models for analyzing call metrics, performance statistics, and geographical
+distribution of voice traffic across different time periods.
+"""
+
 from typing import Literal, TypeVar, Generic, Optional
 from pydantic import BaseModel, Field
 
@@ -16,7 +24,7 @@ class BaseStatsFields(BaseModel):
     date: Optional[str] = None
     calls: int
     duration: int
-    
+
     model_config = {"populate_by_name": True}
 
 class OutboundStatsFields(BaseStatsFields):
@@ -99,7 +107,7 @@ class BaseMetricsResponse(BaseModel):
     stop_date: int = Field(alias="stopDate")
     direction: str
     number: str
-    
+
     model_config = {"populate_by_name": True}
 
 T = TypeVar('T')
@@ -125,7 +133,7 @@ class MetricsResponse(BaseModel, Generic[T]):
     direction: str
     number: str
     stats: list[T]
-    
+
     model_config = {"populate_by_name": True}
 
 class ListOutboundMetricsResponse(MetricsResponse[BaseStats]):
@@ -162,7 +170,7 @@ class TransferredStats(BaseStatsFields):
     busy: int
     rejected: int
     invalid: int
-    
+
     model_config = {"populate_by_name": True}
 
 class ListTransferredMetricsResponse(MetricsResponse[TransferredStats]):
@@ -201,4 +209,3 @@ class ListOutboundCallsByCountryMetricsResponse(MetricsResponse[CountryStats]):
     Attributes:
         stats (list[CountryStats]): List of outbound call statistics by country.
     """
-

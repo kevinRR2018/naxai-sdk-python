@@ -1,3 +1,10 @@
+"""
+Calendar response models for the Naxai SDK.
+
+This module provides response data models for calendar-related API operations,
+including calendar creation, retrieval, updates, and holiday template management.
+"""
+
 from .calendars_responses import (CreateCalendarResponse,
                                   ListCalendarsResponse,
                                   GetCalendarResponse,

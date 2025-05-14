@@ -1,3 +1,10 @@
+"""
+Email metrics response models for the Naxai SDK.
+
+This module defines the data structures for responses from email metrics API operations,
+providing models for tracking email engagement statistics, click rates, and performance metrics.
+"""
+
 from typing import Optional
 from pydantic import BaseModel, Field
 
@@ -17,20 +24,27 @@ class BaseStats(BaseModel):
             May be None if not available or not applicable.
         delivered (Optional[int]): Number of emails successfully delivered to recipients' inboxes.
             May be None if not available or not applicable.
-        opened (Optional[int]): Total number of email opens, including multiple opens by the same recipient.
+        opened (Optional[int]): 
+            Total number of email opens, including multiple opens by the same recipient.
             May be None if not available or not applicable.
-        opened_unique (Optional[int]): Number of unique recipients who opened the email at least once.
+        opened_unique (Optional[int]): 
+            Number of unique recipients who opened the email at least once.
             Mapped from JSON key 'openedUnique'. May be None if not available or not applicable.
-        cliqued (Optional[int]): Total number of link clicks within emails, including multiple clicks by the same recipient.
+        cliqued (Optional[int]): 
+            Total number of link clicks within emails, including multiple clicks by the 
+            same recipient.
             May be None if not available or not applicable.
-        cliqued_unique (Optional[int]): Number of unique recipients who clicked at least one link in the email.
+        cliqued_unique (Optional[int]): 
+            Number of unique recipients who clicked at least one link in the email.
             Mapped from JSON key 'cliquedUnique'. May be None if not available or not applicable.
         failed (Optional[int]): Number of emails that failed to deliver for any reason.
             May be None if not available or not applicable.
         suppress_bound (Optional[int]): Number of emails suppressed due to hard bounces.
             Mapped from JSON key 'suppressBound'. May be None if not available or not applicable.
-        suppress_unsubscribe (Optional[int]): Number of emails suppressed due to unsubscribe requests.
-            Mapped from JSON key 'suppressUnsubscribe'. May be None if not available or not applicable.
+        suppress_unsubscribe (Optional[int]): 
+            Number of emails suppressed due to unsubscribe requests.
+            Mapped from JSON key 'suppressUnsubscribe'. 
+            May be None if not available or not applicable.
         bounced (Optional[int]): Number of emails that bounced (both hard and soft bounces).
             May be None if not available or not applicable.
         rejected (Optional[int]): Number of emails rejected by recipient servers.
@@ -70,7 +84,8 @@ class BaseStats(BaseModel):
         ...     click_rate = stats.cliqued_unique / stats.delivered * 100
         ...     print(f"Open rate: {open_rate:.1f}%")
         ...     print(f"Click rate: {click_rate:.1f}%")
-        ...     print(f"Click-to-open rate: {stats.cliqued_unique / stats.opened_unique * 100:.1f}%" if stats.opened_unique > 0 else "Click-to-open rate: N/A")
+        ...     print(f"Click-to-open rate:{stats.cliqued_unique / stats.opened_unique * 100:.1f}%"\
+        ...          if stats.opened_unique > 0 else "Click-to-open rate: N/A")
         >>> 
         >>> # Calculate negative metrics
         >>> if stats.sent > 0:
@@ -89,7 +104,8 @@ class BaseStats(BaseModel):
     
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
-        - All fields are optional as they may not be included in all API responses or may not be applicable
+        - All fields are optional as they may not be included in all API responses or may
+          not be applicable
         - The date field format depends on the grouping level used in the API request
         - Key engagement metrics to monitor include:
           * Delivery rate: delivered / sent
@@ -100,7 +116,8 @@ class BaseStats(BaseModel):
           * Bounce rate: bounced / sent
           * Complaint rate: complained / sent
           * Unsubscribe rate: unsubscribed / delivered
-        - High bounce or complaint rates may indicate issues with email quality or recipient targeting
+        - High bounce or complaint rates may indicate issues with email quality
+          or recipient targeting
     
     See Also:
         ListMetricsResponse: For time-based email metrics responses
@@ -135,9 +152,11 @@ class BaseClickedUrlsStats(BaseModel):
     Attributes:
         url (Optional[str]): The URL that was clicked within the email.
             May be None if not available or not applicable.
-        clicked (Optional[int]): Total number of clicks on this URL, including multiple clicks by the same recipient.
+        clicked (Optional[int]): 
+            Total number of clicks on this URL, including multiple clicks by the same recipient.
             May be None if not available or not applicable.
-        clicked_unique (Optional[int]): Number of unique recipients who clicked this URL at least once.
+        clicked_unique (Optional[int]): 
+            Number of unique recipients who clicked this URL at least once.
             Mapped from JSON key 'clickedUnique'. May be None if not available or not applicable.
     
     Example:
@@ -162,9 +181,12 @@ class BaseClickedUrlsStats(BaseModel):
     Note:
         - This class supports both alias-based and direct field name access through populate_by_name
         - All fields are optional as they may not be included in all API responses
-        - The difference between clicked and clicked_unique indicates how many recipients clicked multiple times
-        - URLs with high click rates but low conversion might indicate misleading content or technical issues
-        - Analyzing which URLs get the most clicks can help optimize email content and call-to-action placement
+        - The difference between clicked and clicked_unique indicates
+          how many recipients clicked multiple times
+        - URLs with high click rates but low conversion might indicate
+          misleading content or technical issues
+        - Analyzing which URLs get the most clicks can help optimize email content
+          and call-to-action placement
     
     See Also:
         ListClickedUrlsMetricsResponse: For responses containing metrics for multiple URLs
@@ -189,7 +211,8 @@ class ListMetricsResponse(BaseModel):
             May be None if not specified.
         stop (Optional[int]): End timestamp of the reporting period, in milliseconds since epoch.
             May be None if not specified.
-        group (Optional[str]): The time interval grouping used for the metrics (e.g., "hour", "day", "month").
+        group (Optional[str]): 
+            The time interval grouping used for the metrics (e.g., "hour", "day", "month").
             May be None if not specified.
         stats (list[BaseStats]): List of statistics entries, each representing metrics
             for a specific time interval within the overall period.
@@ -226,9 +249,12 @@ class ListMetricsResponse(BaseModel):
         >>> 
         >>> # Calculate overall metrics
         >>> total_sent = sum(day.sent for day in response.stats if day.sent is not None)
-        >>> total_delivered = sum(day.delivered for day in response.stats if day.delivered is not None)
-        >>> total_opened = sum(day.opened_unique for day in response.stats if day.opened_unique is not None)
-        >>> total_clicked = sum(day.cliqued_unique for day in response.stats if day.cliqued_unique is not None)
+        >>> total_delivered = sum(day.delivered for day in response.stats \
+        >>>                    if day.delivered is not None)
+        >>> total_opened = sum(day.opened_unique for day in response.stats \
+        >>>                 if day.opened_unique is not None)
+        >>> total_clicked = sum(day.cliqued_unique for day in response.stats \
+        >>>                 if day.cliqued_unique is not None)
         >>> 
         >>> print(f"Total sent: {total_sent}")
         >>> if total_sent > 0:
@@ -314,7 +340,8 @@ class ListClickedUrlsMetricsResponse(BaseModel):
         >>> 
         >>> # Calculate total clicks
         >>> total_clicks = sum(url.clicked for url in response.stats if url.clicked is not None)
-        >>> total_unique = sum(url.clicked_unique for url in response.stats if url.clicked_unique is not None)
+        >>> total_unique = sum(url.clicked_unique for url in response.stats \
+        >>>                 if url.clicked_unique is not None)
         >>> print(f"Total clicks: {total_clicks} ({total_unique} unique)")
         Period: 1703030400000 to 1703289600000
         Number of tracked URLs: 3
@@ -328,9 +355,12 @@ class ListClickedUrlsMetricsResponse(BaseModel):
         - This class supports both alias-based and direct field name access through populate_by_name
         - The stats list contains one entry per unique URL that was clicked
         - URLs are typically sorted by click count in descending order
-        - Analyzing which URLs get the most clicks can help optimize email content and call-to-action placement
-        - URLs with high click rates but low conversion might indicate misleading content or technical issues
-        - The difference between clicked and clicked_unique indicates how many recipients clicked multiple times
+        - Analyzing which URLs get the most clicks can help optimize email content
+          and call-to-action placement
+        - URLs with high click rates but low conversion might indicate misleading content or
+          technical issues
+        - The difference between clicked and clicked_unique indicates how many recipients clicked
+          multiple times
     
     See Also:
         BaseClickedUrlsStats: For the structure of individual URL statistics entries

@@ -1,3 +1,10 @@
+"""
+Contact response models for the Naxai SDK.
+
+This module defines the data structures for responses from contact-related API operations,
+including contact search, retrieval, creation, and management of contact identifiers.
+"""
+
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 from naxai.models.base.pagination import Pagination

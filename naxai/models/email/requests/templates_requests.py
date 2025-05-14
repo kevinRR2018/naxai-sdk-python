@@ -1,3 +1,10 @@
+"""
+Email template request models for the Naxai SDK.
+
+This module defines the data structures used for creating and managing email templates,
+including HTML content, visual editor designs, and template metadata.
+"""
+
 from typing import Optional, Literal
 from pydantic import BaseModel, Field
 
@@ -21,7 +28,8 @@ class CreateEmailTemplateRequest(BaseModel):
             Defaults to None.
         body (Optional[str]): The HTML content of the template.
             Required when source="html". Defaults to None.
-        body_design (Optional[dict]): The structured design data for templates created with the visual editor.
+        body_design (Optional[dict]): 
+            The structured design data for templates created with the visual editor.
             Required when source="editor". Mapped from JSON key 'bodyDesign'. Defaults to None.
         thumbnail (Optional[str]): URL or base64 data of a thumbnail image for the template.
             Defaults to None.
@@ -36,7 +44,8 @@ class CreateEmailTemplateRequest(BaseModel):
         ...         <body> \
         ...             <h1>Welcome to Our Service!</h1> \
         ...             <p>Dear {{user_name}},</p> \
-        ...             <p>Thank you for joining our platform. We're excited to have you on board!</p> \
+        ...             <p>Thank you for joining our platform. \
+        ...                We're excited to have you on board!</p> \
         ...             <p>Your account has been successfully created and is ready to use.</p> \
         ...             <p>Best regards,<br>The Team</p> \
         ...         </body> \

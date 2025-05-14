@@ -1,3 +1,11 @@
+"""
+Attribute response models for the Naxai SDK.
+
+This module defines the data structures for responses from attribute-related API operations,
+including attribute creation, retrieval, and listing for contact management.
+"""
+
+import json
 from typing import List
 from pydantic import BaseModel, Field
 
@@ -103,19 +111,19 @@ class ListAttributesResponse(BaseModel):
           list when no data is provided
     """
     root: List[BaseListObject] = Field(default_factory=list)
-    
+
     def __len__(self) -> int:
         """Return the number of attributes in the list."""
         return len(self.root)
-    
+
     def __getitem__(self, index):
         """Access attribute by index."""
         return self.root[index]
-    
+
     def __iter__(self):
         """Iterate through attributes."""
         return iter(self.root)
-    
+
     @classmethod
     def model_validate_json(cls, json_data: str, **kwargs):
         """Parse JSON data into the model.
@@ -129,13 +137,12 @@ class ListAttributesResponse(BaseModel):
         Returns:
             ListAttributesResponse: A validated instance of the class
         """
-        import json
         data = json.loads(json_data)
-        
+
         # If the data is a list, wrap it in a dict with the root field
         if isinstance(data, list):
             return cls(root=data)
-        
+
         # Otherwise, use the standard Pydantic validation
         return super().model_validate_json(json_data, **kwargs)
 
