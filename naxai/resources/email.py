@@ -1,3 +1,13 @@
+"""
+Email resource for the Naxai SDK.
+
+This module provides comprehensive email communication capabilities for the Naxai platform,
+including transactional emails, newsletters, templates, domain management, sender identities,
+activity tracking, and performance reporting. It serves as a central access point for all
+email-related functionality, enabling users to create and manage sophisticated email
+communication workflows.
+"""
+
 from typing import List, Optional
 from pydantic import Field, validate_call
 from naxai.models.email.requests.transactional_requests import (SendTransactionalEmailRequest,
@@ -11,7 +21,6 @@ from .email_resources.domains import DomainsResource
 from .email_resources.newsletters import NewslettersResource
 from .email_resources.reporting import ReportingResource
 from .email_resources.sender_identities import SenderIdentitiesResource
-from .email_resources.suppression_lists import SuppressionListsResource
 from .email_resources.templates import TemplatesResource
 
 
@@ -24,13 +33,15 @@ class EmailResource:
         self._client = client
         self.root_path = "/email"
         self.headers = {"Content-Type": "application/json"}
-        self.transactional: TransactionalResource = TransactionalResource(self._client, self.root_path)
-        self.activity_logs: ActivityLogsResource = ActivityLogsResource(self._client, self.root_path)
+        self.transactional: TransactionalResource = TransactionalResource(self._client,
+                                                                          self.root_path)
+        self.activity_logs: ActivityLogsResource = ActivityLogsResource(self._client,
+                                                                        self.root_path)
         self.domains: DomainsResource = DomainsResource(self._client, self.root_path)
         self.newsletters: NewslettersResource = NewslettersResource(self._client, self.root_path)
         self.reporting: ReportingResource = ReportingResource(self._client, self.root_path)
-        self.sender_identities: SenderIdentitiesResource = SenderIdentitiesResource(self._client, self.root_path)
-        #self.suppression_lists: SuppressionListsResource = SuppressionListsResource(self._client, self.root_path)
+        self.sender_identities: SenderIdentitiesResource = SenderIdentitiesResource(self._client,
+                                                                                    self.root_path)
         self.templates: TemplatesResource = TemplatesResource(self._client, self.root_path)
 
     @validate_call
@@ -56,34 +67,43 @@ class EmailResource:
         SendTransactionalEmailModel object.
         
         Args:
-            sender_email (str): The email address of the sender. Must be a verified sender in your account.
+            sender_email (str): 
+                The email address of the sender. Must be a verified sender in your account.
             sender_name (str): The display name of the sender that appears in email clients.
             subject (str): The subject line of the email.
-            to (List[DestinationObject]): List of primary recipients, each containing email and optional name.
+            to (List[DestinationObject]): 
+                List of primary recipients, each containing email and optional name.
                 Must include at least 1 recipient, maximum 1000 recipients.
                 Example: [{"email": "recipient@example.com", "name": "Recipient Name"}]
-            cc (Optional[List[DestinationObject]]): List of CC (carbon copy) recipients, each containing
+            cc (Optional[List[DestinationObject]]): 
+                List of CC (carbon copy) recipients, each containing
                 email and optional name. Maximum 50 recipients. Defaults to None.
-            bcc (Optional[List[DestinationObject]]): List of BCC (blind carbon copy) recipients, each containing
+            bcc (Optional[List[DestinationObject]]): 
+                List of BCC (blind carbon copy) recipients, each containing
                 email and optional name. Maximum 50 recipients. Defaults to None.
-            reply_to (Optional[str]): Email address that will receive replies if recipients reply to the email.
+            reply_to (Optional[str]): 
+                Email address that will receive replies if recipients reply to the email.
                 Defaults to None (replies go to sender_email).
-            text (Optional[str]): Plain text version of the email content. At least one of text or html
+            text (Optional[str]): 
+                Plain text version of the email content. At least one of text or html
                 must be provided. Defaults to None.
             html (Optional[str]): HTML version of the email content. At least one of text or html
                 must be provided. Defaults to None.
             attachments (List[Attachment]): List of file attachments to include with the email.
                 Each attachment should include filename, content_type, and content (base64 encoded).
                 Defaults to None.
-            enable_tracking (Optional[bool]): Whether to enable open and click tracking for this email.
+            enable_tracking (Optional[bool]): 
+                Whether to enable open and click tracking for this email.
                 Defaults to None (system default setting is used).
         
         Returns:
-            SendTransactionalEmailResponse: A response object containing the unique identifier for the sent email.
+            SendTransactionalEmailResponse: A response object containing the unique identifier
+            for the sent email.
                 This ID can be used for tracking and querying the email's status.
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+            or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to send emails
             NaxaiRateLimitExceeded: If the rate limit for sending emails is exceeded
@@ -96,7 +116,8 @@ class EmailResource:
             ...     sender_name="Sender Name",
             ...     subject="Your Account Verification",
             ...     to=[{"email": "recipient@example.com", "name": "Recipient Name"}],
-            ...     html="<html><body><h1>Verify Your Account</h1><p>Click the link to verify your account.</p></body></html>",
+            ...     html="<html><body><h1>Verify Your Account</h1>\
+            ...           <p>Click the link to verify your account.</p></body></html>",
             ...     text="Verify Your Account\n\nClick the link to verify your account.",
             ...     enable_tracking=True
             ... )
@@ -113,7 +134,8 @@ class EmailResource:
             ...     to=[{"email": "customer@example.com", "name": "Customer Name"}],
             ...     cc=[{"email": "accounting@example.com"}],
             ...     reply_to="no-reply@example.com",
-            ...     html="<html><body><p>Please find your monthly statement attached.</p></body></html>",
+            ...     html="<html><body><p>Please find your monthly statement attached.</p>\
+            ...           </body></html>",
             ...     attachments=[{
             ...         "filename": "statement.pdf",
             ...         "content_type": "application/pdf",
@@ -125,9 +147,11 @@ class EmailResource:
         Note:
             - At least one of text or html must be provided
             - The sender_email must be a verified sender in your Naxai account
-            - For high deliverability, ensure your sender domain is properly configured with SPF and DKIM
+            - For high deliverability, ensure your sender domain is properly configured with
+              SPF and DKIM
             - This method is a convenience wrapper around the transactional.send() method
-            - For more advanced options like templates, tags, or custom headers, use transactional.send() directly
+            - For more advanced options like templates, tags, or custom headers, use 
+              transactional.send() directly
             - Attachments should be kept reasonably sized to avoid delivery issues
             - The total size of all attachments should not exceed 10MB
         

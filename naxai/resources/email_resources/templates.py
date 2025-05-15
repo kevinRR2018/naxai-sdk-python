@@ -1,3 +1,12 @@
+"""
+Email templates resource for the Naxai SDK.
+
+This module provides methods for managing email templates in the Naxai platform,
+including creation, retrieval, updating, and deletion of reusable email designs.
+Templates can be created in both HTML format and through a visual editor, and can
+include variable placeholders for personalization when sending emails.
+"""
+
 import json
 from typing import Optional
 from pydantic import Field, validate_call
@@ -41,7 +50,8 @@ class TemplatesResource:
                 - created_by: ID of the user who created the template
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to server issues or invalid template_id
+            NaxaiAPIRequestError: 
+                If the API request fails due to server issues or invalid template_id
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access the shared template
             ValidationError: If the template_id is invalid
@@ -80,7 +90,12 @@ class TemplatesResource:
         See Also:
             list_shared: For retrieving multiple shared templates
         """
-        return GetSharedTemplateResponse.model_validate_json(json.dumps(self._client._request("GET", self.previous_root + "/shared-templates/" + template_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetSharedTemplateResponse.model_validate_json(
+            json.dumps(
+                self._client._request("GET",
+                                      self.previous_root + "/shared-templates/" + template_id,
+                                      headers=self.headers)))
 
     @validate_call
     def list_shared(self,
@@ -126,7 +141,8 @@ class TemplatesResource:
             >>> shared_templates = client.email.templates.list_shared()
             >>> 
             >>> print(f"Found {shared_templates.pagination.total_items} shared templates")
-            >>> print(f"Showing page {shared_templates.pagination.page} of {shared_templates.pagination.total_pages}")
+            >>> print(f"Showing page {shared_templates.pagination.page} of"
+            >>>       f" {shared_templates.pagination.total_pages}")
             >>> 
             >>> # Display available templates
             >>> for template in shared_templates.items:
@@ -149,14 +165,16 @@ class TemplatesResource:
             - Account Setup
         
         Note:
-            - Without any tag filters, this method returns all shared templates available to your account
-            - The tag filtering is inclusive - templates matching ANY of the specified tags will be returned
+            - Without any tag filters, this method returns all shared templates available
+              to your account
+            - The tag filtering is inclusive - templates matching ANY of the specified tags
+              will be returned
             - Shared templates are read-only and cannot be modified through this API
             - These templates can be used as a starting point for creating your own templates
             - For large collections, use the page parameter to navigate through results
             - The page_size parameter allows customizing how many items to retrieve per request
-            - The response includes only basic template information - to get the full template content,
-            use the get_shared method with a specific template ID
+            - The response includes only basic template information - to get the full
+              template content, use the get_shared method with a specific template ID
         
         See Also:
             get_shared: For retrieving a specific shared template by ID
@@ -168,7 +186,12 @@ class TemplatesResource:
         if tags:
             params["tags"] = tags
 
-        return ListSharedTemplatesRespone.model_validate_json(json.dumps(self._client._request("GET", self.previous_root + "/shared-templates", params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListSharedTemplatesRespone.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.previous_root + "/shared-templates",
+                                             params=params,
+                                             headers=self.headers)))
 
     def delete(self, template_id: str):
         """
@@ -185,7 +208,8 @@ class TemplatesResource:
             None
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to server issues or invalid template_id
+            NaxaiAPIRequestError: 
+                If the API request fails due to server issues or invalid template_id
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to delete the template
             ValidationError: If the template_id is invalid
@@ -206,14 +230,17 @@ class TemplatesResource:
             ...     client.email.templates.delete("tmpl_456def")
             ... except Exception as e:
             ...     print(f"Error: {str(e)}")
-            Error: Operation not allowed: Cannot delete a template that is in use by active campaigns
+            Error: Operation not allowed: Cannot delete a template that is in use by
+            active campaigns
         
         Note:
             - This operation permanently removes the template and cannot be undone
             - Templates that are currently in use by active or scheduled emails cannot be deleted
-            - After deletion, any attempt to access the template using its ID will result in an error
+            - After deletion, any attempt to access the template using its ID will
+              result in an error
             - This method is useful for cleaning up unused or outdated templates
-            - Consider the impact on any automated emails or newsletters that might reference this template
+            - Consider the impact on any automated emails or newsletters that might
+              reference this template
             - Shared templates cannot be deleted through this method
         
         See Also:
@@ -222,7 +249,10 @@ class TemplatesResource:
             get: For retrieving a specific template by ID
             update: For modifying an existing template
         """
-        return self._client._request("DELETE", self.root_path + "/" + template_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("DELETE",
+                                     self.root_path + "/" + template_id,
+                                     headers=self.headers)
 
     def update(self, template_id: str, data: CreateEmailTemplateRequest):
         """
@@ -253,7 +283,8 @@ class TemplatesResource:
                 - modified_by: ID of the user who performed this update
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to update the template
             ValidationError: If the provided data fails validation
@@ -264,14 +295,16 @@ class TemplatesResource:
             >>> update_data = CreateEmailTemplateRequest(
             ...     name="Updated Welcome Email",
             ...     source="html",
-            ...     body="<html><body><h1>Welcome to Our Service!</h1><p>We've updated our welcome message...</p></body></html>"
+            ...     body="<html><body><h1>Welcome to Our Service!</h1>\
+            ...           <p>We've updated our welcome message...</p></body></html>"
             ... )
             >>> 
             >>> updated_template = client.email.templates.update("tmpl_123abc", update_data)
             >>> 
             >>> print(f"Template updated: {updated_template.name}")
             >>> print(f"Content type: {updated_template.source}")
-            >>> print(f"Last modified: {updated_template.modified_at} by {updated_template.modified_by}")
+            >>> print(f"Last modified: "
+            >>>       f"{updated_template.modified_at} by {updated_template.modified_by}")
             Template updated: Updated Welcome Email
             Content type: html
             Last modified: 1703066400000 by usr_789ghi
@@ -286,7 +319,8 @@ class TemplatesResource:
             Template thumbnail updated for: Updated Welcome Email
         
         Note:
-            - Only include fields that need to be updated in the request; omitted fields will remain unchanged
+            - Only include fields that need to be updated in the request; omitted fields
+              will remain unchanged
             - When updating content, ensure you use the correct source type:
             * For source="html", provide the updated HTML in the body field
             * For source="editor", provide the updated design in the body_design field
@@ -303,7 +337,13 @@ class TemplatesResource:
             get: For retrieving a specific template by ID
             delete: For removing a template
         """
-        return UpdateTemplateResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + template_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateTemplateResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path + "/" + template_id,
+                                             json=data.model_dump(by_alias=True,
+                                                                  exclude_none=True),
+                                             headers=self.headers)))
 
     def get(self, template_id: str):
         """
@@ -328,7 +368,8 @@ class TemplatesResource:
                 - modified_by: ID of the user who last modified the template
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to server issues or invalid template_id
+            NaxaiAPIRequestError: 
+                If the API request fails due to server issues or invalid template_id
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access the template
             ValidationError: If the template_id is invalid
@@ -357,7 +398,9 @@ class TemplatesResource:
             Template: Welcome Email (ID: tmpl_123abc)
             Content type: html
             HTML content length: 2450 characters
-            First 100 characters: <html><body><h1>Welcome to Our Service!</h1><p>Dear {{user_name}},</p><p>Thank you for joining our...
+            First 100 characters: 
+            <html><body><h1>Welcome to Our Service!</h1><p>Dear {{user_name}},</p>
+            <p>Thank you for joining our...
             Thumbnail available: https://example.com/thumbnails/welcome-template.png
             Created: 1701066400000
             Last modified: 1703066400000 by usr_789ghi
@@ -365,11 +408,13 @@ class TemplatesResource:
         Note:
             - This method retrieves the complete template information, including content
             - For templates with source="html", the body field contains the HTML content
-            - For templates with source="editor", the body_design field contains the structured design data
+            - For templates with source="editor", the body_design field contains the structured
+              design data
             - Templates may include variable placeholders (e.g., {{user_name}}) that will be
             replaced with actual values when the template is used to send an email
             - Use this method to check the current state of a template before performing updates
-            - If the template doesn't exist or you don't have permission to access it, an error will be raised
+            - If the template doesn't exist or you don't have permission to access it, an error
+              will be raised
         
         See Also:
             create: For adding a new template
@@ -377,7 +422,11 @@ class TemplatesResource:
             update: For modifying an existing template
             delete: For removing a template
         """
-        return GetTemplateResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetTemplateResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + template_id,
+                                             headers=self.headers)))
 
     @validate_call
     def list(self,
@@ -420,7 +469,8 @@ class TemplatesResource:
             >>> templates = client.email.templates.list()
             >>> 
             >>> print(f"Found {templates.pagination.total_items} templates")
-            >>> print(f"Showing page {templates.pagination.page} of {templates.pagination.total_pages}")
+            >>> print(f"Showing page "
+            >>>       f"{templates.pagination.page} of {templates.pagination.total_pages}")
             >>> 
             >>> # Display available templates
             >>> for template in templates.items:
@@ -438,8 +488,8 @@ class TemplatesResource:
         
         Note:
             - Results are typically sorted by creation date, with newest templates first
-            - The response includes only basic template information - to get the full template content,
-            use the get method with a specific template ID
+            - The response includes only basic template information - to get the
+              full template content, use the get method with a specific template ID
             - For large collections, use the page parameter to navigate through results
             - The page_size parameter allows customizing how many items to retrieve per request
             - This method returns only your own templates, not shared templates
@@ -457,7 +507,12 @@ class TemplatesResource:
             "pageSize": page_size
         }
 
-        return ListTemplatesResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListTemplatesResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))
 
     def create(self, data: CreateEmailTemplateRequest):
         """
@@ -472,7 +527,8 @@ class TemplatesResource:
                 - name (str): The name or title of the template for internal reference
                 - source (str, optional): Content format, either "html" or "editor"
                 - body (str, optional): HTML content (required when source="html")
-                - body_design (dict, optional): Visual editor content (required when source="editor")
+                - body_design (dict, optional): 
+                    Visual editor content (required when source="editor")
                 - thumbnail (str, optional): URL or base64 data of a thumbnail image
         
         Returns:
@@ -488,7 +544,8 @@ class TemplatesResource:
                 - modified_by: ID of the user who created the template
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to create templates
             ValidationError: If the provided data fails validation
@@ -503,7 +560,8 @@ class TemplatesResource:
             ...         <body> \
             ...             <h1>Welcome to Our Service!</h1> \
             ...             <p>Dear {{user_name}},</p> \
-            ...             <p>Thank you for joining our platform. We're excited to have you on board!</p> \
+            ...             <p>Thank you for joining our platform. \
+            ...                We're excited to have you on board!</p> \
             ...             <p>Your account has been successfully created and is ready to use.</p> \
             ...             <p>Best regards,<br>The Team</p> \
             ...         </body> \
@@ -561,4 +619,10 @@ class TemplatesResource:
             delete: For removing a template
             list_shared: For browsing shared templates that can be used as starting points
         """
-        return CreateTemplateResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateTemplateResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path,
+                                             json=data.model_dump(by_alias=True,
+                                                                  exclude_none=True),
+                                             headers=self.headers)))

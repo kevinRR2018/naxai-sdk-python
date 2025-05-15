@@ -1,3 +1,11 @@
+"""
+Email unsubscribes resource for the Naxai SDK.
+
+This module provides methods for managing email unsubscribe records,
+including creating, listing, and deleting unsubscribe entries to maintain
+compliance with email marketing regulations.
+"""
+
 from typing import Optional
 from pydantic import Field, validate_call
 from naxai.models.email.create_email_supression_lists_unsubscribe import CreateEmailSuppressionListsUnsubscribe
@@ -21,9 +29,21 @@ class UnsubscribesResource:
             dict: The API response indicating the success of the deletion.
 
         Example:
-            >>> response = client.email.suppression_lists.unsubscribes.delete(data)
+            >>> unsubscribes = [
+            ...     CreateEmailSuppressionListsUnsubscribe(
+            ...         email="example@domain.com", 
+            ...         domainName="yourdomain.com"
+            ...     )
+            ... ]
+            >>> response = client.email.suppression_lists.unsubscribes.delete(unsubscribes)
         """
-        return self._client._request("POST", self.root_path + "/remove", json={"recipients": data}, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request(
+            "POST", 
+            self.root_path + "/remove", 
+            json={"recipients": data}, 
+            headers=self.headers
+        )
         
         
     def create(self, data: CreateEmailSuppressionListsUnsubscribe):
@@ -37,9 +57,19 @@ class UnsubscribesResource:
             dict: The API response indicating the success of the creation.
 
         Example:
-            >>> response = client.email.suppression_lists.unsubscribes.create(data)
+            >>> unsubscribe = CreateEmailSuppressionListsUnsubscribe(
+            ...     email="example@domain.com", 
+            ...     domainName="yourdomain.com"
+            ... )
+            >>> response = client.email.suppression_lists.unsubscribes.create(unsubscribe)
         """
-        return self._client._request("POST", self.root_path + "/add", json=data.model_dump(exclude_none=True, by_alias=True), headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request(
+            "POST", 
+            self.root_path + "/add", 
+            json=data.model_dump(exclude_none=True, by_alias=True), 
+            headers=self.headers
+        )
     
     @validate_call
     def list(self,
@@ -58,7 +88,11 @@ class UnsubscribesResource:
             dict: The API response containing the list of unsubscribes.
 
         Example:
-            >>> response = client.email.suppression_lists.unsubscribes.list(start=1625097600, stop=1627689600)
+            >>> response = client.email.suppression_lists.unsubscribes.list(
+            ...     page=1,
+            ...     page_size=50,
+            ...     email="example@domain.com"
+            ... )
         """
         params = {
             "page": page,
@@ -68,4 +102,5 @@ class UnsubscribesResource:
         if email:
              params["email"] = email
 
+        # pylint: disable=protected-access
         return self._client._request("GET", self.root_path, params=params, headers=self.headers)

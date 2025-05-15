@@ -1,3 +1,13 @@
+"""
+SMS resource for the Naxai SDK.
+
+This module provides SMS messaging capabilities for the Naxai platform, including
+sending text messages to individual recipients or groups, tracking message delivery
+and engagement through activity logs, and analyzing messaging performance through
+comprehensive reporting. It supports features such as message scheduling, unicode
+content, delivery constraints, and custom tracking references.
+"""
+
 import json
 from typing import Literal
 from pydantic import Field, validate_call
@@ -54,17 +64,20 @@ class SMSResource:
                 Mapped from JSON key 'senderServiceId'.
             type_ (Literal["text", "unicode", "auto"], optional): The encoding type for the message.
                 - "text": Standard GSM 7-bit encoding (max 160 chars per part)
-                - "unicode": Unicode encoding for messages with special characters (max 70 chars per part)
+                - "unicode": Unicode encoding for messages with special characters
+                  (max 70 chars per part)
                 - "auto": Automatically detect required encoding based on content
                 Defaults to "text". Mapped from JSON key 'type'.
-            scheduled_at (str, optional): ISO 8601 timestamp to schedule the message for future delivery.
+            scheduled_at (str, optional): 
+                ISO 8601 timestamp to schedule the message for future delivery.
                 Format: "YYYY-MM-DDTHH:MM:SSZ". If not provided, the message is sent immediately.
                 Mapped from JSON key 'scheduledAt'.
             validity (int, optional): The period in minutes during which the message is valid.
                 If the message cannot be delivered within this period, it will expire.
                 Range: 5-4320 minutes (5 minutes to 3 days).
             idempotency_key (str, optional): A unique key to prevent duplicate message sending.
-                If you retry a request with the same idempotency_key, only the first request will be processed.
+                If you retry a request with the same idempotency_key, only the first request
+                will be processed.
                 Maximum 200 characters. Mapped from JSON key 'idempotencyKey'.
             reference (str, optional): Custom reference identifier for the message.
                 Maximum 128 characters. Useful for tracking messages in your system.
@@ -74,7 +87,8 @@ class SMSResource:
                 Range: 1-10. If the message requires more parts than specified, it may be truncated
                 or rejected depending on the truncate parameter. Mapped from JSON key 'maxParts'.
             truncate (bool, optional): Whether to truncate messages that exceed the maximum length.
-                If False and the message exceeds the maximum length or max_parts, an error will be returned.
+                If False and the message exceeds the maximum length or max_parts, an error
+                will be returned.
                 Defaults to False.
         
         Returns:
@@ -133,7 +147,7 @@ class SMSResource:
         """
         if from_ is None and sender_service_id is None:
             raise NaxaiValueError("Either 'from_' or 'sender_service_id' must be provided.")
-        
+
         request_body = {"to": to,
                         "body": body,
                         "type": type_,
@@ -156,5 +170,9 @@ class SMSResource:
             request_body["calendarId"] = calendar_id
         if max_parts:
             request_body["maxParts"] = max_parts
-
-        return SendSMSResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/send", json=request_body, headers=self.headers)))
+        # pylint: disable=protected-access
+        return SendSMSResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path + "/send",
+                                             json=request_body,
+                                             headers=self.headers)))

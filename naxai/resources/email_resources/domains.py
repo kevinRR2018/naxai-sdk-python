@@ -1,12 +1,21 @@
+"""
+Email domains resource for the Naxai SDK.
+
+This module provides methods for managing email domains in the Naxai platform,
+including domain creation, verification, updating, and deletion to enable
+proper email sending capabilities.
+"""
+
 import json
 from typing import Optional
 from pydantic import Field, validate_call
-from .domains_resources.shared_domains import SharedDomainsResource
 from naxai.models.email.responses.domains_responses import (VerifyDomainResponse,
                                                             UpdateDomainResponse,
                                                             GetDomainResponse,
                                                             ListDomainsResponse,
                                                             CreateDomainResponse)
+from .domains_resources.shared_domains import SharedDomainsResource
+
 class DomainsResource:
     """ domains resource for email resource """
 
@@ -31,9 +40,16 @@ class DomainsResource:
             dict: The API response indicating the success of the update.
 
          Example:
-            >>> response = client.email.domains.update_tracking_settings(domain_id="example.com", enabled=True)
+            >>> response = client.email.domains.update_tracking_settings(domain_id="example.com",
+            >>>                                                          enabled=True)
          """
-        return self._client._request("PUT", self.root_path + "/" + domain_id + "/tracking/activities", json={"enabled": enabled} if enabled is not None else None, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request(
+            "PUT", 
+            self.root_path + "/" + domain_id + "/tracking/activities",
+            json={"enabled": enabled} if enabled is not None else None,
+            headers=self.headers
+        )
 
     def update_tracking_cname(self,
                             domain_id:str,
@@ -51,7 +67,13 @@ class DomainsResource:
         Example:
             >>> response = client.email.domains.update_tracking_cname(domain_id="example.com")
         """
-        return self._client._request("PUT", self.root_path + "/" + domain_id + "/tracking/prefix", json={"prefix": prefix}, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request(
+            "PUT", 
+            self.root_path + "/" + domain_id + "/tracking/prefix",
+            json={"prefix": prefix},
+            headers=self.headers
+        )
 
     def verify(self, domain_id:str):
         """
@@ -66,7 +88,8 @@ class DomainsResource:
                 This can be obtained from the create() or list() methods.
         
         Returns:
-            VerifyDomainResponse: A response object containing verification status for each required DNS record:
+            VerifyDomainResponse: A response object containing verification status
+            for each required DNS record:
                 - spf_record: Status of the SPF record configuration
                     - current_value: The current SPF record value found in DNS
                     - verified: Whether the SPF record is correctly configured
@@ -84,7 +107,8 @@ class DomainsResource:
                     - verified: Whether the verification token is correctly configured
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+            or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to verify domains
             NaxaiResourceNotFound: If the specified domain_id doesn't exist
@@ -114,7 +138,8 @@ class DomainsResource:
             >>> 
             >>> if not verification.tracking_record.verified:
             ...     print("Tracking record needs to be configured")
-            ...     print(f"Current value: {verification.tracking_record.current_value or 'Not found'}")
+            ...     print(f"Current value: 
+            ...           f"{verification.tracking_record.current_value or 'Not found'}")
             >>> 
             >>> if not verification.mx_record.verified:
             ...     print("MX record needs to be configured")
@@ -122,7 +147,8 @@ class DomainsResource:
             >>> 
             >>> if not verification.verification_token.verified:
             ...     print("Verification token needs to be configured")
-            ...     print(f"Current value: {verification.verification_token.current_value or 'Not found'}")
+            ...     print(f"Current value: "
+            ...           f"{verification.verification_token.current_value or 'Not found'}")
             Domain fully verified: False
             SPF record needs to be configured
             Current value: Not found
@@ -131,7 +157,8 @@ class DomainsResource:
         
         Note:
             - This method performs a real-time check of the domain's DNS records
-            - DNS propagation can take time (up to 24-48 hours), so records may not verify immediately
+            - DNS propagation can take time (up to 24-48 hours), so records may
+              not verify immediately
             - All records must be verified for the domain to be fully functional for email sending
             - The required DNS records include:
             * SPF (Sender Policy Framework): Helps prevent email spoofing
@@ -153,7 +180,14 @@ class DomainsResource:
             VerifyDomainResponse: For the structure of the verification response
             BaseRecord: For the structure of individual record verification status
         """
-        return VerifyDomainResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + domain_id + "/verify", headers=self.headers)))
+        # pylint: disable=protected-access
+        return VerifyDomainResponse.model_validate_json(
+            json.dumps(self._client._request(
+                "GET", 
+                self.root_path + "/" + domain_id + "/verify",
+                headers=self.headers
+            ))
+        )
 
     def delete(self, domain_id:str):
         """
@@ -170,7 +204,8 @@ class DomainsResource:
             None: The API returns a 204 No Content response on successful deletion.
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+            or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to delete domains
             NaxaiResourceNotFound: If the specified domain_id doesn't exist
@@ -190,18 +225,25 @@ class DomainsResource:
         
         Note:
             - This operation cannot be undone
-            - If you delete a domain that is actively being used for sending emails, those emails may fail
+            - If you delete a domain that is actively being used for sending emails, those
+              emails may fail
             - Any sender identities associated with this domain will also be invalidated
             - If you want to use the domain again in the future, you'll need to add it again
             and go through the verification process
-            - Consider using the get() method before deletion to ensure you're deleting the correct domain
+            - Consider using the get() method before deletion to ensure you're deleting
+              the correct domain
         
         See Also:
             list: For retrieving all domains in your account
             get: For retrieving details about a specific domain
             create: For adding a new domain to your account
         """
-        return self._client._request("DELETE", self.root_path + "/" + domain_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request(
+            "DELETE", 
+            self.root_path + "/" + domain_id,
+            headers=self.headers
+        )
 
     #TODO: get explanations
     def update(self, domain_id:str):
@@ -234,7 +276,8 @@ class DomainsResource:
                 - modified_by: Identifier of the user who last modified the domain
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+            or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to update domains
             NaxaiResourceNotFound: If the specified domain_id doesn't exist
@@ -244,7 +287,8 @@ class DomainsResource:
             >>> updated_domain = client.email.domains.update(domain_id="dom_123abc")
             >>> 
             >>> print(f"Domain: {updated_domain.domain_name}")
-            >>> print(f"Verification status: {'Verified' if updated_domain.verified else 'Not verified'}")
+            >>> print(f"Verification status: "
+            >>>       f"{'Verified' if updated_domain.verified else 'Not verified'}")
             >>> print(f"Tracking enabled: {updated_domain.tracking_enabled}")
             >>> print(f"Tracking validated: {updated_domain.tracking_validated}")
             >>> print(f"Last modified: {updated_domain.modified_at}")
@@ -256,7 +300,8 @@ class DomainsResource:
         
         Note:
             - This method is useful after making DNS changes to refresh the verification status
-            - It does not currently support modifying domain properties (such as shared_with_subaccounts)
+            - It does not currently support modifying domain properties
+              (such as shared_with_subaccounts)
             - The response includes the current verification status of the domain
             - If the domain is not verified, use the verify() method to get detailed information
             about which DNS records need to be configured
@@ -270,7 +315,14 @@ class DomainsResource:
             get: For retrieving details about a specific domain without updating
             UpdateDomainResponse: For the structure of the update response
         """
-        return UpdateDomainResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + domain_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateDomainResponse.model_validate_json(
+            json.dumps(self._client._request(
+                "PUT", 
+                self.root_path + "/" + domain_id,
+                headers=self.headers
+            ))
+        )
 
     def get(self, domain_id: str):
         """
@@ -302,7 +354,8 @@ class DomainsResource:
                 - modified_by: Identifier of the user who last modified the domain
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters or
+            server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access domain information
             NaxaiResourceNotFound: If the specified domain_id doesn't exist
@@ -317,7 +370,8 @@ class DomainsResource:
             >>> # Display DNS configuration information
             >>> if not domain.verified:
             ...     print("\nDNS Configuration Required:")
-            ...     print(f"Verification token: Add TXT record with value: {domain.verification_token}")
+            ...     print(f"Verification token: Add TXT record with value: "
+            ...           f"{domain.verification_token}")
             ...     print(f"DKIM: Add {domain.dkim_name} with value: {domain.dkim_value}")
             ...     print(f"SPF: Add or update TXT record with: {domain.spf_record}")
             >>> 
@@ -325,13 +379,15 @@ class DomainsResource:
             >>> print(f"\nTracking enabled: {domain.tracking_enabled}")
             >>> print(f"Tracking validated: {domain.tracking_validated}")
             >>> if domain.tracking_enabled and not domain.tracking_validated:
-            ...     print(f"Add CNAME record {domain.tracking_name} with value: {domain.tracking_record}")
+            ...     print(f"Add CNAME record {domain.tracking_name} with value: "
+            ...           f"{domain.tracking_record}")
             Domain: example.com (ID: dom_123abc)
             Verification status: False
             
             DNS Configuration Required:
             Verification token: Add TXT record with value: naxai-verification=abc123def456
-            DKIM: Add dkim._domainkey.example.com with value: v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA...
+            DKIM: Add dkim._domainkey.example.com with value: 
+            v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA...
             SPF: Add or update TXT record with: v=spf1 include:spf.naxai.com ~all
             
             Tracking enabled: True
@@ -344,9 +400,11 @@ class DomainsResource:
             - For domain ownership verification, add a TXT record with the verification_token value
             - For DKIM authentication, add a TXT record at dkim_name with the dkim_value
             - For SPF configuration, add or update a TXT record with the spf_record value
-            - For tracking configuration, add a CNAME record at tracking_name with the tracking_record value
+            - For tracking configuration, add a CNAME record at tracking_name with the
+              tracking_record value
             - The verified field indicates whether the domain ownership has been verified
-            - The tracking_validated field indicates whether the tracking configuration has been verified
+            - The tracking_validated field indicates whether the tracking configuration has
+              been verified
             - Use the verify() method to check the current DNS configuration status
         
         See Also:
@@ -355,7 +413,14 @@ class DomainsResource:
             list: For retrieving all domains in your account
             GetDomainResponse: For the structure of the domain response
         """
-        return GetDomainResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + domain_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetDomainResponse.model_validate_json(
+            json.dumps(self._client._request(
+                "GET", 
+                self.root_path + "/" + domain_id,
+                headers=self.headers
+            ))
+        )
 
     @validate_call
     def create(self,
@@ -393,7 +458,8 @@ class DomainsResource:
                 - modified_by: Identifier of the user who created the domain
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+            or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to create domains
             ValidationError: If the domain_name is less than 3 characters
@@ -410,10 +476,12 @@ class DomainsResource:
             >>> 
             >>> # Display DNS configuration instructions
             >>> print("\nDNS Configuration Required:")
-            >>> print(f"1. Verification token: Add TXT record with value: {new_domain.verification_token}")
+            >>> print(f"1. Verification token: Add TXT record with value: "
+            >>>       f"{new_domain.verification_token}")
             >>> print(f"2. DKIM: Add {new_domain.dkim_name} with value: {new_domain.dkim_value}")
             >>> print(f"3. SPF: Add or update TXT record with: {new_domain.spf_record}")
-            >>> print(f"4. Tracking: Add CNAME record {new_domain.tracking_name} with value: {new_domain.tracking_record}")
+            >>> print(f"4. Tracking: Add CNAME record {new_domain.tracking_name} with value:"
+            >>>       f" {new_domain.tracking_record}")
             >>> 
             >>> # After configuring DNS, verify the domain
             >>> print("\nAfter configuring DNS records, verify the domain:")
@@ -423,7 +491,8 @@ class DomainsResource:
             
             DNS Configuration Required:
             1. Verification token: Add TXT record with value: naxai-verification=abc123def456
-            2. DKIM: Add dkim._domainkey.example.com with value: v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA...
+            2. DKIM: Add dkim._domainkey.example.com with
+              value: v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA...
             3. SPF: Add or update TXT record with: v=spf1 include:spf.naxai.com ~all
             4. Tracking: Add CNAME record track.example.com with value: track.naxai.com
             
@@ -431,15 +500,18 @@ class DomainsResource:
             client.email.domains.verify(domain_id="dom_123abc")
         
         Note:
-            - After creating a domain, you must configure DNS records to verify ownership and enable features
+            - After creating a domain, you must configure DNS records to verify ownership
+              and enable features
             - The domain will not be usable for sending emails until it's verified
-            - DNS propagation can take time (up to 24-48 hours), so verification may not succeed immediately
+            - DNS propagation can take time (up to 24-48 hours), so verification may not
+              succeed immediately
             - The required DNS records include:
             * TXT record for domain ownership verification
             * TXT record for DKIM authentication
             * TXT record for SPF configuration
             * CNAME record for tracking configuration
-            - The shared_with_subaccounts parameter determines whether subaccounts can use this domain
+            - The shared_with_subaccounts parameter determines whether subaccounts can use
+              this domain
             - Once the domain is verified, you can create sender identities using this domain
             - Use the verify() method to check if your DNS configuration is correct
         
@@ -454,7 +526,15 @@ class DomainsResource:
             "sharedWithSubaccounts": shared_with_subaccounts
         }
 
-        return CreateDomainResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data, headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateDomainResponse.model_validate_json(
+            json.dumps(self._client._request(
+                "POST", 
+                self.root_path,
+                json=data,
+                headers=self.headers
+            ))
+        )
 
     def list(self):
         """
@@ -513,19 +593,22 @@ class DomainsResource:
             Verification token: naxai-verification=xyz789abc
             
             >>> # Find domains with tracking issues
-            >>> tracking_issues = [d for d in domains if d.tracking_enabled and not d.tracking_validated]
+            >>> tracking_issues = [d for d in domains if d.tracking_enabled and not \
+            >>>                    d.tracking_validated]
             >>> if tracking_issues:
             ...     print("\nDomains with tracking configuration issues:")
             ...     for domain in tracking_issues:
             ...         print(f"- {domain.domain_name}")
-            ...         print(f"  Add CNAME record {domain.tracking_name} with value: {domain.tracking_record}")
+            ...         print(f"  Add CNAME record {domain.tracking_name} "
+            ...               f"with value: {domain.tracking_record}")
             Domains with tracking configuration issues:
             - new-domain.example.com
             Add CNAME record track.new-domain.example.com with value: track.naxai.com
         
         Note:
             - This method returns all domains associated with your account
-            - The response is a list-like object that supports iteration, indexing, and len() operations
+            - The response is a list-like object that supports iteration, indexing, and
+              len() operations
             - Each domain in the list includes its verification status and DNS configuration details
             - For domains that are not verified, you can use the verification_token, dkim_name,
             dkim_value, and spf_record fields to configure the necessary DNS records
@@ -540,4 +623,11 @@ class DomainsResource:
             verify: For checking the DNS configuration of a domain
             ListDomainsResponse: For the structure of the response object
         """
-        return ListDomainsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListDomainsResponse.model_validate_json(
+            json.dumps(self._client._request(
+                "GET", 
+                self.root_path,
+                headers=self.headers
+            ))
+        )

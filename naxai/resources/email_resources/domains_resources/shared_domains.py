@@ -1,3 +1,11 @@
+"""
+Shared domains resource for the Naxai SDK.
+
+This module provides methods for interacting with shared domains in the Naxai API,
+allowing users to retrieve domains that have been pre-configured and verified
+for email sending without requiring custom domain verification.
+"""
+
 import json
 from naxai.models.email.responses.domains_responses import ListSharedDomainsResponse
 
@@ -52,9 +60,12 @@ class SharedDomainsResource:
         
         Note:
             - Shared domains are already verified and configured for proper email delivery
-            - Using shared domains can be convenient but may have limitations compared to custom domains
-            - Shared domains are typically used for testing or when custom domain verification is not possible
-            - The response is a list-like object that supports iteration, indexing, and len() operations
+            - Using shared domains can be convenient but may have limitations compared
+              to custom domains
+            - Shared domains are typically used for testing or when custom domain verification
+              is not possible
+            - The response is a list-like object that supports iteration, indexing, and len()
+              operations
             - No parameters are required for this method as it returns all available shared domains
             - The method logs the API request URL at debug level for troubleshooting purposes
         
@@ -62,4 +73,8 @@ class SharedDomainsResource:
             ListSharedDomainsResponse: For the structure of the response object
             DomainsResource.list: For retrieving custom domains owned by your account
         """
-        return ListSharedDomainsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListSharedDomainsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             headers=self.headers)))

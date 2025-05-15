@@ -1,3 +1,12 @@
+"""
+Segment contacts resource for the Naxai People SDK.
+
+This module provides methods for managing contacts within segments in the Naxai platform,
+including adding and removing contacts from manual segments, counting segment members,
+and retrieving contacts that belong to specific segments. These operations are essential
+for targeted audience management and campaign planning.
+"""
+
 import json
 from typing import Optional
 from pydantic import Field, validate_call
@@ -63,7 +72,11 @@ class SegmentsContactsResource:
             - This operation is idempotent - calling it multiple times with the same parameters
             will not result in duplicate contacts in the segment
         """
-        return self._client._request("POST", self.root_path + "/" + segment_id + "/addContacts", json={"ids": contact_ids}, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("POST",
+                                     self.root_path + "/" + segment_id + "/addContacts",
+                                     json={"ids": contact_ids},
+                                     headers=self.headers)
 
     @validate_call
     def delete(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
@@ -116,7 +129,11 @@ class SegmentsContactsResource:
             - The operation is idempotent - calling it multiple times with the same parameters
             will not result in an error
         """
-        return self._client._request("POST", self.root_path + "/" + segment_id + "/deleteContacts", json={"ids": contact_ids}, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("POST",
+                                     self.root_path + "/" + segment_id + "/deleteContacts",
+                                     json={"ids": contact_ids},
+                                     headers=self.headers)
 
     def count(self, segment_id: str):
         """
@@ -164,11 +181,16 @@ class SegmentsContactsResource:
         
         Note:
             - This method works with both manual and dynamic segments
-            - For large segments, the count operation is optimized and faster than retrieving all contacts
+            - For large segments, the count operation is optimized and faster than
+              retrieving all contacts
             - The count represents the current state and may change as contacts are added/removed
             or as they meet/no longer meet the criteria for dynamic segments
         """
-        return CountContactsInSegmentResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/countContacts", headers=self.headers)))
+        # pylint: disable=protected-access
+        return CountContactsInSegmentResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + segment_id + "/countContacts",
+                                             headers=self.headers)))
 
     @validate_call
     def list(self,
@@ -219,7 +241,8 @@ class SegmentsContactsResource:
                 )
                 
                 print(f"Page {first_page.pagination.page} of {first_page.pagination.total_pages}")
-                print(f"Showing {len(first_page.contacts)} of {first_page.pagination.total_items} contacts")
+                print(f"Showing {len(first_page.contacts)} of "
+                      f"{first_page.pagination.total_items} contacts")
                 
                 # Display the contacts on this page
                 for contact in first_page.contacts:
@@ -245,4 +268,9 @@ class SegmentsContactsResource:
             the total number of contacts before retrieving them
         """
         params = {"page": page, "pageSize": page_size, "sort": sort}
-        return ListContactsOfSegmentResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + segment_id + "/members", headers=self.headers, params=params)))
+        # pylint: disable=protected-access
+        return ListContactsOfSegmentResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + segment_id + "/members",
+                                             headers=self.headers,
+                                             params=params)))

@@ -1,3 +1,11 @@
+"""
+Clicked URLs reporting resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing metrics about URL clicks
+in emails sent through the Naxai platform, allowing users to track engagement
+and optimize email content based on link performance.
+"""
+
 import datetime
 import json
 from typing import Optional, Literal
@@ -11,11 +19,17 @@ class ClickedUrlsResource:
         self.root_path = root_path + "/clicks"
         self.headers = {"Content-Type": "application/json"}
 
-    def list(self,
-              start: Optional[int] = int((datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=7)).timestamp()),
-              stop: Optional[int] = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
-              group: Optional[Literal["day", "month"]] = "day",
-              ):
+    def list(
+        self,
+        start: Optional[int] = int(
+            (datetime.datetime.now(tz=datetime.timezone.utc) -
+             datetime.timedelta(days=7)).timestamp()
+        ),
+        stop: Optional[int] = int(
+            datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+        ),
+        group: Optional[Literal["day", "month"]] = "day",
+        ):
         """
         Retrieve metrics about clicked URLs in emails sent through the Naxai email system.
         
@@ -43,7 +57,8 @@ class ClickedUrlsResource:
                     - clicked_unique: Number of unique recipients who clicked this URL
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters
+                or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access click metrics
         
@@ -63,7 +78,11 @@ class ClickedUrlsResource:
             >>> print(f"Found data for {len(metrics.stats)} URLs")
             >>> 
             >>> # Find the most clicked URLs
-            >>> sorted_urls = sorted(metrics.stats, key=lambda x: x.clicked_unique or 0, reverse=True)
+            >>> sorted_urls = sorted(
+            ...     metrics.stats,
+            ...     key=lambda x: x.clicked_unique or 0,
+            ...     reverse=True
+            ... )
             >>> print("\nTop 3 most clicked URLs:")
             >>> for i, url_stats in enumerate(sorted_urls[:3], 1):
             ...     print(f"{i}. {url_stats.url}")
@@ -96,17 +115,17 @@ class ClickedUrlsResource:
         
         Note:
             - The start and stop timestamps are provided in seconds since epoch but converted to
-            milliseconds in the response
+              milliseconds in the response
             - The default time range is the past 7 days if no parameters are provided
             - The difference between clicked and clicked_unique indicates how many recipients
-            clicked multiple times on the same URL
+              clicked multiple times on the same URL
             - URLs with high click rates but low conversion might indicate misleading content
-            or technical issues on landing pages
+              or technical issues on landing pages
             - Analyzing which URLs get the most clicks can help optimize email content and
-            call-to-action placement
+              call-to-action placement
             - For best results, use a time range that matches your email sending frequency
             - The group parameter affects the granularity of time-based analysis but not the
-            URL-specific metrics themselves
+              URL-specific metrics themselves
         
         See Also:
             ListClickedUrlsMetricsResponse: For the structure of the response object
@@ -118,5 +137,9 @@ class ClickedUrlsResource:
             "stop": stop,
             "group": group
         }
-
-        return ListClickedUrlsMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListClickedUrlsMetricsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))

@@ -1,3 +1,12 @@
+"""
+Contacts resource for the Naxai People SDK.
+
+This module provides methods for managing contacts in the Naxai platform,
+including searching, counting, creating, updating, and retrieving individual
+contact profiles. It also serves as a container for more specialized contact
+resources such as events, identifiers, and segment memberships.
+"""
+
 import json
 from typing import Optional, Union
 from pydantic import Field, validate_call
@@ -22,6 +31,7 @@ class ContactsResource:
         self.segments: SegmentsResource = SegmentsResource(client, self.root_path)
 
     @validate_call
+    # pylint: disable=protected-access
     def search(self,
                 page: Optional[int] = Field(default=1, ge=1),
                 page_size: Optional[int] = Field(default=50, ge=1),
@@ -42,7 +52,8 @@ class ContactsResource:
             sort (Optional[str]): Sorting criteria in the format "field:direction".
                 Defaults to "createdAt:desc" (newest contacts first).
                 Examples: "email:asc", "createdAt:desc", "lastName:asc"
-            condition (Optional[Union[dict, SearchCondition]]): Search conditions to filter contacts.
+            condition (Optional[Union[dict, SearchCondition]]): 
+                Search conditions to filter contacts.
                 Can be provided as a SearchCondition object or a dictionary with the same structure.
                 Defaults to None (no filtering).
         
@@ -71,7 +82,8 @@ class ContactsResource:
                     condition = SearchCondition(
                         all=[
                             {"attribute": {"field": "country", "operator": "eq", "value": "US"}},
-                            {"attribute": {"field": "subscription_status", "operator": "eq", "value": "active"}}
+                            {"attribute": {"field": "subscription_status",
+                                           "operator": "eq", "value": "active"}}
                         ]
                     )
                     
@@ -84,7 +96,8 @@ class ContactsResource:
                     )
                     
                     print(f"Found {results.pagination.total_items} matching contacts")
-                    print(f"Showing page {results.pagination.page} of {results.pagination.total_pages}")
+                    print(f"Showing page {results.pagination.page} of "
+                          f"{results.pagination.total_pages}")
                     
                     # Process the contacts on this page
                     for contact in results.contacts:
@@ -104,7 +117,8 @@ class ContactsResource:
                             sort="email:asc",
                             condition=condition
                         )
-                        print(f"\nFetched page {next_page.pagination.page} with {len(next_page.contacts)} more contacts")
+                        print(f"\nFetched page {next_page.pagination.page} with "
+                              f"{len(next_page.contacts)} more contacts")
                         
                 except Exception as e:
                     print(f"Error searching contacts: {str(e)}")
@@ -112,7 +126,8 @@ class ContactsResource:
         
         Note:
             - For complex searches, use the SearchCondition class to build structured queries
-            - The condition parameter supports logical operators (all/any) and various comparison operators
+            - The condition parameter supports logical operators (all/any) and various
+              comparison operators
             - For large result sets, use pagination to retrieve contacts in manageable batches
             - The sort parameter accepts various contact fields with "asc" or "desc" direction
             - Contact data may include custom attributes beyond the standard fields
@@ -120,12 +135,22 @@ class ContactsResource:
         """
         params = {"page": page, "pageSize": page_size, "sort": sort}
 
-        body_params = condition.model_dump(by_alias=True, exclude_none=True) if isinstance(condition, SearchCondition) else condition
+        body_params = condition.model_dump(by_alias=True, exclude_none=True) \
+                      if isinstance(condition, SearchCondition) else condition
         if body_params:
             json_body = {"condition": condition}
-            results = self._client._request("POST", self.root_path, params=params, json=json_body, headers=self.headers)
+
+            results = self._client._request("POST",
+                                            self.root_path,
+                                            params=params,
+                                            json=json_body,
+                                            headers=self.headers)
         else:
-            results = self._client._request("POST", self.root_path, params=params, headers=self.headers)
+            results = self._client._request("POST",
+                                            self.root_path,
+                                            params=params,
+                                            headers=self.headers)
+
         return SearchContactsResponse.model_validate_json(json.dumps(results))
 
 
@@ -170,11 +195,15 @@ class ContactsResource:
         Note:
             - This method returns the total count across all contacts in your account
             - For counting contacts in specific segments, use the segments.contacts.count method
-            - For counting contacts matching specific criteria, use the search method with conditions
-            and check the pagination.total_items value
+            - For counting contacts matching specific criteria, use the search method
+              with conditions and check the pagination.total_items value
             - The count represents the current state and may change as contacts are added or removed
         """
-        return CountContactsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/count", headers=self.headers)))
+        # pylint: disable=protected-access
+        return CountContactsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/count",
+                                             headers=self.headers)))
 
     #TODO: email validation, phone validation
     @validate_call
@@ -184,7 +213,9 @@ class ContactsResource:
                         external_id: Optional[str] = None,
                         unsubscribe: Optional[bool] = None,
                         language: Optional[str] = None,
-                        created_at: Optional[int] = Field(ge=2208988800, le=4102444800, default=None),
+                        created_at: Optional[int] = Field(ge=2208988800,
+                                                          le=4102444800,
+                                                          default=None),
                         **kwargs):
         """
         Create a new contact or update an existing one in the Naxai People API.
@@ -262,12 +293,14 @@ class ContactsResource:
             ```
         
         Note:
-            - This is an upsert operation - it will create or update depending on whether the contact exists
+            - This is an upsert operation - it will create or update depending on whether
+              the contact exists
             - Only the fields you provide will be updated; omitted fields will remain unchanged
             - Custom attributes must be created first using the attributes.create method
             - The identifier used must match your account's primary identifier type
             - Email addresses should be valid and properly formatted
-            - The created_at timestamp allows you to preserve the original creation date from your system
+            - The created_at timestamp allows you to preserve the original creation date
+              from your system
             - For bulk operations, consider using the batch API endpoints
         """
         data = {
@@ -278,7 +311,12 @@ class ContactsResource:
             "createdAt": created_at,
             **kwargs
         }
-        return CreateOrUpdateContactResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + identifier, json=data, headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateOrUpdateContactResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path + "/" + identifier,
+                                             json=data,
+                                             headers=self.headers)))
 
     def get(self, identifier: str):
         """
@@ -347,10 +385,15 @@ class ContactsResource:
             - The contact object includes both standard fields and any custom attributes
             - Custom attributes can be accessed as properties on the contact object
             - If a field or attribute has no value, it will typically be None
-            - The primary identifier used in your account determines which field can be used as the identifier
+            - The primary identifier used in your account determines which field can be used
+              as the identifier
             - For retrieving multiple contacts, use the search method with appropriate conditions
         """
-        return GetContactResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + identifier, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetContactResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + identifier,
+                                             headers=self.headers)))
 
     def delete(self, identifier: str):
         """
@@ -413,4 +456,7 @@ class ContactsResource:
             - For compliance with privacy regulations like GDPR, you may need to delete
             contacts upon request
         """
-        return self._client._request("DELETE", self.root_path + "/" + identifier, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("DELETE",
+                                     self.root_path + "/" + identifier,
+                                     headers=self.headers)

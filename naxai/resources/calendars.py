@@ -1,3 +1,13 @@
+"""
+Calendars resource for the Naxai SDK.
+
+This module provides methods for managing calendars in the Naxai platform,
+including creating, retrieving, updating, and checking calendars with their
+working hours, schedules, and exclusion dates. Calendars can be used to define
+business hours, holidays, and other time-based constraints for various Naxai
+services such as voice calls and other scheduled operations.
+"""
+
 import datetime
 import json
 from typing import Optional
@@ -21,7 +31,9 @@ class CalendarsResource:
         self._client = client
         self.root_path = "/calendars"
         self.headers = {"Content-Type": "application/json"}
-        self.holidays_templates: HolidaysTemplatesResource = HolidaysTemplatesResource(self._client, self.root_path)
+        self.holidays_templates: HolidaysTemplatesResource = HolidaysTemplatesResource(
+            self._client,
+            self.root_path)
 
     def check(self,
               calendar_id: str,
@@ -78,7 +90,12 @@ class CalendarsResource:
             CheckCalendarResponse: The response model for availability checks
         """
         params = {"timestamp": timestamp}
-        return CheckCalendarResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id + "/check", params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return CheckCalendarResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + calendar_id + "/check",
+                                             params=params,
+                                             headers=self.headers)))
 
     def delete_exclusions(self, calendar_id: str, exclusions: list[str]):
         """Deletes exclusion dates from a calendar.
@@ -124,8 +141,13 @@ class CalendarsResource:
         """
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only delete up to 1000 exclusions at a time.")
-
-        return DeleteExclusionsResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/remove", json={"exclusions": exclusions}, headers=self.headers)))
+        url = self.root_path + "/" + calendar_id + "/exclusions/remove"
+        # pylint: disable=protected-access
+        return DeleteExclusionsResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             url,
+                                             json={"exclusions": exclusions},
+                                             headers=self.headers)))
 
     def add_exclusions(self, calendar_id: str, exclusions: list[str]):
         """Adds new exclusion dates to an existing calendar.
@@ -169,8 +191,12 @@ class CalendarsResource:
         """
         if len(exclusions) > 1000:
             raise NaxaiValueError("You can only add up to 1000 exclusions at a time.")
-        
-        return AddExclusionsResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path + "/" + calendar_id + "/exclusions/add", json={"exclusions": exclusions}, headers=self.headers)))
+        # pylint: disable=protected-access
+        return AddExclusionsResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path + "/" + calendar_id + "/exclusions/add",
+                                             json={"exclusions": exclusions},
+                                             headers=self.headers)))
 
     def delete(self, calendar_id):
         """
@@ -189,7 +215,10 @@ class CalendarsResource:
         Example:
             >>> response = client.calendars.delete("calendar_id")
         """
-        return self._client._request("DELETE", self.root_path + "/" + calendar_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("DELETE",
+                                     self.root_path + "/" + calendar_id,
+                                     headers=self.headers)
 
     def update(self, calendar_id: str, data: CreateCalendarRequest):
         """Updates an existing calendar with new configuration.
@@ -251,7 +280,13 @@ class CalendarsResource:
             ScheduleObject: The model class for daily schedule configuration
             CreateCalendarRequest: The model class for update request data
         """
-        return UpdateCalendarResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + calendar_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateCalendarResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path + "/" + calendar_id,
+                                             json=data.model_dump(by_alias=True,
+                                                                  exclude_none=True),
+                                             headers=self.headers)))
 
     def get(self, calendar_id: str):
         """Retrieves a specific calendar by its ID.
@@ -279,7 +314,8 @@ class CalendarsResource:
 
         Raises:
             APIError: If there is an error response from the API.
-            ValidationError: If the response data cannot be properly validated into a Calendar object.
+            ValidationError: 
+                If the response data cannot be properly validated into a Calendar object.
             NotFoundError: If the calendar with the specified ID doesn't exist.
 
         Example:
@@ -302,8 +338,11 @@ class CalendarsResource:
             Calendar: The model class for calendar data
             ScheduleObject: The model class for daily schedule configuration
         """
-
-        return GetCalendarResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + calendar_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetCalendarResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + calendar_id,
+                                             headers=self.headers)))
 
     def list(self):
         """Retrieve a list of all calendars.
@@ -318,7 +357,8 @@ class CalendarsResource:
 
         Raises:
             APIError: If there is an error response from the API.
-            ValidationError: If the response data cannot be properly validated into Calendar objects.
+            ValidationError: 
+                If the response data cannot be properly validated into Calendar objects.
 
         Example:
             >>> calendars = client.calendars.list()
@@ -333,7 +373,11 @@ class CalendarsResource:
         See Also:
             Calendar: The model class used for representing calendar data
         """
-        return ListCalendarsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListCalendarsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             headers=self.headers)))
 
     def create(self,
                data: CreateCalendarRequest):
@@ -341,7 +385,8 @@ class CalendarsResource:
         Creates a new calendar.
 
         Args:
-            data (CreateCalendarRequest): The request body containing the details of the calendar to be created.
+            data (CreateCalendarRequest): 
+                The request body containing the details of the calendar to be created.
 
         Returns:
             Calendar: The created calendar with its properties and settings
@@ -354,4 +399,10 @@ class CalendarsResource:
             ...     )
             ... )
         """
-        return CreateCalendarResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateCalendarResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path,
+                                             json=data.model_dump(by_alias=True,
+                                                                  exclude_none=True),
+                                             headers=self.headers)))

@@ -1,3 +1,12 @@
+"""
+Contact identifier resource for the Naxai People SDK.
+
+This module provides methods for managing the primary identifier type for contacts
+in the Naxai platform. It allows users to retrieve and update which identifier
+(email, phone, or externalId) is used as the unique key for contact records,
+which affects how contacts are referenced throughout the API.
+"""
+
 import json
 from naxai.models.people.responses.contacts_responses import (GetContactIdentifierResponse,
                                                               UpdateContactIdentifierResponse)
@@ -10,7 +19,6 @@ class IdentifierResource:
         self.root_path = root_path + "/keyIdentifier"
         self.headers = {"Content-Type": "application/json"}
 
-    #TODO: check this method ... and get information
     def get(self):
         """
         Retrieve the current primary identifier type for contacts in the Naxai People API.
@@ -21,7 +29,8 @@ class IdentifierResource:
         
         Returns:
             GetContactIdentifierResponse: A response object containing the current primary
-                identifier type. The identifier field will be one of: "email", "phone", or "externalId".
+                identifier type. The identifier field will be one of:
+                "email", "phone", or "externalId".
         
         Raises:
             NaxaiAPIRequestError: If there is an error response from the API.
@@ -49,12 +58,15 @@ class IdentifierResource:
         Note:
             - The primary identifier affects how contacts are identified across the entire API
             - This setting applies to all contacts in your account
-            - Understanding the current identifier type is important when creating or updating contacts
+            - Understanding the current identifier type is important when creating or
+              updating contacts
         """
+        # pylint: disable=protected-access
+        return GetContactIdentifierResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             headers=self.headers)))
 
-        return GetContactIdentifierResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
-
-    #TODO: check this method ... and get information
     def update(self):
         """
         Update the primary identifier type for contacts in the Naxai People API.
@@ -65,7 +77,8 @@ class IdentifierResource:
         
         Returns:
             UpdateContactIdentifierResponse: A response object containing the new primary
-                identifier type. The identifier field will be one of: "email", "phone", or "externalId".
+                identifier type. The identifier field will be one of:
+                "email", "phone", or "externalId".
         
         Raises:
             NaxaiAPIRequestError: If there is an error response from the API.
@@ -88,11 +101,17 @@ class IdentifierResource:
             ```
         
         Note:
-            - This is a significant change that affects how contacts are identified across the entire API
-            - Before changing the identifier type, ensure that all contacts have the new identifier type populated
+            - This is a significant change that affects how contacts are identified across
+              the entire API
+            - Before changing the identifier type, ensure that all contacts have the new
+              identifier type populated
             - Contacts without the new identifier type may become inaccessible
             - This operation may take some time to propagate through the system
-            - Consider the impact on any integrations or automations that rely on the current identifier type
+            - Consider the impact on any integrations or automations that rely on the
+              current identifier type
         """
-
-        return UpdateContactIdentifierResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateContactIdentifierResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path,
+                                             headers=self.headers)))

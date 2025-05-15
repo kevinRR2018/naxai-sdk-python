@@ -1,3 +1,11 @@
+"""
+Email newsletters resource for the Naxai SDK.
+
+This module provides methods for managing email newsletters in the Naxai platform,
+including creation, retrieval, updating, and deletion of newsletters with support
+for both HTML and visual editor content formats.
+"""
+
 import json
 from pydantic import Field, validate_call
 from naxai.models.email.requests.newsletters_request import CreateEmailNewsletterRequest
@@ -33,7 +41,8 @@ class NewslettersResource:
                 - subject (str, optional): The subject line of the newsletter
                 - pre_header (str, optional): Preview text shown in email clients
                 - body (str, optional): HTML content (required when source="html")
-                - body_design (dict, optional): Visual editor content (required when source="editor")
+                - body_design (dict, optional): 
+                    Visual editor content (required when source="editor")
                 - thumbnail (str, optional): URL or base64 data of a thumbnail image
                 - preview (str, optional): URL to preview the newsletter
         
@@ -50,7 +59,8 @@ class NewslettersResource:
                 - and other newsletter properties
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to create newsletters
             ValidationError: If the provided data fails validation
@@ -65,7 +75,8 @@ class NewslettersResource:
             ...     reply_to="newsletter@example.com",
             ...     subject="Your January Newsletter Is Here!",
             ...     pre_header="Check out our latest updates and offers",
-            ...     body="<html><body><h1>January Newsletter</h1><p>Welcome to our monthly update...</p></body></html>",
+            ...     body="<html><body><h1>January Newsletter</h1>\
+            ...           <p>Welcome to our monthly update...</p></body></html>",
             ...     thumbnail="https://example.com/thumbnails/jan-2023.png"
             ... )
             >>> 
@@ -93,7 +104,8 @@ class NewslettersResource:
             ...     body_design={
             ...         "blocks": [
             ...             {"type": "header", "text": "Introducing Our New Product Line"},
-            ...             {"type": "text", "text": "We're excited to announce our latest products..."}
+            ...             {"type": "text",
+            ...              "text": "We're excited to announce our latest products..."}
             ...         ]
             ...     }
             ... )
@@ -110,14 +122,17 @@ class NewslettersResource:
         Note:
             - Newsletters are created in "draft" state unless a scheduled_at timestamp is provided
             - For newsletters with source="html", the body field must contain valid HTML content
-            - For newsletters with source="editor", the body_design field must contain structured design data
+            - For newsletters with source="editor", the body_design field must contain
+              structured design data
             - The segment_id determines which subscribers will receive the newsletter
             - The sender_id must reference a verified sender identity in your Naxai account
             - The reply_to email address will receive replies to the newsletter
             - The pre_header is important for improving open rates as it appears in email previews
             - After creating a draft newsletter, you can later schedule it using the update method
-            - The created newsletter will have a unique newsletter_id that can be used for future operations
-            - A preview URL is typically generated for the newsletter, allowing you to view it before sending
+            - The created newsletter will have a unique newsletter_id that can be used for
+              future operations
+            - A preview URL is typically generated for the newsletter, allowing you to view
+              it before sending
         
         See Also:
             list: For retrieving multiple newsletters
@@ -125,7 +140,13 @@ class NewslettersResource:
             update: For modifying an existing newsletter
             delete: For removing a newsletter
         """
-        return CreateNewsletterResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateNewsletterResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path,
+                                             json=data.model_dump(by_alias=True,
+                                                                  exclude_none=True),
+                                             headers=self.headers)))
 
     @validate_call
     def list(self, page: int = 1, page_size: int = Field(default=25, le=100, ge=1)):
@@ -168,7 +189,8 @@ class NewslettersResource:
             >>> newsletters = client.email.newsletters.list()
             >>> 
             >>> print(f"Found {newsletters.pagination.total_items} newsletters")
-            >>> print(f"Showing page {newsletters.pagination.page} of {newsletters.pagination.total_pages}")
+            >>> print(f"Showing page {newsletters.pagination.page} of "
+            ...       f"{newsletters.pagination.total_pages}")
             >>> 
             >>> # Display newsletters by state
             >>> for newsletter in newsletters.items:
@@ -209,15 +231,20 @@ class NewslettersResource:
             "page": page,
             "pageSize": page_size
         }
-        return ListNewsLettersResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListNewsLettersResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))
 
     def get(self, newsletter_id: str):
         """
         Retrieve detailed information about a specific newsletter in the Naxai email system.
         
-        This method fetches comprehensive information about a newsletter identified by its unique ID,
-        including its configuration, content, scheduling status, and current state. It provides
-        access to all newsletter properties, including content and design data.
+        This method fetches comprehensive information about a newsletter identified by
+        its unique ID, including its configuration, content, scheduling status, and current state.
+        It provides access to all newsletter properties, including content and design data.
         
         Parameters:
             newsletter_id (str): The unique identifier of the newsletter to retrieve.
@@ -245,7 +272,8 @@ class NewslettersResource:
                 - modified_at: Timestamp when the newsletter was last modified
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to server issues or invalid newsletter_id
+            NaxaiAPIRequestError: 
+                If the API request fails due to server issues or invalid newsletter_id
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access the newsletter
             ValidationError: If the newsletter_id is invalid
@@ -291,13 +319,17 @@ class NewslettersResource:
         Note:
             - This method retrieves the complete newsletter information, including content
             - For newsletters with source="html", the body field contains the HTML content
-            - For newsletters with source="editor", the body_design field contains the structured design data
-            - The state field indicates where the newsletter is in its lifecycle (draft, scheduled, sent)
-            - For newsletters with state="scheduled", the scheduled_at field contains the future sending time
+            - For newsletters with source="editor", the body_design field contains the
+              structured design data
+            - The state field indicates where the newsletter is in its lifecycle
+              (draft, scheduled, sent)
+            - For newsletters with state="scheduled", the scheduled_at field contains the
+              future sending time
             - For newsletters with state="sent", the sent_at field contains the sending timestamp
             - The preview URL can be used to view the newsletter in a browser
             - Use this method to check the current state of a newsletter before performing updates
-            - If the newsletter doesn't exist or you don't have permission to access it, an error will be raised
+            - If the newsletter doesn't exist or you don't have permission to access it,
+              an error will be raised
         
         See Also:
             create: For adding a new newsletter
@@ -305,7 +337,11 @@ class NewslettersResource:
             update: For modifying an existing newsletter
             delete: For removing a newsletter
         """
-        return GetNewsletterResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + newsletter_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetNewsletterResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + newsletter_id,
+                                             headers=self.headers)))
 
     def update(self, data: CreateEmailNewsletterRequest, newsletter_id: str):
         """
@@ -347,7 +383,8 @@ class NewslettersResource:
                 - modified_by: ID of the user who performed this update
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to update the newsletter
             ValidationError: If the provided data fails validation
@@ -393,7 +430,8 @@ class NewslettersResource:
             >>> # Update only the content, keeping other properties the same
             >>> content_update = CreateEmailNewsletterRequest(
             ...     source="html",
-            ...     body="<html><body><h1>Updated Content</h1><p>This is the revised newsletter content.</p></body></html>"
+            ...     body="<html><body><h1>Updated Content</h1>\
+            ...           <p>This is the revised newsletter content.</p></body></html>"
             ... )
             >>> 
             >>> result = client.email.newsletters.update(content_update, existing.newsletter_id)
@@ -403,9 +441,12 @@ class NewslettersResource:
             Preview URL: https://example.com/preview/nws_456def
         
         Note:
-            - Only include fields that need to be updated in the request; omitted fields will remain unchanged
-            - Adding a scheduled_at timestamp to a draft newsletter will change its state to "scheduled"
-            - Setting scheduled_at to None for a scheduled newsletter will change its state back to "draft"
+            - Only include fields that need to be updated in the request; omitted fields will
+              remain unchanged
+            - Adding a scheduled_at timestamp to a draft newsletter will change its state
+              to "scheduled"
+            - Setting scheduled_at to None for a scheduled newsletter will change its
+              state back to "draft"
             - Once a newsletter has been sent (state="sent"), most fields cannot be updated
             - When updating content, ensure you use the correct source type:
             * For source="html", provide the updated HTML in the body field
@@ -415,7 +456,8 @@ class NewslettersResource:
             - The state transition rules are:
             * draft -> scheduled (when scheduled_at is set)
             * scheduled -> draft (when scheduled_at is removed)
-            * draft/scheduled -> sent (when the newsletter is sent, either manually or automatically)
+            * draft/scheduled -> sent (when the newsletter is sent, 
+              either manually or automatically)
             - The modified_at and modified_by fields will be updated to reflect this change
             - The preview URL can be used to view the updated newsletter in a browser
         
@@ -425,7 +467,12 @@ class NewslettersResource:
             get: For retrieving a specific newsletter by ID
             delete: For removing a newsletter
         """
-        return UpdateNewsletterResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + newsletter_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateNewsletterResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path + "/" + newsletter_id,
+                                             json=data.model_dump(by_alias=True, exclude_none=True),
+                                             headers=self.headers)))
 
     def delete(self, newsletter_id: str):
         """
@@ -444,12 +491,14 @@ class NewslettersResource:
                 Typically contains a success indicator and/or a confirmation message.
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to server issues or invalid newsletter_id
+            NaxaiAPIRequestError: 
+                If the API request fails due to server issues or invalid newsletter_id
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to delete the newsletter
             ValidationError: If the newsletter_id is invalid
             ResourceNotFoundError: If the specified newsletter_id doesn't exist
-            OperationNotAllowedError: If the newsletter cannot be deleted (e.g., if it has been sent)
+            OperationNotAllowedError: 
+                If the newsletter cannot be deleted (e.g., if it has been sent)
         
         Example:
             >>> # First, retrieve a list of draft newsletters
@@ -459,7 +508,8 @@ class NewslettersResource:
             >>> if drafts:
             ...     # Select an outdated draft to delete
             ...     old_draft = drafts[0]
-            ...     print(f"Deleting draft newsletter: {old_draft.name} (ID: {old_draft.newsletter_id})")
+            ...     print(f"Deleting draft newsletter: "
+            ...           f"{old_draft.name} (ID: {old_draft.newsletter_id})")
             ...     
             ...     # Delete the newsletter
             ...     result = client.email.newsletters.delete(old_draft.newsletter_id)
@@ -487,11 +537,14 @@ class NewslettersResource:
             - This operation permanently removes the newsletter and cannot be undone
             - It's recommended to verify the newsletter state before deletion
             - Typically, only newsletters in "draft" state can be deleted
-            - Newsletters in "scheduled" state may need to be unscheduled first (by updating with scheduled_at=None)
+            - Newsletters in "scheduled" state may need to be unscheduled first
+              (by updating with scheduled_at=None)
             - Newsletters in "sent" state often cannot be deleted due to record-keeping requirements
-            - After deletion, any attempt to access the newsletter using its ID will result in an error
+            - After deletion, any attempt to access the newsletter using its ID will result in
+              an error
             - This method is useful for cleaning up unused or outdated draft newsletters
-            - Consider archiving important newsletters instead of deleting them if they may be needed for reference
+            - Consider archiving important newsletters instead of deleting them if they
+              may be needed for reference
         
         See Also:
             create: For adding a new newsletter
@@ -499,4 +552,7 @@ class NewslettersResource:
             get: For retrieving a specific newsletter by ID
             update: For modifying an existing newsletter or unscheduling a scheduled newsletter
         """
-        return self._client._request("DELETE", self.root_path + "/" + newsletter_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("DELETE",
+                                     self.root_path + "/" + newsletter_id,
+                                     headers=self.headers)

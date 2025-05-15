@@ -1,7 +1,17 @@
+"""
+Voice activity logs resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing detailed voice call logs,
+including listing calls with various filtering options and retrieving comprehensive
+information about specific calls. These logs contain data about call routing, duration,
+status, and other attributes for inbound, outbound, and transferred calls.
+"""
+
 import json
 from typing import Optional, Literal, Annotated
 from pydantic import Field, validate_call
-from naxai.models.voice.responses.activity_logs_responses import ListActivityLogsResponse, GetActivityLogResponse
+from naxai.models.voice.responses.activity_logs_responses import (ListActivityLogsResponse,
+                                                                  GetActivityLogResponse)
 
 class ActivityLogsResource:
     """ activity_logs resource for voice resource """
@@ -37,7 +47,8 @@ class ActivityLogsResource:
             page_size (Optional[int]): Number of items per page (1-100). Defaults to 25.
             start (Optional[int]): Start timestamp for filtering calls, in milliseconds since epoch.
             stop (Optional[int]): End timestamp for filtering calls, in milliseconds since epoch.
-            direction (Optional[Literal["inbound", "outbound", "transfer"]]): Filter by call direction.
+            direction (Optional[Literal["inbound", "outbound", "transfer"]]): 
+                Filter by call direction.
             status (Optional[Literal["delivered", "failed"]]): Filter by call status.
             from_ (Optional[str]): Filter by originating phone number.
             to (Optional[str]): Filter by destination phone number.
@@ -46,7 +57,8 @@ class ActivityLogsResource:
             broadcast_id (Optional[str]): Filter by broadcast identifier.
         
         Returns:
-            ListActivityLogsResponse: A Pydantic model containing the paginated list of call activity logs.
+            ListActivityLogsResponse: 
+                A Pydantic model containing the paginated list of call activity logs.
             The response includes:
                 - pagination: Information about the current page, total pages, and total items
                 - calls: List of CallBaseModel objects with detailed information about each call
@@ -61,7 +73,8 @@ class ActivityLogsResource:
             ...     status="delivered"
             ... )
             >>> print(f"Found {response.pagination.total_items} calls")
-            >>> print(f"Showing page {response.pagination.page} of {response.pagination.total_pages}")
+            >>> print(f"Showing page {response.pagination.page} of "
+            >>>       f"{response.pagination.total_pages}")
             >>> for call in response.calls:
             ...     print(f"Call {call.call_id}: {call.from_} → {call.to}, {call.status}")
             ...     print(f"Duration: {call.call_duration}s, Date: {call.call_date}")
@@ -95,9 +108,13 @@ class ActivityLogsResource:
             params["campaignId"] = campaign_id
         if broadcast_id:
             params["broadcastId"] = broadcast_id
+        # pylint: disable=protected-access
+        return ListActivityLogsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))
 
-        return ListActivityLogsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
-    
     def get(self, call_id:str):
         """
         Retrieves detailed information about a specific call by its ID.
@@ -138,5 +155,8 @@ class ActivityLogsResource:
             CallBaseModel: For detailed information about all available call attributes
             ListActivityLogsResponse: For retrieving multiple calls with pagination
         """
-        
-        return GetActivityLogResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + call_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetActivityLogResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + call_id,
+                                             headers=self.headers)))

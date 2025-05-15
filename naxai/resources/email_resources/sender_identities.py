@@ -1,3 +1,12 @@
+"""
+Email sender identities resource for the Naxai SDK.
+
+This module provides methods for managing email sender identities in the Naxai platform,
+including creation, retrieval, updating, and deletion of sender profiles that are used
+as "From" addresses when sending emails through the system. Sender identities must be
+associated with verified domains to ensure proper email deliverability.
+"""
+
 import json
 from typing import Optional
 from naxai.models.email.responses.senders_responses import (UpdateSenderResponse,
@@ -43,7 +52,8 @@ class SenderIdentitiesResource:
                 - modified_by: ID of the user who performed this update
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to update the sender identity
             ValidationError: If the provided email is invalid or not from a verified domain
@@ -59,8 +69,10 @@ class SenderIdentitiesResource:
             >>> 
             >>> print(f"Sender updated: {updated_sender.name} <{updated_sender.email}>")
             >>> print(f"Domain ID: {updated_sender.domain_id}")
-            >>> print(f"Verification status: {'Verified' if updated_sender.verified else 'Not verified'}")
-            >>> print(f"Last modified: {updated_sender.modified_at} by {updated_sender.modified_by}")
+            >>> print(f"Verification status: "
+            >>>       f"{'Verified' if updated_sender.verified else 'Not verified'}")
+            >>> print(f"Last modified: {updated_sender.modified_at}"
+            >>>       f" by {updated_sender.modified_by}")
             Sender updated: Marketing Team <marketing@example.com>
             Domain ID: dom_456def
             Verification status: Verified
@@ -103,7 +115,12 @@ class SenderIdentitiesResource:
             "email": email
         }
 
-        return UpdateSenderResponse.model_validate_json(json.dumps(self._client._request("PUT", self.root_path + "/" + sender_id, json=payload, headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateSenderResponse.model_validate_json(
+            json.dumps(self._client._request("PUT",
+                                             self.root_path + "/" + sender_id,
+                                             json=payload,
+                                             headers=self.headers)))
 
     def delete(self, sender_id: str):
         """
@@ -126,7 +143,8 @@ class SenderIdentitiesResource:
             NaxaiAuthorizationError: If the account lacks permission to delete the sender identity
             ValidationError: If the sender_id is invalid
             ResourceNotFoundError: If the specified sender_id doesn't exist
-            OperationNotAllowedError: If the sender identity cannot be deleted (e.g., if it's in use)
+            OperationNotAllowedError: 
+                If the sender identity cannot be deleted (e.g., if it's in use)
         
         Example:
             >>> # Delete a sender identity that is no longer needed
@@ -142,16 +160,21 @@ class SenderIdentitiesResource:
             ...     client.email.sender_identities.delete("snd_456def")
             ... except Exception as e:
             ...     print(f"Error: {str(e)}")
-            Error: Operation not allowed: Cannot delete a sender identity that is in use by active campaigns
+            Error: Operation not allowed: Cannot delete a sender identity that is in use by
+            active campaigns
         
         Note:
             - This operation permanently removes the sender identity and cannot be undone
-            - Sender identities that are currently in use by active or scheduled emails cannot be deleted
-            - After deletion, any attempt to access the sender identity using its ID will result in an error
+            - Sender identities that are currently in use by active or scheduled emails
+              cannot be deleted
+            - After deletion, any attempt to access the sender identity using its ID will result
+              in an error
             - If you need to temporarily disable a sender identity, consider updating it instead
-            - Deleting a sender identity does not affect the verification status of its associated domain
+            - Deleting a sender identity does not affect the verification status of its
+              associated domain
             - This method is useful for cleaning up unused or outdated sender identities
-            - Consider the impact on any templates or automated emails that might reference this sender
+            - Consider the impact on any templates or automated emails that might
+              reference this sender
         
         See Also:
             create: For adding a new sender identity
@@ -159,14 +182,18 @@ class SenderIdentitiesResource:
             get: For retrieving a specific sender identity
             update: For modifying an existing sender identity
         """
-        return self._client._request("DELETE", self.root_path + "/" + sender_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("DELETE",
+                                     self.root_path + "/" + sender_id,
+                                     headers=self.headers)
 
     def get(self, sender_id: str):
         """
         Retrieve detailed information about a specific sender identity in the Naxai email system.
         
-        This method fetches comprehensive information about a sender identity identified by its unique ID,
-        including its name, email address, associated domain, verification status, and sharing settings.
+        This method fetches comprehensive information about a sender identity identified by its
+        unique ID, including its name, email address, associated domain, verification status, 
+        and sharing settings.
         
         Parameters:
             sender_id (str): The unique identifier of the sender identity to retrieve.
@@ -210,11 +237,15 @@ class SenderIdentitiesResource:
         
         Note:
             - This method retrieves the complete sender identity information
-            - The verification status is important for determining if the sender can be used for sending emails
+            - The verification status is important for determining if the sender can be used
+              for sending emails
             - Sender identities must be associated with a verified domain to be usable
-            - The shared_with_subaccounts field indicates whether subaccounts can use this sender identity
-            - Use this method to check the current state of a sender identity before performing updates
-            - If the sender identity doesn't exist or you don't have permission to access it, an error will be raised
+            - The shared_with_subaccounts field indicates whether subaccounts can use this
+              sender identity
+            - Use this method to check the current state of a sender identity before
+              performing updates
+            - If the sender identity doesn't exist or you don't have permission to access it, an
+              error will be raised
         
         See Also:
             create: For adding a new sender identity
@@ -222,7 +253,11 @@ class SenderIdentitiesResource:
             update: For modifying an existing sender identity
             delete: For removing a sender identity
         """
-        return GetSenderResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + sender_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetSenderResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + sender_id,
+                                             headers=self.headers)))
 
     #TODO: email validation
     def create(self, domain_id: str, email: str, name: str):
@@ -254,7 +289,8 @@ class SenderIdentitiesResource:
                 - modified_by: ID of the user who created the sender identity
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to create sender identities
             ValidationError: If the provided email is invalid or not from the specified domain
@@ -271,8 +307,10 @@ class SenderIdentitiesResource:
             >>> 
             >>> print(f"Sender created: {new_sender.name} <{new_sender.email}>")
             >>> print(f"Sender ID: {new_sender.id}")
-            >>> print(f"Verification status: {'Verified' if new_sender.verified else 'Not verified'}")
-            >>> print(f"Created at: {new_sender.created_at} by {new_sender.modified_by}")
+            >>> print(f"Verification status: "
+            >>>       f"{'Verified' if new_sender.verified else 'Not verified'}")
+            >>> print(f"Created at: {new_sender.created_at} by"
+            >>>       f" {new_sender.modified_by}")
             Sender created: Customer Support <support@example.com>
             Sender ID: snd_456def
             Verification status: Verified
@@ -297,9 +335,12 @@ class SenderIdentitiesResource:
             - New sender identities can be used immediately for sending emails if verified
             - If verification is required, follow the verification process before using the sender
             - The display name can be any string that identifies the sender to recipients
-            - Multiple sender identities can be created for the same domain with different email addresses
-            - Sender identities are used when sending transactional emails, newsletters, and other communications
-            - The created sender identity will have a unique ID that can be used for future operations
+            - Multiple sender identities can be created for the same domain with different
+              email addresses
+            - Sender identities are used when sending transactional emails, newsletters, and other
+              communications
+            - The created sender identity will have a unique ID that can be used for future
+              operations
         
         See Also:
             list: For retrieving multiple sender identities
@@ -316,7 +357,12 @@ class SenderIdentitiesResource:
             "name": name
         }
 
-        return CreateSenderResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=payload, headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateSenderResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path,
+                                             json=payload,
+                                             headers=self.headers)))
 
     def list(self,
             domain_id: Optional[str] = None,
@@ -330,7 +376,8 @@ class SenderIdentitiesResource:
         identities are used as the "From" address when sending emails through the Naxai platform.
         
         Parameters:
-            domain_id (str, optional): Filter results to sender identities associated with a specific domain.
+            domain_id (str, optional): 
+                Filter results to sender identities associated with a specific domain.
                 If provided, only senders from this domain will be returned.
             verified (bool, optional): Filter results based on verification status.
                 If True, only verified sender identities will be returned.
@@ -397,15 +444,17 @@ class SenderIdentitiesResource:
             ...     verified=True,
             ...     shared=True
             ... )
-            >>> print(f"Found {len(filtered)} verified senders from domain dom_123abc shared with subaccounts")
+            >>> print(f"Found {len(filtered)} verified senders from "
+            >>>       f"domain dom_123abc shared with subaccounts")
             Found 1 verified senders from domain dom_123abc shared with subaccounts
         
         Note:
             - Without any filters, this method returns all sender identities in your account
             - The domain_id filter is useful when you have multiple domains and want to focus on one
-            - The verified filter helps identify sender identities that are ready to use (verified=True)
-            or that need attention (verified=False)
-            - The shared filter is helpful for managing which sender identities are available to subaccounts
+            - The verified filter helps identify sender identities that are ready
+              to use (verified=True) or that need attention (verified=False)
+            - The shared filter is helpful for managing which sender identities
+              are available to subaccounts
             - Sender identities must be verified before they can be used to send emails
             - Verification typically happens automatically if the sender's domain is verified
             - Results are typically sorted by creation date, with newest senders first
@@ -424,10 +473,15 @@ class SenderIdentitiesResource:
         params = {}
 
         if domain_id:
-             params["domainId"] = domain_id
+            params["domainId"] = domain_id
         if verified:
-             params["verified"] = verified
+            params["verified"] = verified
         if shared:
-             params["shared"] = shared
+            params["shared"] = shared
 
-        return ListSendersResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListSendersResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))

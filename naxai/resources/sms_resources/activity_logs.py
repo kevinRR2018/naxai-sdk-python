@@ -1,7 +1,18 @@
+"""
+SMS activity logs resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing SMS message activity logs,
+including listing messages with various filtering options and retrieving detailed
+information about specific messages. These logs contain comprehensive data about
+message delivery, status, content, and associated metadata for both inbound and
+outbound SMS communications.
+"""
+
 import json
 from typing import Literal
 from pydantic import Field, validate_call
-from naxai.models.sms.responses.activity_logs_responses import ListSMSActivityLogsResponse, GetSMSActivityLogsResponse
+from naxai.models.sms.responses.activity_logs_responses import (ListSMSActivityLogsResponse,
+                                                                GetSMSActivityLogsResponse)
 
 class ActivityLogsResource:
     """ activity_logs resource for sms resource """
@@ -34,7 +45,8 @@ class ActivityLogsResource:
             page (int): Page number to retrieve. Defaults to 1.
             page_size (int): Number of items per page. Defaults to 25.
                 Mapped from JSON key 'pageSize'.
-            start (int, optional): Start timestamp for filtering messages, in milliseconds since epoch.
+            start (int, optional): 
+                Start timestamp for filtering messages, in milliseconds since epoch.
                 Only messages sent/received after this time will be included.
             stop (int, optional): End timestamp for filtering messages, in milliseconds since epoch.
                 Only messages sent/received before this time will be included.
@@ -54,10 +66,12 @@ class ActivityLogsResource:
                 Mapped from JSON key 'broadcastId'.
         
         Returns:
-            ListSMSActivityLogsResponse: A Pydantic model containing the paginated list of SMS activity logs.
+            ListSMSActivityLogsResponse: A Pydantic model containing the paginated list of
+            SMS activity logs.
             The response includes:
                 - pagination: Information about the current page, total pages, and total items
-                - messages: List of BaseMessage objects with detailed information about each SMS message
+                - messages: List of BaseMessage objects with detailed information about
+                  each SMS message
         
         Example:
             >>> # Basic usage with pagination
@@ -66,7 +80,8 @@ class ActivityLogsResource:
             ...     page_size=50
             ... )
             >>> print(f"Found {response.pagination.total_items} messages")
-            >>> print(f"Showing page {response.pagination.page} of {response.pagination.total_pages}")
+            >>> print(f"Showing page {response.pagination.page} of "
+            >>>       f"{response.pagination.total_pages}")
             >>> for msg in response.messages:
             ...     print(f"{msg.direction} message: {msg.message_id} - Status: {msg.status}")
             
@@ -80,7 +95,8 @@ class ActivityLogsResource:
             ...     direction="outbound",
             ...     status="delivered"
             ... )
-            >>> print(f"Successfully delivered messages in the last week: {len(delivered.messages)}")
+            >>> print(f"Successfully delivered messages in the last week: "
+                      f"{len(delivered.messages)}")
             
             >>> # Filtering by phone number
             >>> specific_number = client.sms.activity_logs.list(
@@ -101,8 +117,10 @@ class ActivityLogsResource:
             - Timestamp parameters (start, stop) are in milliseconds since epoch
             - The phone_number parameter matches against both sender and recipient numbers
             - Multiple filter parameters can be combined for more specific queries
-            - Results are typically sorted by sent/received time in descending order (most recent first)
-            - For detailed information about a specific message, use the get() method with its message_id
+            - Results are typically sorted by sent/received time in descending order
+              (most recent first)
+            - For detailed information about a specific message, use the get() method
+              with its message_id
         """
         params = {
             "page": page,
@@ -126,7 +144,12 @@ class ActivityLogsResource:
         if broadcast_id:
             params["broadcastId"] = broadcast_id
 
-        return ListSMSActivityLogsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListSMSActivityLogsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))
 
     def get(self, message_id:str):
         """
@@ -139,7 +162,8 @@ class ActivityLogsResource:
             message_id (str): The unique identifier of the SMS message to retrieve.
         
         Returns:
-            GetSMSActivityLogsResponse: A Pydantic model containing detailed information about the message,
+            GetSMSActivityLogsResponse: 
+                A Pydantic model containing detailed information about the message,
             including routing information, content, status, and associated metadata.
         
         Example:
@@ -170,4 +194,8 @@ class ActivityLogsResource:
             - For inbound messages, you can access the complete message content
             - The message_id is typically obtained from the list() method or from send responses
         """
-        return GetSMSActivityLogsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + message_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetSMSActivityLogsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + message_id,
+                                             headers=self.headers)))

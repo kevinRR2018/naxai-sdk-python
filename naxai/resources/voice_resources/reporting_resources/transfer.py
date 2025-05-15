@@ -1,3 +1,13 @@
+"""
+Voice transfer reporting resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing metrics related to transferred
+voice calls, including transfer volumes, success rates, and duration statistics. These
+reports help users understand how often calls are being transferred to other destinations
+and the effectiveness of those transfers, supporting optimization of call routing and
+agent handoff processes.
+"""
+
 import json
 from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
@@ -11,7 +21,7 @@ class TransferResource:
         self._client = client
         self.root_path = root_path + "/transfer"
         self.headers = {"Content-Type": "application/json"}
-        
+
     def list(self,
              group: Literal["hour", "day", "month"],
              start_date: Optional[str] = None,
@@ -42,7 +52,8 @@ class TransferResource:
                 only metrics for this specific number will be returned.
         
         Returns:
-            ListTransferredMetricsResponse: A Pydantic model containing the transferred call metrics.
+            ListTransferredMetricsResponse: 
+                A Pydantic model containing the transferred call metrics.
             The response includes:
                 - start_date: Start timestamp of the reporting period
                 - stop_date: End timestamp of the reporting period
@@ -66,32 +77,36 @@ class TransferResource:
             ... )
             >>> print(f"Found {len(metrics.stats)} daily records")
             >>> for stat in metrics.stats:
-            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Transferred: {stat.transferred}")
-            ...     print(f"Average duration: {stat.duration/stat.calls:.1f} seconds" if stat.calls > 0 else "No calls")
+            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Transferred: "
+            ...           f"{stat.transferred}")
+            ...     print(f"Average duration: {stat.duration/stat.calls:.1f} seconds"\
+            ...           f" if stat.calls > 0 else "No calls")
         """
-        #TODO: verify the validation of start_date and stop_date
+
         if group == "hour":
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'hour'")
 
             if len(start_date) < 17 or len(start_date) > 19:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
-            
+                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' "
+                                      "or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+
             if stop_date is not None and (len(stop_date) < 17 or len(stop_date) > 19):
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' "
+                                      "or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
         else:
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'day' or 'month'")
-            
+
             if len(start_date) < 8 or len(start_date) > 10:
                 raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
             if stop_date is None:
                 raise NaxaiValueError("stopDate must be provided when group is 'day' or 'month'")
-            
+
             if len(stop_date) < 8 or len(stop_date) > 10:
                 raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
         params = {"group": group}
         if start_date:
             params["startDate"] = start_date
@@ -99,5 +114,9 @@ class TransferResource:
             params["stopDate"] = stop_date
         if number:
             params["number"] = number
-
-        return ListTransferredMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListTransferredMetricsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))

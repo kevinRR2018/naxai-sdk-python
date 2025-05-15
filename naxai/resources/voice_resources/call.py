@@ -1,13 +1,26 @@
+"""
+Voice call resource for the Naxai SDK.
+
+This module provides methods for creating and managing individual voice calls,
+including configuring welcome messages, interactive menus, voicemail handling,
+and call endings. It supports features such as machine detection, scheduling,
+and language selection to enable sophisticated voice communication workflows.
+"""
+
 import json
 from typing import Optional, Literal
 from pydantic import Field, validate_call
-from naxai.models.voice.requests.call_requests import CreateCallRequest, Welcome, End, Menu, VoiceMail
+from naxai.models.voice.requests.call_requests import (CreateCallRequest,
+                                                       Welcome,
+                                                       End,
+                                                       Menu,
+                                                       VoiceMail)
 from naxai.models.voice.responses.call_responses import CreateCallResponse
 
 
 class CallResource:
     """ call resource for the voice resource """
-    
+
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/call"
@@ -19,7 +32,8 @@ class CallResource:
         Creates a new call.
 
         Args:
-            data (CreateCallRequest): The request body containing the details of the call to be created.
+            data (CreateCallRequest): 
+                The request body containing the details of the call to be created.
 
         Returns:
             dict: The API response containing the details of the created call.
@@ -33,7 +47,12 @@ class CallResource:
             ...     )
             ... )
         """
-        return self._client._request("POST", "/voice/call", json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)
+        # pylint: disable=protected-access
+        return self._client._request("POST",
+                                     "/voice/call",
+                                     json=data.model_dump(by_alias=True,
+                                                          exclude_none=True),
+                                     headers=self.headers)
 
     @validate_call
     def create(self,
@@ -59,7 +78,8 @@ class CallResource:
             welcome (Welcome): The welcome message configuration for the call.
             language (Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"]): 
                 The language to be used for the call.
-            to (list[str]): List of recipient phone numbers. Must contain between 1 and 1000 numbers.
+            to (list[str]): 
+                List of recipient phone numbers. Must contain between 1 and 1000 numbers.
             from_ (str): The sender's phone number. Must be between 8 and 15 characters.
             batch_id (Optional[str], optional): Unique identifier for the batch. Max 64 characters.
             voice (Optional[Literal["man", "woman"]], optional): Voice gender selection. 
@@ -111,5 +131,5 @@ class CallResource:
                                                voicemail=voicemail,
                                                menu=menu,
                                                end=end)
-        
+
         return CreateCallResponse.model_validate_json(json.dumps(self._create(create_call_object)))
