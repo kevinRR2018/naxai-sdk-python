@@ -1,3 +1,13 @@
+"""
+People resource for the Naxai SDK.
+
+This module provides comprehensive customer data management capabilities for the Naxai platform,
+including contact profiles, custom attributes, segmentation, data imports, and exports.
+It serves as a central access point for all customer data operations, enabling users to
+create, manage, and analyze their customer database for targeted communications and
+personalized experiences.
+"""
+
 from .people_resources.attributes import AttributesResource
 from .people_resources.contacts import ContactsResource
 from .people_resources.exports import ExportsResource

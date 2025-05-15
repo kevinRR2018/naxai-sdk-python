@@ -1,3 +1,12 @@
+"""
+Contact imports resource for the Naxai People SDK.
+
+This module provides methods for managing contact data imports into the Naxai platform,
+allowing users to track and monitor the status of import jobs. It supports retrieving
+lists of all import jobs and getting detailed information about specific imports,
+including their progress, success rates, and any errors encountered.
+"""
+
 import json
 from naxai.models.people.responses.imports_responses import (GetImportResponse,
                                                              ListImportsResponse)
@@ -50,17 +59,19 @@ class ImportsResource:
                     # Display details of the most recent imports
                     if imports:
                         print("\nRecent imports:")
-                        for i, import_job in enumerate(imports[:5]):  # Show up to 5 most recent imports
+                        for i, import_job in enumerate(imports[:5]):  # Show 5 most recent imports
                             # Create a status indicator
                             if import_job.state == "imported":
                                 status = f"✅ Complete ({import_job.rows_imported} rows)"
                             elif import_job.state == "importing":
                                 progress = 0
                                 if import_job.rows_to_import and import_job.rows_imported:
-                                    progress = (import_job.rows_imported / import_job.rows_to_import) * 100
+                                    progress = (
+                                    (import_job.rows_imported / import_job.rows_to_import) * 100)
                                 status = f"⏳ In progress ({progress:.1f}%)"
                             elif import_job.state == "failed":
-                                status = f"❌ Failed (Reason: {import_job.failed_reason or 'Unknown'})"
+                                status = f"❌ Failed (Reason: "
+                                         f"{import_job.failed_reason or 'Unknown'})"
                             elif import_job.state == "preparing":
                                 status = "🔄 Preparing"
                             elif import_job.state == "canceled":
@@ -71,11 +82,13 @@ class ImportsResource:
                             # Display import information
                             print(f"{i+1}. {import_job.name} (ID: {import_job.id})")
                             print(f"   Status: {status}")
-                            print(f"   Type: {import_job.type_ or 'Unknown'}, Mode: {import_job.import_mode or 'Unknown'}")
+                            print(f"   Type: {import_job.type_ or 'Unknown'}, Mode: "
+                                  f"{import_job.import_mode or 'Unknown'}")
                             
                             # For imports in progress, show how to check status
                             if import_job.state in ["preparing", "importing"]:
-                                print(f"   To check status: client.people.imports.get('{import_job.id}')")
+                                print(f"   To check status: "
+                                      f"client.people.imports.get('{import_job.id}')")
                     
                 except Exception as e:
                     print(f"Error listing imports: {str(e)}")
@@ -84,12 +97,17 @@ class ImportsResource:
         Note:
             - Import jobs are typically listed in reverse chronological order (newest first)
             - The response is list-like and supports operations like len(), indexing, and iteration
-            - Import jobs can be in various states: "preparing", "importing", "imported", "failed", or "canceled"
+            - Import jobs can be in various states: 
+              "preparing", "importing", "imported", "failed", or "canceled"
             - For imports in progress, you can track their status using the get method
             - The rows_imported and rows_to_import fields can be used to calculate progress
             - Import jobs remain in the list even after completion for historical reference
         """
-        return ListImportsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListImportsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             headers=self.headers)))
 
     def get(self, import_id: str):
         """
@@ -102,7 +120,8 @@ class ImportsResource:
             import_id (str): The unique identifier of the import job to retrieve.
         
         Returns:
-            GetImportResponse: A response object containing detailed information about the import job.
+            GetImportResponse: 
+                A response object containing detailed information about the import job.
         
         Raises:
             ValueError: If import_id is empty.
@@ -131,7 +150,8 @@ class ImportsResource:
                         
                         # If the import added contacts to a segment, display segment info
                         if import_job.segment:
-                            print(f"Contacts were added to segment: {import_job.segment.segment_id}")
+                            print(f"Contacts were added to segment: "
+                                  f"{import_job.segment.segment_id}")
                         
                     elif import_job.state == "importing":
                         # Calculate and display progress
@@ -140,14 +160,16 @@ class ImportsResource:
                             progress = (import_job.rows_imported / import_job.rows_to_import) * 100
                         
                         print(f"Status: In progress ⏳ ({progress:.1f}%)")
-                        print(f"Imported {import_job.rows_imported} of {import_job.rows_to_import} rows")
+                        print(f"Imported {import_job.rows_imported} of "
+                              f"{import_job.rows_to_import} rows")
                         
                         # In a real application, you might implement polling
                         # import asyncio
                         # print("Waiting 10 seconds to check progress again...")
                         # await asyncio.sleep(10)
                         # updated_import = client.people.imports.get(import_id=import_id)
-                        # updated_progress = (updated_import.rows_imported / updated_import.rows_to_import) * 100
+                        # updated_progress = (
+                        #   updated_import.rows_imported / updated_import.rows_to_import) * 100
                         # print(f"Updated progress: {updated_progress:.1f}%")
                         
                     elif import_job.state == "failed":
@@ -184,7 +206,8 @@ class ImportsResource:
         Note:
             - Use this method to check the status and progress of an import job
             - Import jobs may take time to complete, especially for large datasets
-            - The state field indicates the current status: "preparing", "importing", "imported", "failed", or "canceled"
+            - The state field indicates the current status:
+              "preparing", "importing", "imported", "failed", or "canceled"
             - For imports in the "importing" state, the rows_imported and rows_to_import fields
             can be used to calculate progress
             - The mapping field provides information about how columns in the import file
@@ -192,4 +215,8 @@ class ImportsResource:
             - For failed imports, check the failed_reason field for more information
             - Import jobs remain accessible even after completion for historical reference
         """
-        return GetImportResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + import_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetImportResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + import_id,
+                                             headers=self.headers)))

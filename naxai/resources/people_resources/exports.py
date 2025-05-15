@@ -1,3 +1,12 @@
+"""
+Contact exports resource for the Naxai People SDK.
+
+This module provides methods for creating and managing contact data exports from the Naxai platform,
+allowing users to extract contact information for external processing, analysis, or backup.
+It supports creating export jobs with custom search conditions, monitoring export status,
+and retrieving download URLs for completed exports.
+"""
+
 import json
 from naxai.models.people.helper_models.search_condition import SearchCondition
 from naxai.models.people.responses.exports_responses import (ListExportsResponse,
@@ -60,13 +69,16 @@ class ExportsResource:
                     if exports:
                         print("\nRecent exports:")
                         for i, export in enumerate(exports[:5]):  # Show up to 5 most recent exports
-                            state_emoji = "⏳" if export.state == "pending" else "✅" if export.state == "done" else "❌"
+                            state_emoji = "⏳" if export.state == "pending" else\
+                                  "✅" if export.state == "done" else "❌"
                             rows_info = f", {export.rows} rows" if export.rows else ""
-                            print(f"{i+1}. {state_emoji} {export.export} export ({export.id}): {export.state}{rows_info}")
+                            print(f"{i+1}. {state_emoji} {export.export} export ({export.id}): "
+                                  f"{export.state}{rows_info}")
                             
                             # For completed exports, show how to get the download URL
                             if export.state == "done":
-                                print(f"   To download: client.people.exports.get_download_url('{export.id}')")
+                                print(f"   To download: "
+                                      f"client.people.exports.get_download_url('{export.id}')")
                     
                 except Exception as e:
                     print(f"Error listing exports: {str(e)}")
@@ -80,7 +92,11 @@ class ExportsResource:
             get_download_url method
             - Export files are typically available for a limited time after completion
         """
-        return ListExportsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListExportsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             headers=self.headers)))
 
     def create(self, condition: SearchCondition):
         """
@@ -147,12 +163,19 @@ class ExportsResource:
             - Export jobs are processed asynchronously and may take time to complete
             - The response provides a preview of contacts and pagination information
             - The export ID may need to be extracted from response headers or metadata
-            - After creating an export, you should periodically check its status using the get method
+            - After creating an export, you should periodically check its status
+              using the get method
             - Once the export is complete (state="done"), you can retrieve the download URL
             - Large exports may take significant time to process depending on the amount of data
             - The exported file format is typically CSV for contacts exports
         """
-        return CreateExportResponse.model_validate_json(json.dumps(self._client._request("POST", self.root_path, json=condition.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateExportResponse.model_validate_json(
+            json.dumps(self._client._request("POST",
+                                             self.root_path,
+                                             json=condition.model_dump(by_alias=True,
+                                                                       exclude_none=True),
+                                             headers=self.headers)))
 
     def get(self, export_id: str):
         """
@@ -165,7 +188,8 @@ class ExportsResource:
             export_id (str): The unique identifier of the export job to retrieve.
         
         Returns:
-            GetExportResponse: A response object containing detailed information about the export job.
+            GetExportResponse: 
+                A response object containing detailed information about the export job.
         
         Raises:
             ValueError: If export_id is empty.
@@ -193,7 +217,8 @@ class ExportsResource:
                         print("Getting download URL...")
                         
                         # Get the download URL
-                        download_response = client.people.exports.get_download_url(export_id=export_id)
+                        download_response = (
+                            client.people.exports.get_download_url(export_id=export_id))
                         print(f"Download URL: {download_response.url}")
                         
                         # In a real application, you might download the file
@@ -229,7 +254,11 @@ class ExportsResource:
             using the get_download_url method
             - Export files are typically available for a limited time after completion
         """
-        return GetExportResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + export_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetExportResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + export_id,
+                                             headers=self.headers)))
 
     def get_download_url(self, export_id: str):
         """
@@ -271,7 +300,8 @@ class ExportsResource:
                             print("Export is still being processed. Try again later.")
                     else:
                         # Get the download URL
-                        download_response = client.people.exports.get_download_url(export_id=export_id)
+                        download_response = (
+                            client.people.exports.get_download_url(export_id=export_id))
                         print(f"Download URL obtained: {download_response.url}")
                         
                         # Download the file asynchronously
@@ -295,11 +325,16 @@ class ExportsResource:
         
         Note:
             - This method should only be called for exports in the "done" state
-            - Always check the export's state using the get method before requesting the download URL
+            - Always check the export's state using the get method before requesting
+              the download URL
             - The download URL is temporary and will expire after a certain period
             - The exported file format is typically CSV for contacts exports
             - Large exports may take significant time to download depending on your connection
             - For very large files, consider implementing chunked downloading or streaming
             - In production applications, you might want to implement retry logic for downloads
         """
-        return GetExportDownloadUrlResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + export_id + "/download", headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetExportDownloadUrlResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path + "/" + export_id + "/download",
+                                             headers=self.headers)))

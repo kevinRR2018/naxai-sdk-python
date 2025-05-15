@@ -1,3 +1,10 @@
+"""
+Email bounces resource for the Naxai SDK.
+
+This module provides methods for retrieving and managing email bounce records,
+which are essential for maintaining email deliverability and sender reputation.
+"""
+
 from typing import Optional
 from pydantic import Field, validate_call
 
@@ -8,7 +15,7 @@ class BouncesResource:
         self._client = client
         self.root_path = root_path + "/bounces"
         self.headers = {"Content-Type": "application/json"}
-    
+
     #TODO: email validation
     @validate_call
     def list(self,
@@ -28,7 +35,11 @@ class BouncesResource:
             dict: The API response containing the list of bounces.
 
         Example:
-            >>> response = client.email.suppression_lists.bounces.list(start=1625097600, stop=1627689600)
+            >>> response = client.email.suppression_lists.bounces.list(
+            ...     page=1, 
+            ...     page_size=50, 
+            ...     email="example@domain.com"
+            ... )
         """
         params = {
             "page": page,
@@ -36,6 +47,7 @@ class BouncesResource:
         }
 
         if email:
-             params["email"] = email
+            params["email"] = email
 
+        # pylint: disable=protected-access
         return self._client._request("GET", self.root_path, params=params, headers=self.headers)

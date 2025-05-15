@@ -1,14 +1,24 @@
+"""
+Holiday templates resource for the Naxai SDK.
+
+This module provides methods for interacting with holiday templates in the Naxai API,
+including retrieving individual templates and listing all available templates.
+Holiday templates contain predefined sets of dates that can be used with calendars.
+"""
+
 import json
-from naxai.models.calendars.responses.holidays_template_responses import ListHolidaysTemplatesResponse, GetHolidaysTemplateResponse
+from naxai.models.calendars.responses.holidays_template_responses import (
+    ListHolidaysTemplatesResponse,
+    GetHolidaysTemplateResponse)
 
 class HolidaysTemplatesResource:
     """ holidays_template resource for calendars resource"""
 
     def __init__(self, client, root_path):
-            self._client = client
-            self.root_path = root_path + "/holidays"
-            self.headers = {"Content-Type": "application/json"}
-            
+        self._client = client
+        self.root_path = root_path + "/holidays"
+        self.headers = {"Content-Type": "application/json"}
+
     def get(self, template_id: str):
         """Retrieves a specific holiday template by its ID.
 
@@ -49,8 +59,12 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             list: Method to retrieve all holiday templates
         """
-        return GetHolidaysTemplateResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)))
-            
+        # pylint: disable=protected-access
+        return GetHolidaysTemplateResponse.model_validate_json(
+             json.dumps(self._client._request("GET",
+                                              self.root_path + "/" + template_id,
+                                              headers=self.headers)))
+
     def list(self):
         """Retrieves a list of all available holiday templates.
 
@@ -88,4 +102,8 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             get: Method to retrieve a specific holiday template
         """
-        return ListHolidaysTemplatesResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListHolidaysTemplatesResponse.model_validate_json(
+             json.dumps(self._client._request("GET",
+                                              self.root_path,
+                                              headers=self.headers)))

@@ -1,3 +1,11 @@
+"""
+Email metrics reporting resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing comprehensive email metrics
+from the Naxai platform, including delivery rates, engagement statistics, and
+performance indicators to help optimize email campaigns.
+"""
+
 import datetime
 import json
 from typing import Optional, Literal
@@ -11,17 +19,24 @@ class MetricsResource:
         self.root_path = root_path + "/metrics"
         self.headers = {"Content-Type": "application/json"}
 
-    def list(self,
-            start: Optional[int] = int((datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=7)).timestamp()),
-            stop: Optional[int] = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
+    def list(
+            self,
+            start: Optional[int] = int(
+                (datetime.datetime.now(tz=datetime.timezone.utc) -
+                 datetime.timedelta(days=7)).timestamp()
+            ),
+            stop: Optional[int] = int(
+                datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+            ),
             group: Optional[Literal["day", "month"]] = "day",
-            ):
+    ):
         """
         Retrieve comprehensive email engagement metrics from the Naxai email system.
         
         This method fetches detailed statistics about email performance, including delivery rates,
         open rates, click rates, and negative metrics such as bounces and complaints. The data
-        can be filtered by time period and grouped by day or month to analyze trends over time.
+        can be filtered by time period and grouped by day or month to analyze trends over
+        time.
         
         Args:
             start (Optional[int]): Start timestamp for the reporting period, in seconds since epoch.
@@ -55,7 +70,8 @@ class MetricsResource:
                     - unsubscribed: Number of recipients who unsubscribed
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: If the API request fails due to invalid parameters or 
+                server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access email metrics
         
@@ -76,10 +92,17 @@ class MetricsResource:
             >>> print(f"Data points: {len(metrics.stats)}")
             >>> 
             >>> # Calculate overall metrics
+            >>> # Calculate totals for each metric
             >>> total_sent = sum(day.sent for day in metrics.stats if day.sent is not None)
-            >>> total_delivered = sum(day.delivered for day in metrics.stats if day.delivered is not None)
-            >>> total_opened = sum(day.opened_unique for day in metrics.stats if day.opened_unique is not None)
-            >>> total_clicked = sum(day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None)
+            >>> total_delivered = sum(
+            ...     day.delivered for day in metrics.stats if day.delivered is not None
+            ... )
+            >>> total_opened = sum(
+            ...     day.opened_unique for day in metrics.stats if day.opened_unique is not None
+            ... )
+            >>> total_clicked = sum(
+            ...     day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None
+            ... )
             >>> 
             >>> # Calculate key performance indicators
             >>> if total_sent > 0:
@@ -99,8 +122,10 @@ class MetricsResource:
             >>> # Find the day with highest engagement
             >>> if metrics.stats:
             ...     best_day = max(metrics.stats, key=lambda day: day.opened_unique or 0)
-            ...     print(f"\nBest performing day: {datetime.datetime.fromtimestamp(best_day.date/1000)}")
-            ...     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, Clicked: {best_day.cliqued_unique}")
+            ...     print(f"\nBest performing day: "
+            ...           f"{datetime.datetime.fromtimestamp(best_day.date/1000)}")
+            ...     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, "
+            ...           f"Clicked: {best_day.cliqued_unique}")
             Email metrics from 1703066400000 to 1705658400000
             Grouped by: day
             Data points: 30
@@ -125,20 +150,21 @@ class MetricsResource:
         
         Note:
             - The start and stop timestamps are provided in seconds since epoch but converted to
-            milliseconds in the response
+              milliseconds in the response
             - The default time range is the past 7 days if no parameters are provided
             - Key engagement metrics to monitor include:
-            * Delivery rate: delivered / sent
-            * Open rate: opened_unique / delivered
-            * Click rate: cliqued_unique / delivered
-            * Click-to-open rate: cliqued_unique / opened_unique
+              * Delivery rate: delivered / sent
+              * Open rate: opened_unique / delivered
+              * Click rate: cliqued_unique / delivered
+              * Click-to-open rate: cliqued_unique / opened_unique
             - Key negative metrics to monitor include:
-            * Bounce rate: bounced / sent
-            * Complaint rate: complained / sent
-            * Unsubscribe rate: unsubscribed / delivered
-            - High bounce or complaint rates may indicate issues with email quality or recipient targeting
+              * Bounce rate: bounced / sent
+              * Complaint rate: complained / sent
+              * Unsubscribe rate: unsubscribed / delivered
+            - High bounce or complaint rates may indicate issues with email quality or 
+              recipient targeting
             - The date field in each stats entry is in milliseconds since epoch and represents the
-            start of that time interval (day or month)
+              start of that time interval (day or month)
             - For more detailed click metrics by URL, use the clicked_urls.list() method
             - For best results, use a time range that matches your email sending frequency
         
@@ -154,4 +180,9 @@ class MetricsResource:
             "group": group
         }
 
-        return ListMetricsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListMetricsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             self.root_path,
+                                             params=params,
+                                             headers=self.headers)))

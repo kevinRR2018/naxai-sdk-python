@@ -1,16 +1,26 @@
+"""
+Voice broadcast recipient calls resource for the Naxai SDK.
+
+This module provides methods for retrieving and analyzing call attempts made to individual
+recipients within voice broadcast campaigns. It allows users to track call statuses,
+durations, outcomes, and retry attempts for specific recipients, helping to understand
+delivery effectiveness and recipient engagement patterns.
+"""
+
 import json
 from naxai.models.voice.responses.broadcasts_responses import GetBroadcastRecipientCallsResponse
 
 class CallsResource:
     """
-    This class represents the CallsResource, which provides methods to interact with the broadcast recipients calls API.
+    This class represents the CallsResource, which provides methods to interact with the 
+    broadcast recipients calls API.
     """
 
     def __init__(self, client, root_path: str):
         self._client = client
         self.root_path = root_path
         self.headers = {"Content-Type": "application/json"}
-        
+
     def list(self, broadcast_id: str, recipient_id: str):
         """
         Get the recipient calls for a voice broadcast by broadcast id and recipient id.
@@ -39,5 +49,9 @@ class CallsResource:
             ...     print(f"Last call status: {calls[-1].status}")
             ...     print(f"Call duration: {calls[-1].duration} seconds")
         """
-
-        return GetBroadcastRecipientCallsResponse.model_validate_json(json.dumps(self._client._request("GET", self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id + "/calls", headers=self.headers)))
+        # pylint: disable=protected-access
+        url = self.root_path + "/" + broadcast_id + "/recipients/" + recipient_id + "/calls"
+        return GetBroadcastRecipientCallsResponse.model_validate_json(
+            json.dumps(self._client._request("GET",
+                                             url,
+                                             headers=self.headers)))
