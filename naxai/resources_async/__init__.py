@@ -17,6 +17,7 @@ from .calendars import CalendarsResource
 from .email import EmailResource
 from .people import PeopleResource
 from .sms import SMSResource
+from .webhooks import WebhooksResource
 
 __all__ = [
     "VoiceResource",
@@ -24,4 +25,5 @@ __all__ = [
     "EmailResource",
     "PeopleResource",
     "SMSResource",
+    "WebhooksResource"
 ]

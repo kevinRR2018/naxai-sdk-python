@@ -48,11 +48,12 @@ from naxai.resources_async.calendars import CalendarsResource
 from naxai.resources_async.email import EmailResource
 from naxai.resources_async.people import PeopleResource
 from naxai.resources_async.sms import SMSResource
+from naxai.resources_async.webhooks import WebhooksResource
 from .config import API_BASE_URL
 
 class NaxaiAsyncClient(BaseClient):
     """
-    Async Naxai Client for interacting with Voice, SMS, Email, Calendars and People APIs.
+    Async Naxai Client for interacting with Voice, SMS, Email, Calendars, Webhooks and People APIs.
     """
 
     def __init__(self,
@@ -77,6 +78,7 @@ class NaxaiAsyncClient(BaseClient):
         self.email = EmailResource(self)
         self.people = PeopleResource(self)
         self.sms = SMSResource(self)
+        self.webhooks = WebhooksResource(self)
 
     async def __aenter__(self):
         return self
