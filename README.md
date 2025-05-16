@@ -21,6 +21,7 @@ The Naxai Python SDK provides a simple and intuitive way to interact with Naxai'
   - [Email API](#email-api)
   - [Calendars API](#calendars-api)
   - [People API](#people-api)
+  - [Webhooks API](#webhooks-api)
 - [Error Handling](#error-handling)
 - [Logging](#logging)
 - [Resource Cleanup](#resource-cleanup)
@@ -346,6 +347,15 @@ response = client.people.create(data=contact_request)
 response = await client.people.create(data=contact_request)
 ```
 
+### Webhooks API
+
+The Webhooks API allows you to manage webhooks:
+
+```python
+# List all webhooks
+response = client.webhooks.list()
+```
+
 ## Error Handling
 
 All exceptions inherit from `NaxaiException`:
@@ -512,7 +522,8 @@ finally:
 - ✅ Provide a client for synchronous code
 - ✅ Publish SDK on PyPI
 - ✅ Improve type hints for auto-completion and IDE support
-- 🚧 Add comprehensive test suite
+- ✅ Webhooks
+- ✅ Add comprehensive test suite
 - 🚧 Add more examples and use cases
 
 ## Contributing
