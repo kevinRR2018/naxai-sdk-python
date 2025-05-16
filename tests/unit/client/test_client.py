@@ -22,6 +22,7 @@ from naxai.resources.calendars import CalendarsResource
 from naxai.resources.email import EmailResource
 from naxai.resources.sms import SMSResource
 from naxai.resources.people import PeopleResource
+from naxai.resources.webhooks import WebhooksResource
 
 
 class TestNaxaiClient:
@@ -86,7 +87,7 @@ class TestNaxaiClient:
         assert isinstance(client.email, EmailResource)
         assert isinstance(client.sms, SMSResource)
         assert isinstance(client.people, PeopleResource)
-
+        assert isinstance(client.webhooks, WebhooksResource)
     def test_initialization_with_env_vars(self, mock_httpx_client):
         """Test client initialization with environment variables."""
         with patch.dict(os.environ, {
