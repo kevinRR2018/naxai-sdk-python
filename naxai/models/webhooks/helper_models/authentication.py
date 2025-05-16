@@ -21,7 +21,7 @@ class NoAuthModel(BaseModel):
     """
     type_: str = Field(alias="type", default="none")
 
-    model_config = {"populate_by_name", True}
+    model_config = {"populate_by_name": True}
 
 class BasicAuthModel(BaseModel):
     """
@@ -30,7 +30,7 @@ class BasicAuthModel(BaseModel):
     type_: str = Field(alias="type", default="basic")
     user: str
 
-    model_config = {"populate_by_name", True}
+    model_config = {"populate_by_name": True}
 
 class OAuth2AuthModel(BaseModel):
     """
@@ -40,7 +40,7 @@ class OAuth2AuthModel(BaseModel):
     client_id: str = Field(alias="clientId")
     auth_url: str = Field(alias="authUrl")
 
-    model_config = {"populate_by_name", True}
+    model_config = {"populate_by_name": True}
 
 class HeaderAuthModel(BaseModel):
     """
@@ -49,4 +49,4 @@ class HeaderAuthModel(BaseModel):
     type_: str = Field(alias="type", default="header")
     header_key: str = Field(alias="headerKey")
 
-    model_config = {"populate_by_name", True}
+    model_config = {"populate_by_name": True}
