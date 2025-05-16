@@ -1,10 +1,20 @@
+"""
+Asynchronous voice broadcast input metrics resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving and analyzing DTMF input metrics
+from voice broadcasts, allowing users to track how recipients interact with interactive
+voice messages by pressing keys on their phone keypads. These metrics help measure
+engagement and response rates for voice broadcast campaigns in a non-blocking manner
+suitable for high-performance asynchronous applications.
+"""
+
 import json
 from naxai.models.voice.responses.broadcasts_responses import GetBroadcastInputMetricsResponse
 
 class InputResource:
     """
-    This class provides methods to interact with the Voice Broadcast Metrics Input resource in the API.
-
+    This class provides methods to interact with the Voice Broadcast Metrics Input
+    resource in the API.
     """
     def __init__(self, client, root_path):
         self._client = client
@@ -20,7 +30,8 @@ class InputResource:
             broadcast_id (str): The unique identifier of the broadcast to get the inputs.
             
         Returns:
-            GetBroadcastInputMetricsResponse: A Pydantic model containing the input counts for the given broadcast.
+            GetBroadcastInputMetricsResponse: 
+                A Pydantic model containing the input counts for the given broadcast.
                 The model includes counts for each DTMF key (0-9, *, #) and a total count.
                 
         Example:
@@ -30,5 +41,9 @@ class InputResource:
             >>> print(f"Total inputs received: {input_result.total}")
             >>> print(f"Option 1 selected: {input_result.input_1} times")
         """
-
-        return GetBroadcastInputMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + broadcast_id + "/metrics/input", headers=self.headers)))
+        url = self.root_path + "/" + broadcast_id + "/metrics/input"
+        # pylint: disable=protected-access
+        return GetBroadcastInputMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   url,
+                                                   headers=self.headers)))

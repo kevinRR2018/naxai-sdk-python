@@ -1,3 +1,13 @@
+"""
+Asynchronous segment contacts resource for the Naxai People SDK.
+
+This module provides asynchronous methods for managing contacts within segments in the
+Naxai platform, including adding and removing contacts from manual segments, counting
+segment members, and retrieving contacts that belong to specific segments. These
+operations are essential for targeted audience management and campaign planning in
+high-performance asynchronous applications.
+"""
+
 import json
 from typing import Optional
 from pydantic import Field, validate_call
@@ -41,7 +51,8 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Add multiple contacts to a manual segment
                 segment_id = "seg_123abc"
                 contacts_to_add = ["cnt_456def", "cnt_789ghi", "cnt_012jkl"]
@@ -63,7 +74,11 @@ class SegmentsContactsResource:
             - This operation is idempotent - calling it multiple times with the same parameters
             will not result in duplicate contacts in the segment
         """
-        return await self._client._request("POST", self.root_path + "/" + segment_id + "/addContacts", json={"ids": contact_ids}, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("POST",
+                                           self.root_path + "/" + segment_id + "/addContacts",
+                                           json={"ids": contact_ids},
+                                           headers=self.headers)
 
     @validate_call
     async def delete(self, segment_id: str, contact_ids: list[str] = Field(min_length=1)):
@@ -92,7 +107,8 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Remove contacts from a manual segment
                 segment_id = "seg_123abc"
                 contacts_to_remove = ["cnt_456def", "cnt_789ghi"]
@@ -116,7 +132,11 @@ class SegmentsContactsResource:
             - The operation is idempotent - calling it multiple times with the same parameters
             will not result in an error
         """
-        return await self._client._request("POST", self.root_path + "/" + segment_id + "/deleteContacts", json={"ids": contact_ids}, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("POST",
+                                           self.root_path + "/" + segment_id + "/deleteContacts",
+                                           json={"ids": contact_ids},
+                                           headers=self.headers)
 
     async def count(self, segment_id: str):
         """
@@ -142,7 +162,8 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Count contacts in a segment
                 segment_id = "seg_123abc"
                 
@@ -164,11 +185,17 @@ class SegmentsContactsResource:
         
         Note:
             - This method works with both manual and dynamic segments
-            - For large segments, the count operation is optimized and faster than retrieving all contacts
+            - For large segments, the count operation is optimized and faster than
+              retrieving all contacts
             - The count represents the current state and may change as contacts are added/removed
             or as they meet/no longer meet the criteria for dynamic segments
         """
-        return CountContactsInSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/countContacts", headers=self.headers)))
+        url = self.root_path + "/" + segment_id + "/countContacts"
+        # pylint: disable=protected-access
+        return CountContactsInSegmentResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   url,
+                                                   headers=self.headers)))
 
     @validate_call
     async def list(self,
@@ -206,7 +233,8 @@ class SegmentsContactsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # List contacts in a segment with pagination
                 segment_id = "seg_123abc"
                 
@@ -219,7 +247,8 @@ class SegmentsContactsResource:
                 )
                 
                 print(f"Page {first_page.pagination.page} of {first_page.pagination.total_pages}")
-                print(f"Showing {len(first_page.contacts)} of {first_page.pagination.total_items} contacts")
+                print(f"Showing {len(first_page.contacts)} of "
+                      f"{first_page.pagination.total_items} contacts")
                 
                 # Display the contacts on this page
                 for contact in first_page.contacts:
@@ -246,4 +275,9 @@ class SegmentsContactsResource:
         """
         params = {"page": page, "pageSize": page_size, "sort": sort}
         self._client.logger.debug("params: %s", params)
-        return ListContactsOfSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/members", headers=self.headers, params=params)))
+        # pylint: disable=protected-access
+        return ListContactsOfSegmentResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + segment_id + "/members",
+                                                   headers=self.headers,
+                                                   params=params)))

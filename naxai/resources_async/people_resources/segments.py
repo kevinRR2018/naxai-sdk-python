@@ -1,3 +1,13 @@
+"""
+Asynchronous contact segments resource for the Naxai People SDK.
+
+This module provides asynchronous methods for managing contact segments in the Naxai platform,
+including creating, retrieving, updating, and analyzing segments of contacts based on
+various criteria. It supports both manual segments (explicitly defined members) and
+dynamic segments (rule-based membership), and provides tools for tracking segment
+membership changes over time in high-performance asynchronous applications.
+"""
+
 import datetime
 import json
 from typing import Optional
@@ -36,7 +46,8 @@ class SegmentsResource:
                 Defaults to None (no filtering by type).
             exclude_predefined (Optional[bool]): Whether to exclude predefined system segments.
                 Defaults to False (include predefined segments).
-            attribute (Optional[str]): Filter segments that use the specified attribute in their conditions.
+            attribute (Optional[str]): 
+                Filter segments that use the specified attribute in their conditions.
                 Defaults to None (no filtering by attribute).
         
         Returns:
@@ -50,7 +61,8 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # List all segments
                     all_segments = await client.people.segments.list()
@@ -76,7 +88,8 @@ class SegmentsResource:
                     for segment in all_segments:
                         segment_type = "Manual" if segment.type_ == "manual" else "Dynamic"
                         predefined = "Predefined" if segment.predefined else "Custom"
-                        print(f"- {segment.name} (ID: {segment.id}, Type: {segment_type}, {predefined})")
+                        print(f"- {segment.name} (ID: {segment.id}, "
+                              f"Type: {segment_type}, {predefined})")
                         if segment.description:
                             print(f"  Description: {segment.description}")
                     
@@ -97,7 +110,12 @@ class SegmentsResource:
             params["type"] = type_
         if attribute:
             params["attribute"] = attribute
-        return ListSegmentsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers, params=params)))
+        # pylint: disable=protected-access
+        return ListSegmentsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   headers=self.headers,
+                                                   params=params)))
 
     async def get(self, segment_id: str):
         """
@@ -121,7 +139,8 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Retrieve a specific segment
                     segment_id = "seg_123abc"
@@ -160,7 +179,8 @@ class SegmentsResource:
                                 print(f"- {cond}")
                     
                     # Get the number of contacts in this segment
-                    count_response = await client.people.segments.contacts.count(segment_id=segment_id)
+                    count_response = (
+                    await client.people.segments.contacts.count(segment_id=segment_id))
                     print(f"\nThis segment contains {count_response.count} contacts")
                     
                 except Exception as e:
@@ -168,14 +188,19 @@ class SegmentsResource:
             ```
         
         Note:
-            - This method returns complete segment information including conditions for dynamic segments
+            - This method returns complete segment information including conditions
+              for dynamic segments
             - For predefined segments, some fields may be read-only
             - To get the contacts in the segment, use the segments.contacts.list method
             - To get the count of contacts in the segment, use the segments.contacts.count method
             - The condition structure for dynamic segments can be complex and may require
             custom parsing logic to display or analyze
         """
-        return GetSegmentResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetSegmentResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + segment_id,
+                                                   headers=self.headers)))
 
     async def delete(self, segment_id: str):
         """
@@ -201,7 +226,8 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Check if the segment is in use before deleting
                     segment_id = "seg_123abc"
@@ -225,7 +251,7 @@ class SegmentsResource:
                                 print(f"- Used in {len(usage.broadcast_ids)} broadcasts")
                             print("Consider the impact before deleting")
                         
-                        # Proceed with deletion (in a real application, you might prompt for confirmation)
+                        # Proceed with deletion (you might prompt for confirmation)
                         print("Proceeding with deletion...")
                         
                         # Delete the segment
@@ -244,7 +270,10 @@ class SegmentsResource:
             using the segments.usage method
             - If a segment is in use, deleting it may affect active campaigns or automations
         """
-        return await self._client._request("DELETE", self.root_path + "/" + segment_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("DELETE",
+                                           self.root_path + "/" + segment_id,
+                                           headers=self.headers)
 
     async def update(self, segment_id: str, data: CreateSegmentRequest):
         """
@@ -273,9 +302,12 @@ class SegmentsResource:
         Example:
             ```python
             from naxai.models.people.requests.segments_requests import CreateSegmentRequest
-            from naxai.models.people.search_condition import Condition, AttributeCondSimple, AttributeObject
+            from naxai.models.people.search_condition import (Condition,
+                                                              AttributeCondSimple,
+                                                              AttributeObject)
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Update a segment's name and description
                     segment_id = "seg_123abc"
@@ -333,14 +365,21 @@ class SegmentsResource:
         
         Note:
             - Predefined segments cannot be updated
-            - For dynamic segments, updating conditions will trigger a recalculation of segment membership
+            - For dynamic segments, updating conditions will trigger a recalculation of
+              segment membership
             - During recalculation, the segment's state will be "building"
             - You cannot change a segment's type (manual/dynamic) after creation
             - For manual segments, use the segments.contacts.add and segments.contacts.delete
             methods to modify segment membership
             - Only include the fields you want to update in the CreateSegmentRequest object
         """
-        return UpdateSegmentResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + segment_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateSegmentResponse.model_validate_json(
+            json.dumps(await self._client._request("PUT",
+                                                   self.root_path + "/" + segment_id,
+                                                   json=data.model_dump(by_alias=True,
+                                                                        exclude_none=True),
+                                                   headers=self.headers)))
 
     async def create(self, data: CreateSegmentRequest):
         """
@@ -351,10 +390,12 @@ class SegmentsResource:
         
         Args:
             data (CreateSegmentRequest): The segment data. This should be a CreateSegmentRequest
-                object containing the segment's name, description, type, and conditions (if dynamic).
+                object containing the segment's name, description, type, and
+                conditions (if dynamic).
         
         Returns:
-            CreateSegmentResponse: A response object containing information about the newly created segment.
+            CreateSegmentResponse: 
+                A response object containing information about the newly created segment.
         
         Raises:
             ValueError: If data is invalid.
@@ -366,9 +407,12 @@ class SegmentsResource:
         Example:
             ```python
             from naxai.models.people.requests.segments_requests import CreateSegmentRequest
-            from naxai.models.people.search_condition import Condition, AttributeCondSimple, AttributeObject
+            from naxai.models.people.search_condition import (Condition,
+                                                              AttributeCondSimple,
+                                                              AttributeObject)
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Create a manual segment
                     manual_segment = CreateSegmentRequest(
@@ -417,7 +461,8 @@ class SegmentsResource:
                     )
                     
                     dynamic_result = await client.people.segments.create(data=dynamic_segment)
-                    print(f"Dynamic segment created: {dynamic_result.name} (ID: {dynamic_result.id})")
+                    print(f"Dynamic segment created: {dynamic_result.name} "
+                          f"(ID: {dynamic_result.id})")
                     print(f"Current state: {dynamic_result.state}")
                     
                     # For dynamic segments, you might want to wait until it's ready
@@ -438,10 +483,17 @@ class SegmentsResource:
             the initial calculation of segment membership is complete
             - Segment names should be descriptive and unique within your account
         """
-        return CreateSegmentResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateSegmentResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path,
+                                                   json=data.model_dump(by_alias=True,
+                                                                        exclude_none=True),
+                                                   headers=self.headers)))
 
     async def history(self, segment_id: str,
-                      start: int = datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=30),
+                      start: int = (datetime.datetime.now(tz=datetime.timezone.utc) -
+                                     datetime.timedelta(days=30)),
                       stop: int = datetime.datetime.now(tz=datetime.timezone.utc)):
         """
         Retrieve the membership history of a segment in the Naxai People API.
@@ -470,7 +522,8 @@ class SegmentsResource:
             import datetime
             from datetime import timedelta
             
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Get segment history for the last 90 days
                     segment_id = "seg_123abc"
@@ -493,15 +546,19 @@ class SegmentsResource:
                         last_day = history.history[-1]
                         
                         # Convert timestamps to readable dates
-                        first_date = datetime.datetime.fromtimestamp(first_day.date / 1000).strftime('%Y-%m-%d')
-                        last_date = datetime.datetime.fromtimestamp(last_day.date / 1000).strftime('%Y-%m-%d')
+                        first_date = (
+                        datetime.datetime.fromtimestamp(first_day.date / 1000).strftime('%Y-%m-%d'))
+                        last_date = (
+                        datetime.datetime.fromtimestamp(last_day.date / 1000).strftime('%Y-%m-%d'))
                         
                         print(f"\nInitial size on {first_date}: {first_day.current}")
                         print(f"Final size on {last_date}: {last_day.current}")
                         
                         # Calculate total changes over the period
-                        total_added = sum(day.added for day in history.history if day.added is not None)
-                        total_removed = sum(day.removed for day in history.history if day.removed is not None)
+                        total_added = sum(
+                            day.added for day in history.history if day.added is not None)
+                        total_removed = sum(
+                            day.removed for day in history.history if day.removed is not None)
                         net_change = total_added - total_removed
                         
                         print(f"\nTotal contacts added: {total_added}")
@@ -509,14 +566,20 @@ class SegmentsResource:
                         print(f"Net change: {net_change}")
                         
                         # Find the day with the most changes
-                        max_change_day = max(history.history, key=lambda day: abs(day.change) if day.change is not None else 0)
-                        max_change_date = datetime.datetime.fromtimestamp(max_change_day.date / 1000).strftime('%Y-%m-%d')
+                        max_change_day = max(
+                        history.history,
+                        key=lambda day: abs(day.change) if day.change is not None else 0)
+                        max_change_date = (
+                        datetime.datetime.fromtimestamp(max_change_day.date 
+                                                        / 1000).strftime('%Y-%m-%d'))
                         
-                        print(f"\nLargest daily change: {max_change_day.change} on {max_change_date}")
+                        print(f"\nLargest daily change: {max_change_day.change} on "
+                              f"{max_change_date}")
                         print(f"  Added: {max_change_day.added}, Removed: {max_change_day.removed}")
                         
                     else:
-                        print("No history data available for this segment in the specified time range")
+                        print("No history data available for this "
+                                "segment in the specified time range")
                     
                 except Exception as e:
                     print(f"Error retrieving segment history: {str(e)}")
@@ -534,7 +597,12 @@ class SegmentsResource:
             - The default time range is the last 30 days
         """
         params = {"start": start, "stop": stop}
-        return GetSegmentsHistoryResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/history", headers=self.headers, params=params)))
+        # pylint: disable=protected-access
+        return GetSegmentsHistoryResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + segment_id + "/history",
+                                                   headers=self.headers,
+                                                   params=params)))
 
     async def usage(self, segment_id: str):
         """
@@ -560,7 +628,8 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Check where a segment is being used
                     segment_id = "seg_123abc"
@@ -598,9 +667,11 @@ class SegmentsResource:
                     
                     # Determine if it's safe to modify or delete the segment
                     if not usage.campaign_ids and not usage.broadcast_ids:
-                        print("\nThis segment is not currently in use and can be safely modified or deleted")
+                        print("\nThis segment is not currently in use and can"
+                                " be safely modified or deleted")
                     else:
-                        print("\nThis segment is in use - modifications or deletion may affect active communications")
+                        print("\nThis segment is in use - modifications or "
+                                "deletion may affect active communications")
                     
                 except Exception as e:
                     print(f"Error checking segment usage: {str(e)}")
@@ -617,4 +688,8 @@ class SegmentsResource:
             - The response includes only the IDs of campaigns and broadcasts; to get detailed
             information about them, you would need to make additional API calls
         """
-        return GetSegmentUsageResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + segment_id + "/usage", headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetSegmentUsageResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + segment_id + "/usage",
+                                                   headers=self.headers)))

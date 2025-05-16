@@ -1,3 +1,12 @@
+"""
+Asynchronous clicked URLs reporting resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving and analyzing metrics about
+URL clicks in emails sent through the Naxai platform. It enables non-blocking access
+to link engagement data, helping users understand which links receive the most clicks,
+identify popular content, and optimize email campaigns for better click-through rates.
+"""
+
 import datetime
 import json
 from typing import Optional, Literal
@@ -11,11 +20,17 @@ class ClickedUrlsResource:
         self.root_path = root_path + "/clicks"
         self.headers = {"Content-Type": "application/json"}
 
-    async def list(self,
-              start: Optional[int] = int((datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=7)).timestamp()),
-              stop: Optional[int] = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
-              group: Optional[Literal["day", "month"]] = "day",
-              ):
+    async def list(
+            self,
+            start: Optional[int] = int(
+                (datetime.datetime.now(tz=datetime.timezone.utc) -
+                datetime.timedelta(days=7)).timestamp()
+            ),
+            stop: Optional[int] = int(
+                datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+            ),
+            group: Optional[Literal["day", "month"]] = "day",
+        ):
         """
         Retrieve metrics about clicked URLs in emails sent through the Naxai email system.
         
@@ -43,7 +58,8 @@ class ClickedUrlsResource:
                     - clicked_unique: Number of unique recipients who clicked this URL
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access click metrics
         
@@ -63,7 +79,8 @@ class ClickedUrlsResource:
             >>> print(f"Found data for {len(metrics.stats)} URLs")
             >>> 
             >>> # Find the most clicked URLs
-            >>> sorted_urls = sorted(metrics.stats, key=lambda x: x.clicked_unique or 0, reverse=True)
+            >>> sorted_urls = (
+            >>>     sorted(metrics.stats, key=lambda x: x.clicked_unique or 0, reverse=True))
             >>> print("\nTop 3 most clicked URLs:")
             >>> for i, url_stats in enumerate(sorted_urls[:3], 1):
             ...     print(f"{i}. {url_stats.url}")
@@ -118,5 +135,9 @@ class ClickedUrlsResource:
             "stop": stop,
             "group": group
         }
-
-        return ListClickedUrlsMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListClickedUrlsMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   params=params,
+                                                   headers=self.headers)))

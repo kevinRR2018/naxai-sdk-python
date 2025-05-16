@@ -1,3 +1,13 @@
+"""
+Asynchronous email activity logs resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving and analyzing email activity logs,
+including delivery status, engagement metrics, and event history for individual messages
+and across multiple emails. It enables non-blocking access to detailed email tracking data,
+allowing applications to efficiently monitor email performance and recipient interactions
+without impacting application responsiveness.
+"""
+
 import json
 from typing import Optional, Literal
 from pydantic import Field, validate_call
@@ -29,7 +39,8 @@ class ActivityLogsResource:
                 This must match the email address the message was sent to.
         
         Returns:
-            GetEmailActivityLogsResponse: A response object containing detailed information about the email,
+            GetEmailActivityLogsResponse: 
+                A response object containing detailed information about the email,
             including:
                 - message_id: Unique identifier for the email message
                 - from_email: The sender's email address
@@ -46,7 +57,8 @@ class ActivityLogsResource:
                 - events: List of events in the email's lifecycle, providing a chronological history
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access email activity logs
             NaxaiResourceNotFound: If the specified message_id or email combination doesn't exist
@@ -61,7 +73,8 @@ class ActivityLogsResource:
             >>> print(f"Email: {message_details.subject}")
             >>> print(f"From: {message_details.from_email} to: {message_details.to_email}")
             >>> print(f"Status: {message_details.status}")
-            >>> print(f"Engagement: {message_details.opens or 0} opens, {message_details.clicks or 0} clicks")
+            >>> print(f"Engagement: {message_details.opens or 0} opens, "
+            >>>       f"{message_details.clicks or 0} clicks")
             >>> 
             >>> # Display event timeline
             >>> if message_details.events:
@@ -83,10 +96,13 @@ class ActivityLogsResource:
             - 2023-12-21T10:16:03Z: clicked - https://example.com/login
         
         Note:
-            - Both message_id and email parameters are required to uniquely identify the email activity
-            - The message_id is typically obtained from the response when sending an email or from list() results
+            - Both message_id and email parameters are required to uniquely identify
+              the email activity
+            - The message_id is typically obtained from the response when sending an email or
+              from list() results
             - The email parameter must match the recipient's email address the message was sent to
-            - The events list provides a chronological history of the email's journey and recipient interactions
+            - The events list provides a chronological history of the email's journey and
+              recipient interactions
             - Common event types include:
             * "sent": Email has been accepted for delivery
             * "delivered": Email has been delivered to the recipient's inbox
@@ -108,7 +124,11 @@ class ActivityLogsResource:
             GetEmailActivityLogsResponse: For the structure of the response object
             EmailEvents: For the structure of individual email events
         """
-        return GetEmailActivityLogsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + message_id + "/" + email, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetEmailActivityLogsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + message_id + "/" + email,
+                                                   headers=self.headers)))
 
     #TODO: email validation
     @validate_call
@@ -134,7 +154,8 @@ class ActivityLogsResource:
             page (Optional[int]): Page number to retrieve. Defaults to 1.
             page_size (Optional[int]): Number of items per page. Must be between 1 and 100.
                 Defaults to 50.
-            start (Optional[int]): Start timestamp for filtering emails, in milliseconds since epoch.
+            start (Optional[int]): 
+                Start timestamp for filtering emails, in milliseconds since epoch.
                 Only emails sent/received after this time will be included. Defaults to None.
             stop (Optional[int]): End timestamp for filtering emails, in milliseconds since epoch.
                 Only emails sent/received before this time will be included. Defaults to None.
@@ -148,11 +169,13 @@ class ActivityLogsResource:
                 Only emails associated with this client will be included. Defaults to None.
             campaign_id (Optional[str]): Filter by campaign identifier.
                 Only emails associated with this campaign will be included. Defaults to None.
-            status (Optional[Literal["sent", "delivered", "failed"]]): Filter by email delivery status.
+            status (Optional[Literal["sent", "delivered", "failed"]]): 
+                Filter by email delivery status.
                 Only emails with this status will be included. Defaults to None.
         
         Returns:
-            ListEmailActivityLogsResponse: A response object containing the paginated list of email activity logs.
+            ListEmailActivityLogsResponse: 
+                A response object containing the paginated list of email activity logs.
             The response includes:
                 - pagination: Information about the current page, total pages, and total items
                 - messages: List of BaseActivityLogs objects with information about each email:
@@ -167,7 +190,8 @@ class ActivityLogsResource:
                     - clicks: Number of times links within the email have been clicked
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access email activity logs
             ValidationError: If the provided parameters fail validation
@@ -179,7 +203,8 @@ class ActivityLogsResource:
             ...     page_size=25
             ... )
             >>> print(f"Found {activity_logs.pagination.total_items} emails")
-            >>> print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.total_pages}")
+            >>> print(f"Showing page {activity_logs.pagination.page} of "
+            >>>       f"{activity_logs.pagination.total_pages}")
             >>> for msg in activity_logs.messages:
             ...     print(f"Email: {msg.subject} - Status: {msg.status}")
             Found 87 emails
@@ -201,12 +226,15 @@ class ActivityLogsResource:
             ...     email="customer@example.com",
             ...     sort="createdAt:asc"
             ... )
-            >>> print(f"Found {len(delivered_emails.messages)} delivered emails to customer@example.com in the last week")
+            >>> print(f"Found {len(delivered_emails.messages)} delivered emails "
+            >>>       "to customer@example.com in the last week")
             >>> 
             >>> # Calculate engagement metrics
             >>> if delivered_emails.messages:
-            ...     opened = sum(1 for msg in delivered_emails.messages if msg.opens and msg.opens > 0)
-            ...     clicked = sum(1 for msg in delivered_emails.messages if msg.clicks and msg.clicks > 0)
+            ...     opened = sum(
+            ...         1 for msg in delivered_emails.messages if msg.opens and msg.opens > 0)
+            ...     clicked = sum(
+            ...         1 for msg in delivered_emails.messages if msg.clicks and msg.clicks > 0)
             ...     open_rate = opened / len(delivered_emails.messages) * 100
             ...     click_rate = clicked / len(delivered_emails.messages) * 100
             ...     print(f"Open rate: {open_rate:.1f}%")
@@ -244,9 +272,11 @@ class ActivityLogsResource:
             * "updatedAt": Sort by when the email status was last updated
             * "status": Sort by delivery status
             - The email parameter filters by recipient email address
-            - The client_id and campaign_id parameters help filter emails associated with specific entities
+            - The client_id and campaign_id parameters help filter emails associated
+              with specific entities
             - The status parameter filters by delivery status ("sent", "delivered", "failed")
-            - For detailed information about a specific email, use the get() method with its message_id
+            - For detailed information about a specific email, use the get() method
+              with its message_id
             - The response provides a high-level overview of email activity
             - Email tracking (opens, clicks) requires proper configuration of tracking domains
         
@@ -266,16 +296,20 @@ class ActivityLogsResource:
         }
 
         if start:
-             params["start"] = start
+            params["start"] = start
         if stop:
-             params["stop"] = stop
+            params["stop"] = stop
         if email:
-             params["email"] = email
+            params["email"] = email
         if client_id:
-             params["clientId"] = client_id
+            params["clientId"] = client_id
         if campaign_id:
-             params["campaignId"] = campaign_id
+            params["campaignId"] = campaign_id
         if status:
-             params["status"] = status
-
-        return ListEmailActivityLogsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+            params["status"] = status
+        # pylint: disable=protected-access
+        return ListEmailActivityLogsResponse.model_validate_json(
+             json.dumps(await self._client._request("GET",
+                                                    self.root_path,
+                                                    params=params,
+                                                    headers=self.headers)))

@@ -1,6 +1,17 @@
+"""
+Asynchronous holiday templates resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving holiday templates from the Naxai API,
+allowing users to access predefined sets of dates that represent holidays or special days.
+These templates can be used with calendars to automatically exclude specific dates from
+working hours calculations, supporting proper scheduling in voice calls and other
+time-sensitive operations.
+"""
+
 import json
-from naxai.models.calendars.responses.holidays_template_responses import (GetHolidaysTemplateResponse,
-                                                                          ListHolidaysTemplatesResponse)
+from naxai.models.calendars.responses.holidays_template_responses import (
+    GetHolidaysTemplateResponse,
+    ListHolidaysTemplatesResponse)
 
 class HolidaysTemplatesResource:
     """ holidays_template resource for calendars resource"""
@@ -51,7 +62,11 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             list: Method to retrieve all holiday templates
         """
-        return GetHolidaysTemplateResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + template_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetHolidaysTemplateResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + template_id,
+                                                   headers=self.headers)))
 
     async def list(self):
         """Retrieves a list of all available holiday templates.
@@ -91,4 +106,8 @@ class HolidaysTemplatesResource:
             HolidayTemplate: The model class for holiday template data
             get: Method to retrieve a specific holiday template
         """
-        return ListHolidaysTemplatesResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListHolidaysTemplatesResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   headers=self.headers)))

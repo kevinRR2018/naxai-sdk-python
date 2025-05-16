@@ -1,3 +1,13 @@
+"""
+Asynchronous contact attributes resource for the Naxai People SDK.
+
+This module provides asynchronous methods for managing custom contact attributes in the
+Naxai platform, including creating, retrieving, listing, and deleting attributes that
+define the structure of contact profiles. These attributes can be used to store custom
+information about contacts and can be leveraged for segmentation, personalization, and
+analytics in high-performance asynchronous applications.
+"""
+
 import json
 from naxai.models.people.responses.attributes_responses import (GetAttributeResponse,
                                                                 ListAttributesResponse,
@@ -36,7 +46,8 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Delete a custom attribute
                 attribute_name = "loyalty_points"
                 
@@ -55,7 +66,10 @@ class AttributesResource:
             - If the attribute is used in segment conditions, those segments may need to be updated
             - Consider the impact on integrations or automations that rely on this attribute
         """
-        return await self._client._request("DELETE", self.root_path + "/" + name, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("DELETE",
+                                           self.root_path + "/" + name,
+                                           headers=self.headers)
 
     async def get(self, name: str):
         """
@@ -75,12 +89,14 @@ class AttributesResource:
             ValueError: If the name is empty.
             NaxaiAPIRequestError: If there is an error response from the API.
             NaxaiAuthenticationError: If authentication fails.
-            NaxaiAuthorizationError: If the account lacks permission to access attribute information.
+            NaxaiAuthorizationError: 
+                If the account lacks permission to access attribute information.
             NaxaiResourceNotFound: If the specified attribute does not exist.
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Get information about a specific attribute
                 attribute_name = "loyalty_tier"
                 
@@ -105,7 +121,11 @@ class AttributesResource:
             - The segment_ids field shows which segments use this attribute in their conditions
             - This information is useful for understanding attribute usage and dependencies
         """
-        return GetAttributeResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + name, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetAttributeResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + name,
+                                                   headers=self.headers)))
 
     async def list(self):
         """
@@ -122,11 +142,13 @@ class AttributesResource:
         Raises:
             NaxaiAPIRequestError: If there is an error response from the API.
             NaxaiAuthenticationError: If authentication fails.
-            NaxaiAuthorizationError: If the account lacks permission to access attribute information.
+            NaxaiAuthorizationError: 
+                If the account lacks permission to access attribute information.
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Retrieve all attributes
                     attributes = await client.people.attributes.list()
@@ -171,7 +193,11 @@ class AttributesResource:
             - The response is list-like and supports operations like len(), indexing, and iteration
             - There is no pagination for attributes as the total number is typically manageable
         """
-        return ListAttributesResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListAttributesResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   headers=self.headers)))
 
     async def create(self, name: str):
         """
@@ -199,7 +225,8 @@ class AttributesResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 try:
                     # Create a new custom attribute
                     attribute_name = "loyalty_tier"
@@ -223,10 +250,17 @@ class AttributesResource:
         
         Note:
             - Attribute names should follow a consistent naming convention
-            - Common conventions include snake_case (e.g., "loyalty_tier") or camelCase (e.g., "loyaltyTier")
+            - Common conventions include snake_case (e.g., "loyalty_tier") or
+              camelCase (e.g., "loyaltyTier")
             - Attribute names should be descriptive and indicate the type of data they store
             - Once created, attributes cannot be renamed (they must be deleted and recreated)
-            - Creating an attribute does not automatically populate it with values for existing contacts
+            - Creating an attribute does not automatically populate it with values
+              for existing contacts
             - New attributes can be used immediately for updating contacts and creating segments
         """
-        return CreateAttributeResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path, json={"name": name}, headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateAttributeResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path,
+                                                   json={"name": name},
+                                                   headers=self.headers)))

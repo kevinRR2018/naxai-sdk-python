@@ -1,3 +1,13 @@
+"""
+Asynchronous contact segments resource for the Naxai People SDK.
+
+This module provides asynchronous methods for retrieving segment memberships for
+individual contacts in the Naxai platform. It allows users to determine which
+segments a specific contact belongs to in a non-blocking manner, which is useful
+for understanding how contacts are categorized and which targeted communications
+they may receive in high-performance asynchronous applications.
+"""
+
 import json
 from naxai.models.people.responses.contacts_responses import ListSegmentsOfContactResponse
 
@@ -36,7 +46,8 @@ class SegmentsResource:
         
         Example:
             ```python
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 # Get all segments for a specific contact
                 contact_id = "john.doe@example.com"  # Using email as identifier
                 response = await client.people.contacts.segments.list(identifier=contact_id)
@@ -52,7 +63,8 @@ class SegmentsResource:
                 
                 # Check if the contact is in a specific segment
                 target_segment_id = "seg_123abc"
-                is_in_segment = any(segment.id == target_segment_id for segment in response.segments)
+                is_in_segment = any(segment.id == target_segment_id
+                                     for segment in response.segments)
                 print(f"Contact is in target segment: {is_in_segment}")
             ```
         
@@ -61,7 +73,11 @@ class SegmentsResource:
             - For detailed segment definitions including conditions, use the dedicated segment API
             - An empty list indicates the contact doesn't belong to any segments
             - Segment membership can change over time as contacts' attributes and behaviors evolve
-            - For dynamic segments, membership is recalculated periodically based on the segment conditions
+            - For dynamic segments, membership is recalculated periodically based
+              on the segment conditions
         """
-
-        return ListSegmentsOfContactResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + identifier + "/segments", headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListSegmentsOfContactResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + identifier + "/segments",
+                                                   headers=self.headers)))

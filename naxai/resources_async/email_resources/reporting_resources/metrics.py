@@ -1,3 +1,13 @@
+"""
+Asynchronous email metrics reporting resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving comprehensive email performance
+metrics from the Naxai platform, including delivery rates, engagement statistics, and
+negative indicators. It enables non-blocking access to email analytics data, allowing
+applications to efficiently monitor campaign performance, identify trends, and optimize
+email marketing strategies without blocking the main execution thread.
+"""
+
 import datetime
 import json
 from typing import Optional, Literal
@@ -11,11 +21,17 @@ class MetricsResource:
         self.root_path = root_path + "/metrics"
         self.headers = {"Content-Type": "application/json"}
 
-    async def list(self,
-            start: Optional[int] = int((datetime.datetime.now(tz=datetime.timezone.utc) - datetime.timedelta(days=7)).timestamp()),
-            stop: Optional[int] = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
+    async def list(
+            self,
+            start: Optional[int] = int(
+                (datetime.datetime.now(tz=datetime.timezone.utc) -
+                 datetime.timedelta(days=7)).timestamp()
+            ),
+            stop: Optional[int] = int(
+                datetime.datetime.now(tz=datetime.timezone.utc).timestamp()
+            ),
             group: Optional[Literal["day", "month"]] = "day",
-            ):
+        ):
         """
         Retrieve comprehensive email engagement metrics from the Naxai email system.
         
@@ -55,7 +71,8 @@ class MetricsResource:
                     - unsubscribed: Number of recipients who unsubscribed
         
         Raises:
-            NaxaiAPIRequestError: If the API request fails due to invalid parameters or server issues
+            NaxaiAPIRequestError: 
+                If the API request fails due to invalid parameters or server issues
             NaxaiAuthenticationError: If authentication fails
             NaxaiAuthorizationError: If the account lacks permission to access email metrics
         
@@ -77,9 +94,12 @@ class MetricsResource:
             >>> 
             >>> # Calculate overall metrics
             >>> total_sent = sum(day.sent for day in metrics.stats if day.sent is not None)
-            >>> total_delivered = sum(day.delivered for day in metrics.stats if day.delivered is not None)
-            >>> total_opened = sum(day.opened_unique for day in metrics.stats if day.opened_unique is not None)
-            >>> total_clicked = sum(day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None)
+            >>> total_delivered = sum(
+            >>>     day.delivered for day in metrics.stats if day.delivered is not None)
+            >>> total_opened = sum(
+            >>>     day.opened_unique for day in metrics.stats if day.opened_unique is not None)
+            >>> total_clicked = sum(
+            >>>     day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None)
             >>> 
             >>> # Calculate key performance indicators
             >>> if total_sent > 0:
@@ -99,8 +119,10 @@ class MetricsResource:
             >>> # Find the day with highest engagement
             >>> if metrics.stats:
             ...     best_day = max(metrics.stats, key=lambda day: day.opened_unique or 0)
-            ...     print(f"\nBest performing day: {datetime.datetime.fromtimestamp(best_day.date/1000)}")
-            ...     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, Clicked: {best_day.cliqued_unique}")
+            ...     print(f"\nBest performing day: "
+            ...           f"{datetime.datetime.fromtimestamp(best_day.date/1000)}")
+            ...     print(f"Sent: {best_day.sent}, Opened: "
+            ...           f"{best_day.opened_unique}, Clicked: {best_day.cliqued_unique}")
             Email metrics from 1703066400000 to 1705658400000
             Grouped by: day
             Data points: 30
@@ -136,7 +158,8 @@ class MetricsResource:
             * Bounce rate: bounced / sent
             * Complaint rate: complained / sent
             * Unsubscribe rate: unsubscribed / delivered
-            - High bounce or complaint rates may indicate issues with email quality or recipient targeting
+            - High bounce or complaint rates may indicate issues with email quality or
+              recipient targeting
             - The date field in each stats entry is in milliseconds since epoch and represents the
             start of that time interval (day or month)
             - For more detailed click metrics by URL, use the clicked_urls.list() method
@@ -153,5 +176,9 @@ class MetricsResource:
             "stop": stop,
             "group": group
         }
-
-        return ListMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   params=params,
+                                                   headers=self.headers)))
