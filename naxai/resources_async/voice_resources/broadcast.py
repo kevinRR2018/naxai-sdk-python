@@ -1,3 +1,13 @@
+"""
+Asynchronous voice broadcast resource for the Naxai SDK.
+
+This module provides asynchronous methods for creating and managing voice broadcast campaigns,
+including creating, retrieving, updating, and controlling broadcasts. It supports operations
+such as starting, pausing, resuming, and canceling broadcasts, as well as accessing detailed
+metrics and recipient information through specialized sub-resources, all in a non-blocking
+manner suitable for high-performance asynchronous applications.
+"""
+
 import json
 from typing import Optional, Annotated
 from pydantic import Field, validate_call
@@ -15,7 +25,7 @@ from .broadcast_resources.recipients import RecipientsResource
 
 class BroadcastsResource:
     """ broadcasts resource for voice resource"""
-    
+
     def __init__(self, client, root_path):
         self._client = client
         self.root_path = root_path + "/broadcasts"
@@ -48,18 +58,25 @@ class BroadcastsResource:
             ...     print(f"Broadcast: {broadcast.name} ({broadcast.state})")
             ...     print(f"Progress: {broadcast.completed_count}/{broadcast.total_count}")
         """
-        params = {"page": page, "pagesize": page_size}
-        return ListBroadcastResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, headers=self.headers, params=params)))
-    
+        params = {"page": page, "pageSize": page_size}
+        # pylint: disable=protected-access
+        return ListBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   headers=self.headers,
+                                                   params=params)))
+
     async def create(self, data: CreateBroadcastRequest):
         """
         Creates a new broadcast.
 
         Args:
-            data (CreateBroadcastRequest): The request body containing the details of the broadcast to be created.
+            data (CreateBroadcastRequest): 
+                The request body containing the details of the broadcast to be created.
 
         Returns:
-            CreateBroadcastResponse: A Pydantic model containing the details of the created broadcast,
+            CreateBroadcastResponse: 
+            A Pydantic model containing the details of the created broadcast,
             including the broadcast_id, name, configuration, and other metadata.
 
         Example:
@@ -73,10 +90,13 @@ class BroadcastsResource:
             ... )
             >>> print(f"Created broadcast with ID: {new_broadcast.broadcast_id}")
         """
-        return CreateBroadcastResponse.model_validate_json(json.dumps(await self._client._request("POST",
-                                                                                                  self.root_path,
-                                                                                                  json=data.model_dump(by_alias=True, exclude_none=True),
-                                                                                                  headers=self.headers)))
+        # pylint: disable=protected-access
+        return CreateBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path,
+                                                   json=data.model_dump(by_alias=True,
+                                                                        exclude_none=True),
+                                                   headers=self.headers)))
 
     async def get(self, broadcast_id: str):
         """
@@ -96,7 +116,11 @@ class BroadcastsResource:
             >>> print(f"Broadcast: {broadcast.name}")
             >>> print(f"Progress: {broadcast.completed_count}/{broadcast.total_count}")
         """
-        return GetBroadcastResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/" + broadcast_id, headers=self.headers)))
+        # pylint: disable=protected-access
+        return GetBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/" + broadcast_id,
+                                                   headers=self.headers)))
 
     async def delete(self, broadcast_id: str):
         """
@@ -113,7 +137,10 @@ class BroadcastsResource:
             ...     broadcast_id="XXXXXXXXX"
             ... )
         """
-        return await self._client._request("DELETE", self.root_path + "/" + broadcast_id, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("DELETE",
+                                           self.root_path + "/" + broadcast_id,
+                                           headers=self.headers)
 
     async def update(self, broadcast_id: str, data: CreateBroadcastRequest):
         """
@@ -121,10 +148,12 @@ class BroadcastsResource:
 
         Args:
             broadcast_id (str): The unique identifier of the broadcast to update.
-            data (CreateBroadcastRequest): The request body containing the updated details of the broadcast.
+            data (CreateBroadcastRequest): 
+                The request body containing the updated details of the broadcast.
 
         Returns:
-            UpdateBroadcastResponse: A Pydantic model containing the details of the updated broadcast,
+            UpdateBroadcastResponse: 
+            A Pydantic model containing the details of the updated broadcast,
             including any modified fields and metadata.
 
         Example:
@@ -139,7 +168,13 @@ class BroadcastsResource:
             ... )
             >>> print(f"Updated broadcast: {updated_broadcast.name}")
         """
-        return UpdateBroadcastResponse.model_validate_json(json.dumps(await self._client._request("PUT", self.root_path + "/" + broadcast_id, json=data.model_dump(by_alias=True, exclude_none=True), headers=self.headers)))
+        # pylint: disable=protected-access
+        return UpdateBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("PUT",
+                                                   self.root_path + "/" + broadcast_id,
+                                                   json=data.model_dump(by_alias=True,
+                                                                        exclude_none=True),
+                                                   headers=self.headers)))
 
     async def start(self, broadcast_id: str):
         """
@@ -158,7 +193,11 @@ class BroadcastsResource:
             ... )
             >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return StartBroadcastResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path + "/" + broadcast_id + "/start", headers=self.headers)))
+        # pylint: disable=protected-access
+        return StartBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path + "/" + broadcast_id + "/start",
+                                                   headers=self.headers)))
 
     async def pause(self, broadcast_id: str):
         """
@@ -177,7 +216,11 @@ class BroadcastsResource:
             ... )
             >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return PauseBroadcastResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path + "/" + broadcast_id + "/pause", headers=self.headers)))
+        # pylint: disable=protected-access
+        return PauseBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path + "/" + broadcast_id + "/pause",
+                                                   headers=self.headers)))
 
     async def resume(self, broadcast_id: str):
         """
@@ -196,7 +239,11 @@ class BroadcastsResource:
             ... )
             >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return ResumeBroadcastResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path + "/" + broadcast_id + "/resume", headers=self.headers)))
+        # pylint: disable=protected-access
+        return ResumeBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path + "/" + broadcast_id + "/resume",
+                                                   headers=self.headers)))
 
     async def cancel(self, broadcast_id: str):
         """
@@ -215,4 +262,8 @@ class BroadcastsResource:
             ... )
             >>> print(f"Broadcast {result.broadcast_id} is {result.state}")
         """
-        return CancelBroadcastResponse.model_validate_json(json.dumps(await self._client._request("POST", self.root_path + "/" + broadcast_id + "/cancel", headers=self.headers)))
+        # pylint: disable=protected-access
+        return CancelBroadcastResponse.model_validate_json(
+            json.dumps(await self._client._request("POST",
+                                                   self.root_path + "/" + broadcast_id + "/cancel",
+                                                   headers=self.headers)))
