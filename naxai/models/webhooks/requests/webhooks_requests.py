@@ -22,11 +22,11 @@ from naxai.models.webhooks.helper_models.authentication import (
     OAuth2AuthModel,
     HeaderAuthModel
 )
-EVENT_OBJECTS = Literal["all",
-                        "people",
-                        "sms",
-                        "call",
-                        "email"]
+EVENT_OBJECTS = Literal["All",
+                        "People",
+                        "Sms",
+                        "Call",
+                        "Email"]
 
 class CreateWebhookRequest(BaseModel):
     """

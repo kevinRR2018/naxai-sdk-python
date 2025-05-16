@@ -109,8 +109,8 @@ class WebhooksResource:
                                      HeaderAuthModel,
                                      NoAuthModel],
                 event_object: Literal[
-                            "all", "people", "sms",
-                            "email", "call"],
+                            "All", "People", "Sms",
+                            "Email", "Call"],
                 event_filter: List[str],
                 event_names: List[str],
                 active: bool = True):
