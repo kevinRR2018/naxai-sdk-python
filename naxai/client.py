@@ -56,6 +56,7 @@ from naxai.resources.calendars import CalendarsResource
 from naxai.resources.email import EmailResource
 from naxai.resources.sms import SMSResource
 from naxai.resources.people import PeopleResource
+from naxai.resources.webhooks import WebhooksResource
 from .config import API_BASE_URL
 
 
@@ -86,6 +87,7 @@ class NaxaiClient(BaseClient):
         self.email = EmailResource(self)
         self.sms = SMSResource(self)
         self.people = PeopleResource(self)
+        self.webhooks = WebhooksResource(self)
 
     def __enter__(self):
         return self
