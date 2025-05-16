@@ -1,3 +1,13 @@
+"""
+Asynchronous SMS reporting resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving and analyzing SMS messaging metrics,
+including outgoing message statistics, delivery error reports, incoming message volumes,
+and country-based performance data. These reports help users understand messaging patterns,
+delivery success rates, and geographical distribution of their SMS communications in a
+non-blocking manner suitable for high-performance asynchronous applications.
+"""
+
 import json
 from typing import Literal
 from pydantic import Field
@@ -43,7 +53,8 @@ class ReportingResource:
                 - Mapped from JSON key 'stopDate'.
         
         Returns:
-            ListOutgoingSMSMetricsResponse: A Pydantic model containing detailed outgoing SMS metrics.
+            ListOutgoingSMSMetricsResponse: 
+            A Pydantic model containing detailed outgoing SMS metrics.
             The response includes:
                 - start_date: Start date of the reporting period
                 - stop_date: End date of the reporting period
@@ -102,36 +113,41 @@ class ReportingResource:
             - These metrics provide insights into outgoing message performance over time
             - Analyzing trends can help identify optimal sending times and delivery patterns
         """
-        #TODO: verify the validation of start_date and stop_date
         if group == "hour":
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'hour'")
 
             if len(start_date) < 17 or len(start_date) > 19:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
-            
+                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
+
             if stop_date is not None and (len(stop_date) < 17 or len(stop_date) > 19):
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
         else:
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'day' or 'month'")
-            
+
             if len(start_date) < 8 or len(start_date) > 10:
                 raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
             if stop_date is None:
                 raise NaxaiValueError("stopDate must be provided when group is 'day' or 'month'")
-            
+
             if len(stop_date) < 8 or len(stop_date) > 10:
                 raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
         params = {"group": group}
         if start_date:
             params["startDate"] = start_date
         if stop_date:
             params["stopDate"] = stop_date
-
-        return ListOutgoingSMSMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/outgoing", params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListOutgoingSMSMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/outgoing",
+                                                   params=params,
+                                                   headers=self.headers)))
 
     async def list_outgoing_metrics_by_country(self,
                                                start_date: str,
@@ -173,7 +189,8 @@ class ReportingResource:
             >>> for country in country_metrics.stats:
             ...     if country.sms > 0:
             ...         delivery_rate = country.delivered / country.sms * 100
-            ...         print(f"{country.country} ({country.mcc}-{country.mnc}): {delivery_rate:.1f}% delivery rate")
+            ...         print(f"{country.country} ({country.mcc}-{country.mnc}): "
+            ...               f"{delivery_rate:.1f}% delivery rate")
             >>> 
             >>> # Find country with highest volume
             >>> if country_metrics.stats:
@@ -190,23 +207,29 @@ class ReportingResource:
         Note:
             - The stats list contains one entry per country/network combination
             - Countries are typically identified by ISO 3166-1 alpha-2 codes (e.g., "US", "GB")
-            - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify a specific mobile network
+            - The MCC (Mobile Country Code) and MNC (Mobile Network Code) together identify
+              a specific mobile network
             - Each stats entry includes detailed metrics such as:
             * Total SMS count
             * Delivered, failed, expired, unknown, canceled, and rejected counts
             * Average time to deliver and submit (in milliseconds)
             - These metrics provide insights into geographical performance differences
-            - Analyzing country-specific metrics can help optimize international messaging strategies
+            - Analyzing country-specific metrics can help optimize international
+              messaging strategies
         """
         if len(start_date) != 10:
             raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD'")
         if len(stop_date) != 10:
             raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD'")
-        
+
         params = {"startDate": start_date,
                   "stopDate": stop_date}
-        
-        return ListOutgoingSMSByCountryMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/outgoing-by-country", params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListOutgoingSMSByCountryMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/outgoing-by-country",
+                                                   params=params,
+                                                   headers=self.headers)))
 
     async def list_incoming_metrics(self,
                                     group: Literal["hour", "day", "month"],
@@ -270,7 +293,8 @@ class ReportingResource:
             >>> # Find day with highest volume
             >>> if daily_metrics.stats:
             ...     busiest_day = max(daily_metrics.stats, key=lambda day: day.sms)
-            ...     print(f"Busiest day: {busiest_day.date} with {busiest_day.sms} incoming messages")
+            ...     print(f"Busiest day: {busiest_day.date} with "
+            ...           f"{busiest_day.sms} incoming messages")
         
         Note:
             - The stats list contains entries corresponding to the specified grouping level
@@ -282,35 +306,40 @@ class ReportingResource:
             - These metrics provide insights into incoming message patterns over time
             - Analyzing trends can help identify peak times for customer engagement
         """
-        #TODO: verify the validation of start_date and stop_date
         if group == "hour":
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'hour'")
 
             if len(start_date) < 17 or len(start_date) > 19:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
-            
+                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
+
             if stop_date is not None and (len(stop_date) < 17 or len(stop_date) > 19):
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
         else:
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'day' or 'month'")
-            
+
             if len(start_date) < 8 or len(start_date) > 10:
                 raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
             if stop_date is None:
                 raise NaxaiValueError("stopDate must be provided when group is 'day' or 'month'")
-            
+
             if len(stop_date) < 8 or len(stop_date) > 10:
                 raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
         params = {"group": group,
                   "startDate": start_date,
                   "stopDate": stop_date}
-        
-        return ListIncomingSMSMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/incoming", params=params, headers=self.headers)))
-    
+        # pylint: disable=protected-access
+        return ListIncomingSMSMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/incoming",
+                                                   params=params,
+                                                   headers=self.headers)))
+
     async def list_delivery_errors_metrics(self,
                                          start_date: str,
                                          stop_date: str
@@ -329,7 +358,8 @@ class ReportingResource:
                 Must be exactly 10 characters. Mapped from JSON key 'stopDate'.
         
         Returns:
-            ListDeliveryErrorMetricsResponse: A Pydantic model containing SMS delivery error metrics.
+            ListDeliveryErrorMetricsResponse: 
+            A Pydantic model containing SMS delivery error metrics.
             The response includes:
                 - start_date: Start date of the reporting period
                 - stop_date: End date of the reporting period
@@ -366,7 +396,8 @@ class ReportingResource:
             >>> # Find most common error
             >>> if error_metrics.stats:
             ...     most_common = max(error_metrics.stats, key=lambda error: error.sms)
-            ...     print(f"Most common error: {most_common.status_code} ({most_common.status_category})")
+            ...     print(f"Most common error: {most_common.status_code} "
+            ...           f"({most_common.status_category})")
             ...     print(f"Occurrences: {most_common.sms}")
         
         Note:
@@ -384,7 +415,9 @@ class ReportingResource:
 
         params = {"startDate": start_date,
                   "stopDate": stop_date}
-
-        return ListDeliveryErrorMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path + "/delivery-errors", params=params, headers=self.headers)))
-            
-        
+        # pylint: disable=protected-access
+        return ListDeliveryErrorMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path + "/delivery-errors",
+                                                   params=params,
+                                                   headers=self.headers)))

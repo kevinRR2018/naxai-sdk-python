@@ -1,3 +1,14 @@
+"""
+Asynchronous voice resource for the Naxai SDK.
+
+This module provides asynchronous voice communication capabilities for the Naxai platform,
+including individual call management, broadcast campaigns for reaching multiple recipients,
+detailed activity tracking, and comprehensive performance reporting. It supports interactive
+voice features such as menus, voicemail handling, and call transfers to enable sophisticated
+voice communication workflows in a non-blocking manner suitable for high-performance
+asynchronous applications.
+"""
+
 from .voice_resources.call import CallResource
 from .voice_resources.broadcast import BroadcastsResource
 from .voice_resources.reporting import ReportingResource

@@ -1,3 +1,13 @@
+"""
+Asynchronous contact events resource for the Naxai People SDK.
+
+This module provides asynchronous methods for recording and managing contact events
+in the Naxai platform, allowing users to track customer interactions, behaviors, and
+activities without blocking the main execution thread. These events can be used for
+contact segmentation, automation triggers, and analytics to better understand customer
+engagement and journeys in high-performance asynchronous applications.
+"""
+
 import datetime
 from typing import Literal, Optional
 from pydantic import Field, validate_call
@@ -18,7 +28,7 @@ class EventsResource:
                 timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
                 idempotency_key: Optional[str] = Field(default=None, max_length=200),
                 data: Optional[dict[str,str]] = None):
-         
+
         """
         Send an event for a specific contact in the Naxai People API.
         
@@ -53,11 +63,13 @@ class EventsResource:
         Example:
             ```python
             # Send a purchase event with product details
-            async with NaxaiAsyncClient(api_client_id="your_id", api_client_secret="your_secret") as client:
+            async with NaxaiAsyncClient(api_client_id="your_id",
+                                        api_client_secret="your_secret") as client:
                 response = await client.people.contacts.events.send(
                     identifier="john.doe@example.com",  # Using email as identifier
                     name="purchase_completed",
-                    timestamp=int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000),
+                    timestamp=int(
+                        datetime.datetime.now(tz=datetime.timezone.utc).timestamp() * 1000),
                     idempotency_key="order_12345",
                     data={
                         "product_id": "prod_123",
@@ -74,7 +86,8 @@ class EventsResource:
             - The timestamp should be in milliseconds since epoch (Unix time * 1000)
             - Using an idempotency_key is recommended to prevent duplicate events
             - The data dictionary can contain any custom properties relevant to the event
-            - Events are processed asynchronously and may not be immediately available for segmentation
+            - Events are processed asynchronously and may not be immediately available
+              for segmentation
         """
         data = {
             "name": name,
@@ -83,5 +96,8 @@ class EventsResource:
             "idempotencyKey": idempotency_key,
             "data": data
         }
-
-        return await self._client._request("POST", self.root_path + "/" + identifier + "/events", json=data, headers=self.headers)
+        # pylint: disable=protected-access
+        return await self._client._request("POST",
+                                           self.root_path + "/" + identifier + "/events",
+                                           json=data,
+                                           headers=self.headers)

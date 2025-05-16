@@ -1,19 +1,32 @@
+"""
+Asynchronous voice outbound reporting resource for the Naxai SDK.
+
+This module provides asynchronous methods for retrieving and analyzing metrics related to
+outbound voice calls, including call volumes, delivery rates, and geographical distribution.
+These reports can be grouped by different time intervals or by country, and filtered by
+specific phone numbers to help users understand outbound call performance and optimize
+their voice communication strategies in a non-blocking manner suitable for high-performance
+asynchronous applications.
+"""
+
 import json
 from typing import Optional, Literal
 from naxai.base.exceptions import NaxaiValueError
-from naxai.models.voice.responses.reporting_responses import ListOutboundMetricsResponse, ListOutboundCallsByCountryMetricsResponse
+from naxai.models.voice.responses.reporting_responses import (
+    ListOutboundMetricsResponse,
+    ListOutboundCallsByCountryMetricsResponse)
 
 class OutboundResource:
     """
     Outbound Resource for reporting resource
     """
-    
+
     def __init__(self, client, root_path):
         self._client = client
         self.previous_path = root_path
         self.root_path = root_path + "/outbound"
         self.headers = {"Content-Type": "application/json"}
-        
+
     async def list(self,
              group: Literal["hour", "day", "month"],
              start_date: Optional[str] = None,
@@ -24,7 +37,8 @@ class OutboundResource:
         Retrieve a list of outbound call metrics grouped by the specified time interval.
         
         This method fetches outbound call statistics from the API, allowing filtering by date range
-        and specific phone numbers. The results are grouped according to the specified time interval.
+        and specific phone numbers. The results are grouped according to the specified 
+        time interval.
         
         Args:
             group (Literal["hour", "day", "month"]): The time interval for grouping the metrics.
@@ -68,28 +82,30 @@ class OutboundResource:
             >>> print(f"Found {len(metrics.stats)} daily records")
             >>> for stat in metrics.stats:
             ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Delivered: {stat.delivered}")
-            ...     print(f"Success rate: {stat.delivered/stat.calls*100:.1f}% if stat.calls > 0 else 'N/A'")
+            ...     print(f"Success rate: "
+            ...          f"{stat.delivered/stat.calls*100:.1f}% if stat.calls > 0 else 'N/A'")
         """
-        #TODO: verify the validation of start_date and stop_date
         if group == "hour":
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'hour'")
 
             if len(start_date) < 17 or len(start_date) > 19:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
-            
+                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
+
             if stop_date is not None and (len(stop_date) < 17 or len(stop_date) > 19):
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or "
+                                      "'YY-MM-DD HH:MM:SS' when group is 'hour'")
         else:
             if start_date is None:
                 raise NaxaiValueError("startDate must be provided when group is 'day' or 'month'")
-            
+
             if len(start_date) < 8 or len(start_date) > 10:
                 raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-            
+
             if stop_date is None:
                 raise NaxaiValueError("stopDate must be provided when group is 'day' or 'month'")
-            
+
             if len(stop_date) < 8 or len(stop_date) > 10:
                 raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
 
@@ -101,9 +117,13 @@ class OutboundResource:
             params["stopDate"] = stop_date
         if number:
             params["number"] = number
+        # pylint: disable=protected-access
+        return ListOutboundMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.root_path,
+                                                   params=params,
+                                                   headers=self.headers)))
 
-        return ListOutboundMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.root_path, params=params, headers=self.headers)))
-    
     async def list_by_country(self,
                               start_date: str,
                               stop_date: str,
@@ -124,7 +144,8 @@ class OutboundResource:
                 only metrics for this specific number will be returned.
         
         Returns:
-            ListOutboundCallsByCountryMetricsResponse: A Pydantic model containing the outbound call metrics by country.
+            ListOutboundCallsByCountryMetricsResponse: 
+            A Pydantic model containing the outbound call metrics by country.
             The response includes:
                 - start_date: Start timestamp of the reporting period
                 - stop_date: End timestamp of the reporting period
@@ -143,17 +164,22 @@ class OutboundResource:
             ... )
             >>> print(f"Found metrics for {len(country_metrics.stats)} countries")
             >>> for stat in country_metrics.stats:
-            ...     print(f"Country: {stat.country}, Calls: {stat.calls}, Delivered: {stat.delivered}")
+            ...     print(f"Country: {stat.country}, Calls: {stat.calls}, "
+            ...           f"Delivered: {stat.delivered}")
         """
         if len(start_date) != 10:
             raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD'")
         if len(stop_date) != 10:
             raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD'")
-        
+
         params = {"startDate": start_date,
                   "stopDate": stop_date}
-        
+
         if number:
             params["number"] = number
-
-        return ListOutboundCallsByCountryMetricsResponse.model_validate_json(json.dumps(await self._client._request("GET", self.previous_path + "/outbound-by-country", params=params, headers=self.headers)))
+        # pylint: disable=protected-access
+        return ListOutboundCallsByCountryMetricsResponse.model_validate_json(
+            json.dumps(await self._client._request("GET",
+                                                   self.previous_path + "/outbound-by-country",
+                                                   params=params,
+                                                   headers=self.headers)))
