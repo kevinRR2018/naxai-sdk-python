@@ -92,7 +92,7 @@ class TestBroadcastsResource:
         args, kwargs = mock_client._request.call_args
         assert args[0] == "GET"
         assert args[1] == "/voice/broadcasts"
-        assert kwargs["params"] == {"page": 1, "pagesize": 25}
+        assert kwargs["params"] == {"page": 1, "pageSize": 25}
         assert kwargs["headers"] == {"Content-Type": "application/json"}
 
     @pytest.mark.asyncio

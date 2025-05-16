@@ -59,7 +59,7 @@ class BroadcastsResource:
             ...     print(f"Broadcast: {broadcast.name} ({broadcast.state})")
             ...     print(f"Progress: {broadcast.completed_count}/{broadcast.total_count}")
         """
-        params = {"page": page, "pagesize": page_size}
+        params = {"page": page, "pageSize": page_size}
         # pylint: disable=protected-access
         return ListBroadcastResponse.model_validate_json(
             json.dumps(self._client._request("GET",
