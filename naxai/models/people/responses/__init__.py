@@ -23,12 +23,6 @@ from .segments_responses import (ListSegmentsResponse,
                                  CountContactsInSegmentResponse,
                                  GetSegmentUsageResponse,
                                  ListContactsOfSegmentResponse)
-from .exports_responses import (ListExportsResponse,
-                                GetExportResponse,
-                                GetExportDownloadUrlResponse,
-                                CreateExportResponse)
-from .imports_responses import (GetImportResponse,
-                                ListImportsResponse)
 
 __all__ = ["CreateAttributeResponse",
            "ListAttributesResponse",
@@ -47,10 +41,5 @@ __all__ = ["CreateAttributeResponse",
            "GetSegmentsHistoryResponse",
            "CountContactsInSegmentResponse",
            "GetSegmentUsageResponse",
-           "ListContactsOfSegmentResponse",
-           "ListExportsResponse",
-           "GetExportResponse",
-           "CreateExportResponse",
-           "GetExportDownloadUrlResponse",
-           "ListImportsResponse",
-           "GetImportResponse"]
+           "ListContactsOfSegmentResponse"
+]
