@@ -39,11 +39,7 @@ class TestEmailResource:
         # Verify all sub-resources are initialized
         assert email_resource.transactional is not None
         assert email_resource.activity_logs is not None
-        assert email_resource.domains is not None
-        assert email_resource.newsletters is not None
         assert email_resource.reporting is not None
-        assert email_resource.sender_identities is not None
-        assert email_resource.templates is not None
 
     @pytest.mark.asyncio
     async def test_send_email_basic(self, email_resource, mock_client):

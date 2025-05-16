@@ -11,8 +11,6 @@ from .transactional_requests import (SenderObject,
                                      BCCObject,
                                      Attachment,
                                      SendTransactionalEmailRequest)
-from .newsletters_request import CreateEmailNewsletterRequest
-from .templates_requests import CreateEmailTemplateRequest
 
 __all__ = [
     "SenderObject",
@@ -20,7 +18,5 @@ __all__ = [
     "CCObject",
     "BCCObject",
     "Attachment",
-    "SendTransactionalEmailRequest",
-    "CreateEmailNewsletterRequest",
-    "CreateEmailTemplateRequest"
+    "SendTransactionalEmailRequest"
 ]
