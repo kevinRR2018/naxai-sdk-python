@@ -37,6 +37,15 @@ class SegmentsContactsResource:
             segment_id (str): The unique identifier of the segment to add contacts to.
             contact_ids (list[str]): A list of contact IDs to add to the segment.
                 Must contain at least one ID.
+            examples:
+                nxid:
+                value: "nxid_{contact_id}"
+                phone:
+                value: "32478123412"
+                email:
+                value: "john@example.com"
+                externalId:
+                value: "ABCD1234"
         
         Returns:
             None
@@ -93,6 +102,15 @@ class SegmentsContactsResource:
             segment_id (str): The unique identifier of the segment to remove contacts from.
             contact_ids (list[str]): A list of contact IDs to remove from the segment.
                 Must contain at least one ID.
+                examples:
+                nxid:
+                value: "nxid_{contact_id}"
+                phone:
+                value: "32478123412"
+                email:
+                value: "john@example.com"
+                externalId:
+                value: "ABCD1234"
         
         Returns:
             None
