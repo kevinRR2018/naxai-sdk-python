@@ -327,7 +327,7 @@ response = client.calendars.create(data=calendar)
 response = await client.calendars.create(data=calendar)
 ```
 
-### People API ( Coming soon )
+### People API
 
 The People API allows you to manage contacts:
 
