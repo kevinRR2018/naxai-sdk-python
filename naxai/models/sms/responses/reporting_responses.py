@@ -73,6 +73,7 @@ class BaseStats(BaseModel):
         ...     unknown=5,
         ...     canceled=10,
         ...     rejected=5,
+        ...     blocked=0,
         ...     avgTimeToDeliver=2500,
         ...     avgTimeToSubmit=150
         ... )
