@@ -165,8 +165,7 @@ class SegmentsContactsResource:
             segment_id (str): The unique identifier of the segment to count contacts in.
         
         Returns:
-            CountContactsInSegmentResponse: A response object containing the count of
-                contacts in the segment.
+            int: The count of contacts in the segment.
         
         Raises:
             ValueError: If segment_id is empty.
@@ -184,15 +183,15 @@ class SegmentsContactsResource:
                 try:
                     response = client.people.segments.contacts.count(segment_id=segment_id)
                     
-                    print(f"Segment {segment_id} contains {response.count} contacts")
+                    print(f"Segment {segment_id} contains {response} contacts")
                     
                     # Use the count for planning
-                    if response.count > 10000:
+                    if response > 10000:
                         print("Large segment - consider batch processing")
-                    elif response.count == 0:
+                    elif response == 0:
                         print("Empty segment - no contacts to process")
                     else:
-                        print(f"Processing {response.count} contacts")
+                        print(f"Processing {response} contacts")
                 except Exception as e:
                     print(f"Error counting contacts in segment: {str(e)}")
             ```
@@ -202,13 +201,13 @@ class SegmentsContactsResource:
             - For large segments, the count operation is optimized and faster than
               retrieving all contacts
             - The count represents the current state and may change as contacts are added/removed
-            or as they meet/no longer meet the criteria for dynamic segments
+              or as they meet/no longer meet the criteria for dynamic segments
         """
         # pylint: disable=protected-access
         return CountContactsInSegmentResponse.model_validate_json(
             json.dumps(self._client._request("GET",
                                              self.root_path + "/" + segment_id + "/countContacts",
-                                             headers=self.headers)))
+                                             headers=self.headers))).count
 
     @validate_call
     def list(self,

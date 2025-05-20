@@ -163,7 +163,7 @@ class ContactsResource:
         that might affect all contacts.
         
         Returns:
-            CountContactsResponse: A response object containing the count of contacts.
+            int: the count of contacts.
         
         Raises:
             NaxaiAPIRequestError: If there is an error response from the API.
@@ -177,7 +177,7 @@ class ContactsResource:
                     # Get the total number of contacts
                     response = client.people.contacts.count()
                     
-                    total_contacts = response.count
+                    total_contacts = response
                     print(f"Total contacts in account: {total_contacts}")
                     
                     # Use the count for planning
@@ -203,7 +203,7 @@ class ContactsResource:
         return CountContactsResponse.model_validate_json(
             json.dumps(self._client._request("GET",
                                              self.root_path + "/count",
-                                             headers=self.headers)))
+                                             headers=self.headers))).count
 
     #TODO: email validation, phone validation
     @validate_call
