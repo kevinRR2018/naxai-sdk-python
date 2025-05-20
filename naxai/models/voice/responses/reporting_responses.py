@@ -194,10 +194,10 @@ class ListInboundMetricsResponse(MetricsResponse[InboundStats]):
     containing a list of InboundStats and grouping information.
     
     Attributes:
-        group (Literal["day", "month"]): The time interval grouping for the statistics.
+        group (Literal["day", "month", "hour"]): The time interval grouping for the statistics.
         stats (list[InboundStats]): List of inbound call statistics.
     """
-    group: Literal["day", "month"]
+    group: Literal["day", "month", "hour"]
 
 class ListOutboundCallsByCountryMetricsResponse(MetricsResponse[CountryStats]):
     """
