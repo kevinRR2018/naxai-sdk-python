@@ -59,6 +59,7 @@ class BaseStats(BaseModel):
         unknown (int): Number of messages with unknown delivery status.
         canceled (int): Number of messages that were canceled before delivery.
         rejected (int): Number of messages rejected by carriers or recipients.
+        blocked (int) optional: Number of messages blocked.
         avg_time_to_deliver (int): Average time in milliseconds from submission to delivery.
             Mapped from JSON key 'avgTimeToDeliver'.
         avg_time_to_submit (int): Average time in milliseconds from sending to carrier submission.
