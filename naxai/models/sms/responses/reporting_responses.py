@@ -98,6 +98,7 @@ class BaseStats(BaseModel):
     unknown: int
     canceled: int
     rejected: int
+    blocked: Optional[int] = Field(default=0)
     avg_time_to_deliver: int = Field(alias="avgTimeToDeliver")
     avg_time_to_submit: int = Field(alias="avgTimeToSubmit")
 
