@@ -181,8 +181,7 @@ class TestContactsResourceAsync:
         result = await contacts_resource.count()
 
         # Verify the result
-        assert isinstance(result, CountContactsResponse)
-        assert result.count == 100
+        assert result == 100
 
         # Verify the client was called correctly
         mock_client._request.assert_called_once_with(
