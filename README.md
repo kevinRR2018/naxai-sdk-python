@@ -1,478 +1,38 @@
 # Naxai Python SDK
 
+[![PyPI version](https://badge.fury.io/py/naxai.svg)](https://badge.fury.io/py/naxai)
+[![Python Versions](https://img.shields.io/pypi/pyversions/naxai.svg)](https://pypi.org/project/naxai/)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Authentication](#authentication)
+- [Resource Hierarchy](#resource-hierarchy)
+- [Detailed Examples](#detailed-examples)
+- [API Reference](#api-reference)
+  - [Voice API](#voice-api)
+  - [Email API](#email-api)
+  - [People API](#people-api)
+  - [Calendars API](#calendars-api)
+  - [Webhooks API](#webhooks-api)
+- [Type Definitions](#type-definitions)
+- [Error Handling](#error-handling)
+- [Best Practices](#best-practices)
+- [Version Compatibility](#version-compatibility)
+- [Response Types](#response-types)
+
 ## Overview
 
 The Naxai Python SDK provides a simple and intuitive way to interact with Naxai's APIs. This SDK offers both synchronous and asynchronous clients for accessing various Naxai services including Voice, SMS, Email, Calendars, and People APIs.
 
 ⚠️ This SDK is a work in progress. Features and APIs may change until the release of version 1.0.0.
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Client Initialization](#client-initialization)
-  - [Example 1: Explicit Parameters](#example-1-initializing-with-explicit-parameters)
-  - [Example 2: Environment Variables](#example-2-initializing-with-environment-variables)
-- [Environment Variables](#environment-variables)
-- [Authentication](#authentication)
-- [Client Structure](#client-structure)
-- [Available Resources](#available-resources)
-  - [Voice API](#voice-api)
-  - [SMS API](#sms-api)
-  - [Email API](#email-api)
-  - [Calendars API](#calendars-api)
-  - [People API](#people-api)
-  - [Webhooks API](#webhooks-api)
-- [Error Handling](#error-handling)
-- [Logging](#logging)
-- [Resource Cleanup](#resource-cleanup)
-- [Examples](#examples)
-  - [Voice Call Example](#voice-call-example)
-  - [Calendar Event Example](#calendar-event-example)
-- [Roadmap](#roadmap)
-- [Contributing](#contributing)
-- [License](#license)
-
-## Installation
-
-Install the Naxai SDK using pip:
-
-```bash
-pip install naxai
-```
-
-## Client Initialization
-
-The Naxai SDK provides two client types:
-- `NaxaiClient` - Synchronous client
-- `NaxaiAsyncClient` - Asynchronous client
-
-Both clients offer the same functionality but with different programming paradigms.
-
-### Example 1: Initializing with Explicit Parameters
-
-You can initialize the client by explicitly providing all required parameters:
-
-```python
-# For synchronous client
-from naxai.client import NaxaiClient
-
-client = NaxaiClient(
-    api_client_id="your_client_id",
-    api_client_secret="your_client_secret",
-    api_version="2023-03-25",
-    auth_url="https://auth.naxai.com/oauth2/token",
-    api_base_url="https://api.naxai.com"
-)
-
-# Use the client
-response = client.voice.call.create(language="en-GB",
-                                    to=["XXXXXXXXXX"],
-                                    from_="XXXXXXXX",
-                                    welcome={"say": "Hello this is a test from the Naxai SDK."})
-print(response)
-
-# Always close the client when done
-client.close()
-```
-
-```python
-# For asynchronous client
-import asyncio
-from naxai.async_client import NaxaiAsyncClient
-
-async def main():
-    client = NaxaiAsyncClient(
-        api_client_id="your_client_id",
-        api_client_secret="your_client_secret",
-        api_version="v1",
-        auth_url="https://auth.naxai.com/oauth2/token",
-        api_base_url="https://api.naxai.com"
-    )
-
-    # Use the client
-    response = await client.voice.call.create(language="en-GB",
-                                              to=["XXXXXXXXXX"],
-                                              from_="XXXXXXXX",
-                                              welcome={"say": "Hello this is a test from the Naxai SDK."})
-    print(response)
-
-    # Always close the async client when done
-    await client.aclose()
-
-asyncio.run(main())
-```
-
-### Example 2: Initializing with Environment Variables
-
-You can also initialize the client using environment variables, which is useful for keeping sensitive information out of your code:
-
-```bash
-# Set these environment variables in your system or .env file
-export NAXAI_CLIENT_ID="your_client_id"
-export NAXAI_SECRET="your_client_secret"
-export NAXAI_AUTH_URL="https://auth.naxai.com/oauth2/token"  # Optional, has default value
-export NAXAI_API_URL="https://api.naxai.com"  # Optional, has default value
-export NAXAI_API_VERSION="2023-03-25"  # Optional, has default value
-```
-
-Then in your code:
-
-```python
-# For synchronous client
-from naxai.client import NaxaiClient
-
-# The client will automatically use environment variables
-client = NaxaiClient()
-
-# Use the client
-response = client.voice.call.create(language="en-GB",
-                                    to=["XXXXXXXXXX"],
-                                    from_="XXXXXXXX",
-                                    welcome={"say": "Hello this is a test from the Naxai SDK."})
-print(response)
-
-# Always close the client when done
-client.close()
-```
-
-```python
-# For asynchronous client
-import asyncio
-from naxai.async_client import NaxaiAsyncClient
-
-async def main():
-    # The client will automatically use environment variables
-    client = NaxaiAsyncClient()
-
-    # Use the client
-    response = await client.voice.call.create(language="en-GB",
-                                              to=["XXXXXXXXXX"],
-                                              from_="XXXXXXXX",
-                                              welcome={"say": "Hello this is a test from the Naxai SDK."})
-    print(response)
-
-    # Always close the async client when done
-    await client.aclose()
-
-asyncio.run(main())
-```
-
-## Environment Variables
-
-The SDK looks for the following environment variables:
-
-| Environment Variable | Description | Default Value |
-|---------------------|-------------|---------------|
-| `NAXAI_CLIENT_ID` | Your Naxai API client ID | None (Required) |
-| `NAXAI_SECRET` | Your Naxai API client secret | None (Required) |
-| `NAXAI_AUTH_URL` | Authentication URL | https://auth.naxai.com/oauth2/token |
-| `NAXAI_API_URL` | API base URL | https://api.naxai.com |
-| `NAXAI_API_VERSION` | API version to use | 2023-03-25 |
-
-## Authentication
-
-Authentication is handled automatically by the SDK:
-
-- When you first perform an API action, the SDK authenticates using the provided credentials
-- The access token is stored and automatically refreshed when needed (valid for 24 hours)
-- You don't need to manage tokens manually
-
-The SDK uses the OAuth 2.0 client credentials flow for authentication.
-
-## Client Structure
-
-The main entry points to the SDK are:
-
-```python
-from naxai.client import NaxaiClient       # Synchronous client
-from naxai.async_client import NaxaiAsyncClient  # Asynchronous client
-```
-
-
-## Available Resources
-
-### Voice API
-
-The Voice API allows you to create and manage voice calls:
-
-```python
-# Create a voice call
-from naxai.models.voice.voice_flow import Welcome, End
-import uuid
-import datetime
-
-welcome = Welcome(say="Welcome to the Naxai demo")
-end = End(say="Thank you for using the Naxai demo")
-
-# Synchronous
-response = client.voice.call.create(to=["123456789"],
-                                    from_="123456789",
-                                    language="en-GB",
-                                    welcome=welcome,
-                                    end=end)
-
-# Asynchronous
-response = await client.voice.call.create(to=["123456789"],
-                                          from_="123456789",
-                                          language="en-GB",
-                                          welcome=welcome,
-                                          end=end)
-
-```
-
-### SMS API
-
-The SMS API allows you to send text messages:
-
-```python
-# Send an SMS
-sms_request = {
-    "to": ["123456789"],
-    "from": "1234",
-    "body": "Hello from Naxai SDK!"
-}
-
-# Synchronous
-response = client.sms.send(to=["123456789"],
-                           from_="1234",
-                           body="Hello from Naxai SDK!")
-
-# Asynchronous
-response = await client.sms.send(to=["123456789"],
-                                 from_="1234",
-                                 body="Hello from Naxai SDK!")
-```
-
-### Email API
-
-The Email API allows you to send emails:
-
-```python
-# Send an email
-email_request = {
-    "to": ["recipient@example.com"],
-    "from": "sender@example.com",
-    "subject": "Hello from Naxai",
-    "text": "This is a test email from Naxai SDK",
-    "html": "<p>This is a test email from Naxai SDK</p>"
-}
-
-# Synchronous
-response = client.email.send(data=email_request)
-
-# Asynchronous
-response = await client.email.send(data=email_request)
-```
-
-### Calendars API
-
-The Calendars API allows you to manage calendar events:
-
-```python
-# Create a calendar event
-schedules = [ScheduleObject(
-        day = 1,
-        open=True,
-        start="10:00",
-        stop="17:59",
-        extended=False
-    ),
-    ScheduleObject(
-        day = 2,
-        open=True,
-        start="10:00",
-        stop="17:59",
-        extended=False
-    ),
-    ScheduleObject(
-        day = 3,
-        open=True,
-        start="10:00",
-        stop="17:59",
-        extended=False
-    ),
-    ScheduleObject(
-        day = 4,
-        open=True,
-        start="10:00",
-        stop="17:59",
-        extended=False
-    ),
-    ScheduleObject(
-        day = 5,
-        open=True,
-        start="10:00",
-        stop="17:59",
-        extended=False
-    ),
-    ScheduleObject(
-        day = 6,
-        open=False
-    ),
-    ScheduleObject(
-        day = 7,
-        open = False
-    )]
-
-    calendar = CreateCalendarRequest(
-        name="Test Calendar from SDK",
-        timezone="Europe/Brussels",
-        schedule=schedules
-    )
-
-# Synchronous
-response = client.calendars.create(data=calendar)
-
-# Asynchronous
-response = await client.calendars.create(data=calendar)
-```
-
-### People API
-
-The People API allows you to manage contacts:
-
-```python
-# Create a contact
-contact_request = {
-    "firstName": "John",
-    "lastName": "Doe",
-    "email": "john.doe@example.com",
-    "phone": "+1234567890"
-}
-
-# Synchronous
-response = client.people.create(data=contact_request)
-
-# Asynchronous
-response = await client.people.create(data=contact_request)
-```
-
-### Webhooks API
-
-The Webhooks API allows you to manage webhooks:
-
-```python
-# List all webhooks
-response = client.webhooks.list()
-```
-
-## Error Handling
-
-All exceptions inherit from `NaxaiException`:
-
-```python
-from naxai.base.exceptions import NaxaiException, NaxaiAuthenticationError
-
-try:
-    response = client.voice.call.create(data=call_request)
-except NaxaiAuthenticationError as e:
-    print(f"Authentication failed: {e}")
-except NaxaiException as e:
-    print(f"API call failed: {e}")
-```
-
-Common exceptions include:
-
-| Exception | When it Happens |
-|-----------|-----------------|
-| `NaxaiAuthenticationError` | Authentication failed (401) |
-| `NaxaiAuthorizationError` | Access forbidden (403) |
-| `NaxaiResourceNotFound` | Resource not found (404) |
-| `NaxaiInvalidRequestError` | Invalid request parameters (422) |
-| `NaxaiRateLimitExceeded` | Rate limit hit (429) |
-| `NaxaiAPIRequestError` | Generic API error |
-| `NaxaiValueError` | Incorrect parameter value |
-
-## Logging
-
-The SDK supports custom logging. Pass your own logger into the client to integrate with your application's logging system:
-
-```python
-import logging
-
-# Configure your logger
-logger = logging.getLogger("naxai")
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-logger.addHandler(handler)
-
-# Pass the logger to the client
-client = NaxaiClient(
-    api_client_id="your_client_id",
-    api_client_secret="your_client_secret",
-    logger=logger
-)
-```
-
-## Resource Cleanup
-
-Always close the HTTP session after usage to properly release network resources:
-
-```python
-# Synchronous client
-client.close()
-
-# Asynchronous client
-await client.aclose()
-```
-
-For asynchronous clients, it's recommended to use them as context managers:
-
-```python
-async with NaxaiAsyncClient(
-    api_client_id="your_client_id",
-    api_client_secret="your_client_secret"
-) as client:
-    response = await client.voice.call.create(data=call_request)
-    print(response)
-    # No need to call aclose() when using as context manager
-```
-
-## Examples
-
-### Voice Call Example
-
-```python
-import asyncio
-import uuid
-import datetime
-from naxai import NaxaiAsyncClient
-from naxai.models.voice.voice_flow import Welcome, End
-
-async def make_voice_call():
-    client = NaxaiAsyncClient(
-        api_client_id="your_client_id",
-        api_client_secret="your_client_secret"
-    )
-    
-    try:
-        # Create a simple voice flow
-        welcome = Welcome(say="Welcome to the Naxai demo")
-        end = End(say="Thank you for using the Naxai demo")
-        
-        # Make the API call
-        response = await client.voice.call.create(welcome=welcome,
-                                                  end=end,
-                                                  to=["+1234567890"],
-                                                  from_="+0987654321",
-                                                  language="en-GB")
-        print(f"Call created successfully: {response}")
-        
-    except Exception as e:
-        print(f"Error creating call: {e}")
-    finally:
-        await client.aclose()
-
-# Run the async function
-asyncio.run(make_voice_call())
-```
-
-### Calendar Event Example
+## Quick Start
 
 ```python
 from naxai import NaxaiClient
-import datetime
 
 # Initialize the client
 client = NaxaiClient(
@@ -480,56 +40,958 @@ client = NaxaiClient(
     api_client_secret="your_client_secret"
 )
 
-try:
-    # Create a calendar event
-    start_time = datetime.datetime.now() + datetime.timedelta(days=1)
-    end_time = start_time + datetime.timedelta(hours=1)
-    
-    event_request = {
-        "summary": "Project Review Meeting",
-        "description": "Quarterly project review with the team",
-        "start": {
-            "dateTime": start_time.isoformat(),
-            "timeZone": "UTC"
-        },
-        "end": {
-            "dateTime": end_time.isoformat(),
-            "timeZone": "UTC"
-        },
-        "attendees": [
-            {"email": "team.member1@example.com"},
-            {"email": "team.member2@example.com"}
-        ],
-        "location": "Conference Room A"
-    }
-    
-    response = client.calendars.create(data=event_request)
-    print(f"Calendar event created: {response}")
-    
-except Exception as e:
-    print(f"Error creating calendar event: {e}")
-finally:
-    client.close()
+# Make a simple voice call
+welcome = {"say": "Hello from Naxai!"}
+response = client.voice.call.create(
+    to=["1234567890"],
+    from_="0987654321",
+    language="en-GB",
+    welcome=welcome
+)
+
+# Don't forget to close the client
+client.close()
 ```
 
-## Roadmap
+## Installation
 
-- ✅ Add Voice resource
-- ✅ Add Calendars resource
-- ✅ Add Email resource (partially implemented. Some methods are not working)
-- ✅ Add SMS resource
-- ✅ Add People resource
-- ✅ Provide a client for synchronous code
-- ✅ Publish SDK on PyPI
-- ✅ Improve type hints for auto-completion and IDE support
-- ✅ Webhooks
-- ✅ Add comprehensive test suite
-- 🚧 Add more examples and use cases
+```bash
+pip install naxai
+```
+
+## Authentication
+
+The SDK supports two authentication methods:
+
+### Environment Variables (Recommended)
+```bash
+export NAXAI_CLIENT_ID="your_client_id"
+export NAXAI_SECRET="your_client_secret"
+```
+
+```python
+from naxai import NaxaiClient
+client = NaxaiClient()  # Automatically uses environment variables
+```
+
+### Explicit Configuration
+```python
+from naxai import NaxaiClient
+
+client = NaxaiClient(
+    api_client_id="your_client_id",
+    api_client_secret="your_client_secret"
+)
+```
+
+## Resource Hierarchy
+
+```mermaid
+graph TD
+    A[Naxai Client] --> B[Voice]
+    A --> C[Calendars]
+    A --> D[Email]
+    A --> E[People]
+    A --> F[Webhooks]
+    A --> G[SMS]
+    
+    B --> B1[Call]
+    B --> B2[Broadcasts]
+    B --> B3[Reporting]
+    B --> B4[Activity Logs]
+    
+    B2 --> B2.1[Metrics]
+    B2 --> B2.2[Recipients]
+    
+    B3 --> B3.1[Inbound]
+    B3 --> B3.2[Outbound]
+    B3 --> B3.3[Transfer]
+    
+    C --> C1[Holidays Templates]
+    
+    D --> D1[Activity Logs]
+    D --> D2[Reporting]
+    D --> D3[Transactional]
+    
+    D2 --> D2.1[Metrics]
+    D2 --> D2.2[Clicked URLs]
+    
+    E --> E1[Contacts]
+    E --> E2[Segments]
+    
+    E1 --> E1.1[Events]
+    E1.2[Identifier]
+    
+    G --> G1[Activity Logs]
+    G --> G2[Reporting]
+    
+    G2 --> G2.1[Outgoing]
+    G2 --> G2.2[Incoming]
+    G2 --> G2.3[Delivery Errors]
+    G2 --> G2.4[By Country]
+```
+
+## Detailed Examples
+
+<details>
+<summary>Basic Usage Examples</summary>
+
+### Voice Call
+```python
+from naxai import NaxaiClient
+from naxai.models.voice.voice_flow import Welcome, End
+
+async with NaxaiAsyncClient() as client:
+    # Create welcome and end messages
+    welcome = Welcome(say="Welcome to Naxai!")
+    end = End(say="Goodbye!")
+    
+    # Make the call
+    response = await client.voice.call.create(
+        to=["1234567890"],
+        from_="0987654321",
+        language="en-GB",
+        welcome=welcome,
+        end=end
+    )
+    print(f"Call initiated with ID: {response.call_id}")
+```
+
+### Calendar Management
+```python
+from naxai import NaxaiClient
+from naxai.models.calendars.requests import CreateCalendarRequest, ScheduleObject
+
+with NaxaiClient() as client:
+    # Create a business hours calendar
+    schedule = [
+        ScheduleObject(
+            day=1,  # Monday
+            open=True,
+            start="09:00",
+            stop="17:00"
+        ),
+        # ... repeat for all days
+    ]
+    
+    calendar = CreateCalendarRequest(
+        name="Business Hours",
+        timezone="Europe/London",
+        schedule=schedule
+    )
+    
+    response = client.calendars.create(data=calendar)
+    print(f"Calendar created with ID: {response.id}")
+```
+
+### Email Sending
+```python
+from naxai import NaxaiClient
+
+with NaxaiClient() as client:
+    email_data = {
+        "to": ["recipient@example.com"],
+        "from": "sender@yourdomain.com",
+        "subject": "Hello from Naxai",
+        "text": "This is a test email",
+        "html": "<p>This is a test email</p>"
+    }
+    
+    response = client.email.send(data=email_data)
+    print(f"Email sent with ID: {response.message_id}")
+```
+</details>
+
+<details>
+<summary>Advanced Usage Examples</summary>
+
+### Error Handling and Retries
+```python
+import asyncio
+from naxai import NaxaiAsyncClient
+from naxai.base.exceptions import NaxaiRateLimitExceeded
+
+async def send_with_retry(client, data, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return await client.email.send(data=data)
+        except NaxaiRateLimitExceeded:
+            if attempt == max_retries - 1:
+                raise
+            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+
+async with NaxaiAsyncClient() as client:
+    try:
+        response = await send_with_retry(client, email_data)
+    except NaxaiRateLimitExceeded:
+        print("Failed after max retries")
+```
+
+### Batch Processing
+```python
+from naxai import NaxaiClient
+import uuid
+
+with NaxaiClient() as client:
+    # Create a broadcast
+    batch_id = str(uuid.uuid4())
+    recipients = ["1234567890", "0987654321"]
+    
+    response = client.voice.broadcasts.create(data={
+        "batchId": batch_id,
+        "to": recipients,
+        "from": "1111111111",
+        "language": "en-GB",
+        "welcome": {"say": "Welcome to our service"}
+    })
+    
+    # Monitor progress
+    metrics = client.voice.broadcasts.metrics.get(
+        broadcast_id=response.broadcast_id
+    )
+    print(f"Completed: {metrics.completed}/{metrics.total}")
+```
+</details>
+
+## API Reference
+
+<details>
+<summary>Voice API</summary>
+
+### Call Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `create` | Create a new voice call | - `welcome: Welcome` (required)<br>- `language: Literal["fr-BE"...]` (required)<br>- `to: list[str]` (required)<br>- `from_: str` (required)<br>- `batch_id?: str`<br>- `voice?: Literal["man", "woman"]`<br>- `idempotency_key?: str`<br>- `calendar_id?: str`<br>- `scheduled_at?: int`<br>- `machine_detection?: bool`<br>- `voicemail?: VoiceMail`<br>- `menu?: Menu`<br>- `end?: End` | `CreateCallResponse` |
+
+### Broadcasts Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `create` | Create a new broadcast campaign | `data: CreateBroadcastRequest` | `CreateBroadcastResponse` |
+| `list` | List all broadcasts | None | `ListBroadcastResponse` |
+| `get` | Get broadcast details | `broadcast_id: str` | `GetBroadcastResponse` |
+| `update` | Update a broadcast | `broadcast_id: str, data: CreateBroadcastRequest` | `UpdateBroadcastResponse` |
+| `start` | Start a broadcast | `broadcast_id: str` | None |
+| `pause` | Pause a broadcast | `broadcast_id: str` | None |
+| `resume` | Resume a broadcast | `broadcast_id: str` | None |
+| `cancel` | Cancel a broadcast | `broadcast_id: str` | None |
+
+#### Broadcasts Metrics Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `get` | Get broadcast metrics | `broadcast_id: str` | `GetBroadcastMetricsResponse` |
+
+#### Broadcasts Recipients Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List broadcast recipients | - `broadcast_id: str`<br>- `page?: int`<br>- `page_size?: int`<br>- `phone?: str`<br>- `completed?: bool`<br>- `status?: str` | `ListBroadcastRecipientsResponse` |
+
+##### Recipients Calls Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `get` | Get recipient call details | `broadcast_id: str, recipient_id: str` | `GetBroadcastRecipientCallsResponse` |
+
+### Reporting Resource
+
+#### Inbound Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List inbound call metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["hour", "day", "month"]`<br>- `phone?: str` | `ListInboundMetricsResponse` |
+
+#### Outbound Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List outbound call metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["hour", "day", "month"]`<br>- `phone?: str` | `ListOutboundMetricsResponse` |
+| `list_by_country` | List outbound metrics by country | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["hour", "day", "month"]` | `ListOutboundByCountryMetricsResponse` |
+
+#### Transfer Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List transfer call metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["hour", "day", "month"]`<br>- `phone?: str` | `ListTransferMetricsResponse` |
+
+### Activity Logs Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List voice activity logs | - `page?: int`<br>- `page_size?: int`<br>- `start?: int`<br>- `stop?: int`<br>- `direction?: Literal["inbound", "outbound", "transfer"]`<br>- `status?: Literal["delivered", "failed"]`<br>- `from_?: str`<br>- `to?: str`<br>- `client_id?: str`<br>- `campaign_id?: str`<br>- `broadcast_id?: str` | `ListVoiceActivityLogsResponse` |
+</details>
+
+<details>
+<summary>Email API</summary>
+
+### Transactional Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `send` | Send a transactional email | `data: SendTransactionalEmailRequest` | `SendTransactionalEmailResponse` |
+
+### Activity Logs Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `get` | Get email activity details | `message_id: str, email: str` | `GetEmailActivityLogsResponse` |
+| `list` | List email activity logs | - `page?: int`<br>- `page_size?: int`<br>- `start?: int`<br>- `stop?: int`<br>- `sort?: str`<br>- `email?: str`<br>- `client_id?: str`<br>- `campaign_id?: str`<br>- `status?: Literal["sent", "delivered", "failed"]` | `ListEmailActivityLogsResponse` |
+
+### Reporting Resource
+
+#### Metrics Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List email metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["day", "month"]` | `ListMetricsResponse` |
+
+#### Clicked URLs Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List clicked URL metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["day", "month"]` | `ListClickedUrlsMetricsResponse` |
+</details>
+
+<details>
+<summary>SMS Types</summary>
+
+### SendSMSRequest
+```typescript
+{
+    to: string[];         // List of recipient phone numbers (max 1000)
+    body: string;         // Message content (max 1530 chars)
+    from?: string;        // Sender's phone number (8-15 chars)
+    sender_service_id?: string;  // Alternative to from field
+    type?: "text" | "unicode" | "auto";  // Message encoding (default: "text")
+    scheduled_at?: string;  // ISO 8601 timestamp for scheduled delivery
+    validity?: number;    // Message validity period in minutes (5-4320)
+    idempotency_key?: string;  // Prevent duplicates (max 200 chars)
+    reference?: string;   // Custom tracking reference (max 128 chars)
+    calendar_id?: string; // Calendar ID for delivery constraints
+    max_parts?: number;   // Maximum message parts (1-10)
+    truncate?: boolean;   // Whether to truncate long messages
+}
+```
+
+### SendSMSResponse
+```typescript
+{
+    batch_id: string;     // Unique batch identifier
+    count: number;        // Number of messages in batch
+    messages: Array<{
+        to: string;       // Recipient phone number
+        message_id: string;  // Unique message identifier
+    }>;
+}
+```
+
+### SMSActivityLog
+```typescript
+{
+    message_id: string;   // Unique message identifier
+    direction: "inbound" | "outbound";
+    status: "delivered" | "failed";
+    from: string;         // Sender phone number
+    to: string;          // Recipient phone number
+    body: string;        // Message content
+    created_at: number;  // Timestamp in milliseconds
+    updated_at: number;  // Timestamp in milliseconds
+    client_id?: string;
+    campaign_id?: string;
+    broadcast_id?: string;
+}
+```
+
+### SMSMetrics
+```typescript
+{
+    group: "hour" | "day" | "month";
+    start_date?: string;  // ISO 8601 date
+    stop_date?: string;   // ISO 8601 date
+    metrics: Array<{
+        timestamp: number;
+        total: number;
+        delivered: number;
+        failed: number;
+    }>;
+}
+```
+
+### SMSDeliveryError
+```typescript
+{
+    code: string;        // Error code
+    description: string; // Error description
+    count: number;      // Number of occurrences
+    percentage: number; // Percentage of total errors
+}
+```
+</details>
+
+<details>
+<summary>Email Types</summary>
+
+### BaseObject
+```typescript
+{
+    email: string;        // Email address
+    name: string;         // Display name
+}
+```
+
+### SenderObject extends BaseObject
+```typescript
+{
+    email: string;        // Verified sender email
+    name: string;         // Sender display name
+}
+```
+
+### DestinationObject extends BaseObject
+```typescript
+{
+    email: string;        // Recipient email
+    name: string;         // Recipient display name
+}
+```
+
+### Attachment
+```typescript
+{
+    id: string;           // Unique attachment ID
+    name: string;         // Filename
+    content_type: string; // MIME type
+    data: string;         // Base64 encoded file content
+}
+```
+
+### SendTransactionalEmailRequest
+```typescript
+{
+    sender: SenderObject;
+    to: DestinationObject[];  // Max 1000 recipients
+    cc?: CCObject[];         // Max 50 recipients
+    bcc?: BCCObject[];       // Max 50 recipients
+    reply_to?: string;       // Reply-to address (max 100 chars)
+    subject: string;
+    text?: string;          // Plain text content
+    html?: string;          // HTML content
+    attachments?: Attachment[];  // Max 10 attachments
+    enable_tracking?: boolean;
+}
+```
+
+### EmailActivityLogs
+```typescript
+{
+    message_id: string;
+    from_email: string;
+    to_email: string;
+    subject?: string;
+    status?: "sent" | "delivered" | "failed";
+    created_at?: number;  // Timestamp in ms
+    updated_at?: number;  // Timestamp in ms
+    opens?: number;
+    clicks?: number;
+    events?: EmailEvents[];
+    client_id?: string;
+    campaign_id?: string;
+}
+```
+</details>
+
+<details>
+<summary>People Types</summary>
+
+### CreateSegmentRequest
+```typescript
+{
+    name: string;
+    description?: string;
+    condition?: Condition;  // Required for dynamic segments
+    type: "manual" | "dynamic";
+}
+```
+
+### CreateAttributeRequest
+```typescript
+{
+    name: string;
+}
+```
+
+### SearchContactsRequest
+```typescript
+{
+    page?: number;
+    page_size?: number;
+    sort?: string;
+    condition?: SearchCondition;
+}
+```
+</details>
+
+<details>
+<summary>People API</summary>
+
+### Contacts Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `search` | Search contacts | - `page?: int`<br>- `page_size?: int`<br>- `sort?: str`<br>- `condition?: Union[dict, SearchCondition]` | `SearchContactsResponse` |
+| `count` | Count contacts | None | `CountContactsResponse` |
+| `create_or_update` | Create or update a contact | - `identifier: str`<br>- `email?: str`<br>- `external_id?: str`<br>- `unsubscribe?: bool`<br>- `language?: str`<br>- `created_at?: int`<br>- `**kwargs` | `CreateOrUpdateContactResponse` |
+| `get` | Get contact details | `identifier: str` | `GetContactResponse` |
+
+#### Contacts Events Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List contact events | `identifier: str` | `ListContactEventsResponse` |
+
+#### Contacts Identifier Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `get` | Get contact by identifier | `identifier: str` | `GetContactIdentifierResponse` |
+
+#### Contacts Segments Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List contact segments | `identifier: str` | `ListSegmentsOfContactResponse` |
+
+### Attributes Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `create` | Create a new attribute | `name: str` | `CreateAttributeResponse` |
+| `get` | Get attribute details | `name: str` | `GetAttributeResponse` |
+| `list` | List all attributes | None | `ListAttributesResponse` |
+| `delete` | Delete an attribute | `name: str` | None |
+
+### Segments Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List segments | - `type_?: str`<br>- `exclude_predefined?: bool`<br>- `attribute?: str` | `ListSegmentsResponse` |
+| `get` | Get segment details | `segment_id: str` | `GetSegmentResponse` |
+| `create` | Create a new segment | `data: CreateSegmentRequest` | `CreateSegmentResponse` |
+| `update` | Update a segment | `segment_id: str, data: dict` | `UpdateSegmentResponse` |
+| `get_history` | Get segment history | - `segment_id: str`<br>- `start_date: datetime`<br>- `end_date: datetime` | `GetSegmentsHistoryResponse` |
+| `get_usage` | Get segment usage | `segment_id: str` | `GetSegmentUsageResponse` |
+
+#### Segments Contacts Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `add` | Add contacts to segment | - `segment_id: str`<br>- `contact_ids: list[str]` | None |
+| `delete` | Remove contacts from segment | - `segment_id: str`<br>- `contact_ids: list[str]` | None |
+| `count` | Count contacts in segment | `segment_id: str` | `CountContactsInSegmentResponse` |
+| `list` | List contacts in segment | - `segment_id: str`<br>- `page?: int`<br>- `page_size?: int`<br>- `sort?: str` | `ListContactsOfSegmentResponse` |
+</details>
+
+<details>
+<summary>Calendars API</summary>
+
+### Calendar Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `check` | Check calendar availability | - `calendar_id: str`<br>- `timestamp?: int` | `CheckCalendarResponse` |
+| `create` | Create a new calendar | `data: CreateCalendarRequest` | `CreateCalendarResponse` |
+| `update` | Update a calendar | - `calendar_id: str`<br>- `data: CreateCalendarRequest` | `UpdateCalendarResponse` |
+| `get` | Get calendar details | `calendar_id: str` | `GetCalendarResponse` |
+| `list` | List all calendars | None | `ListCalendarsResponse` |
+| `add_exclusions` | Add exclusion dates | - `calendar_id: str`<br>- `exclusions: list[str]` | `AddExclusionsResponse` |
+| `delete_exclusions` | Remove exclusion dates | - `calendar_id: str`<br>- `exclusions: list[str]` | `DeleteExclusionsResponse` |
+| `delete` | Delete a calendar | `calendar_id: str` | None |
+
+### Holidays Templates Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `list` | List holiday templates | None | `ListHolidaysTemplatesResponse` |
+| `get` | Get template details | `template_id: str` | `GetHolidaysTemplateResponse` |
+</details>
+
+<details>
+<summary>Webhooks API</summary>
+
+### Webhooks Resource
+| Method | Description | Parameters | Returns |
+|--------|-------------|------------|---------|
+| `create` | Create a webhook | - `name: str`<br>- `url: str`<br>- `authentication: Union[BasicAuthModel, OAuth2AuthModel, HeaderAuthModel, NoAuthModel]`<br>- `event_object: Literal["All", "People", "Sms", "Email", "Call"]`<br>- `event_filter: List[str]`<br>- `event_names: List[str]`<br>- `active?: bool` | `CreateWebhookResponse` |
+| `get` | Get webhook details | `webhook_id: str` | `GetWebhookResponse` |
+</details>
+
+## Type Definitions
+
+<details>
+<summary>Voice Types</summary>
+
+### Welcome
+```typescript
+{
+    say?: string;          // Text to be spoken
+    prompt?: string;       // URL to audio file to play
+    replay?: number;       // Number of times to replay (default: 0)
+}
+```
+
+### VoiceMail
+```typescript
+{
+    say?: string;          // Text to be spoken for voicemail
+    prompt?: string;       // URL to audio file for voicemail
+}
+```
+
+### Menu
+```typescript
+{
+    say?: string;          // Text to be spoken as menu prompt
+    prompt?: string;       // URL to audio file for menu prompt
+    replay?: number;       // Number of times to replay menu (default: 0)
+    choices: Choice[];     // List of available menu choices
+}
+```
+
+### End
+```typescript
+{
+    say?: string;          // Text to be spoken at end
+    prompt?: string;       // URL to audio file to play at end
+}
+```
+
+### CreateCallRequest
+```typescript
+{
+    batch_id?: string;     // Unique identifier for grouping calls (max 64 chars)
+    to: string[];         // List of recipient phone numbers (max 1000)
+    from: string;         // Sender's phone number (8-15 chars)
+    language: "fr-FR" | "fr-BE" | "nl-NL" | "nl-BE" | "en-GB" | "de-DE";
+    voice: "woman" | "man";
+    idempotency_key?: string;  // Key to prevent duplicates (1-128 chars)
+    calendar_id?: string;  // Associated calendar ID
+    scheduled_at?: number; // Timestamp for scheduled calls
+    machine_detection?: boolean;  // Whether to detect answering machines
+    voicemail?: VoiceMail;
+    welcome: Welcome;      // Initial greeting configuration
+    menu?: Menu;          // Interactive menu configuration
+    end?: End;            // Call ending configuration
+}
+```
+
+### CreateBroadcastRequest
+```typescript
+{
+    name: string;         // Campaign name
+    from: string;         // Sender's phone number (8-15 chars)
+    source?: string;      // Source of broadcast (default: "people")
+    segment_ids: string[]; // Target segment IDs (max 1)
+    include_unsubscribed?: boolean;  // Include unsubscribed contacts
+    language?: "fr-FR" | "fr-BE" | "nl-NL" | "nl-BE" | "en-GB" | "de-DE";
+    voice?: "woman" | "man";
+    scheduled_at?: string;  // Scheduled start time
+    retries?: number;      // Number of retry attempts (0-3)
+    retry_on_no_input?: boolean;
+    retry_on_failed?: boolean;
+    retry_delays?: number[];  // Delays between retries (0-3 values)
+    calendar_id?: string;
+    distribution?: "none" | "dynamic";
+    dynamic_name?: string;
+    voice_flow: VoiceFlow;
+    actions?: Actions;
+}
+```</details><details><summary>Email Types</summary>
+
+### BaseObject
+```typescript
+{
+    email: string;        // Email address
+    name: string;         // Display name
+}
+```
+
+### SenderObject extends BaseObject
+```typescript
+{
+    email: string;        // Verified sender email
+    name: string;         // Sender display name
+}
+```
+
+### DestinationObject extends BaseObject
+```typescript
+{
+    email: string;        // Recipient email
+    name: string;         // Recipient display name
+}
+```
+
+### Attachment
+```typescript
+{
+    id: string;           // Unique attachment ID
+    name: string;         // Filename
+    content_type: string; // MIME type
+    data: string;         // Base64 encoded file content
+}
+```
+
+### SendTransactionalEmailRequest
+```typescript
+{
+    sender: SenderObject;
+    to: DestinationObject[];  // Max 1000 recipients
+    cc?: CCObject[];         // Max 50 recipients
+    bcc?: BCCObject[];       // Max 50 recipients
+    reply_to?: string;       // Reply-to address (max 100 chars)
+    subject: string;
+    text?: string;          // Plain text content
+    html?: string;          // HTML content
+    attachments?: Attachment[];  // Max 10 attachments
+    enable_tracking?: boolean;
+}
+```
+
+### EmailActivityLogs
+```typescript
+{
+    message_id: string;
+    from_email: string;
+    to_email: string;
+    subject?: string;
+    status?: "sent" | "delivered" | "failed";
+    created_at?: number;  // Timestamp in ms
+    updated_at?: number;  // Timestamp in ms
+    opens?: number;
+    clicks?: number;
+    events?: EmailEvents[];
+    client_id?: string;
+    campaign_id?: string;
+}
+```
+</details>
+
+<details>
+<summary>People Types</summary>
+
+### CreateSegmentRequest
+```typescript
+{
+    name: string;
+    description?: string;
+    condition?: Condition;  // Required for dynamic segments
+    type: "manual" | "dynamic";
+}
+```
+
+### CreateAttributeRequest
+```typescript
+{
+    name: string;
+}
+```
+
+### SearchContactsRequest
+```typescript
+{
+    page?: number;
+    page_size?: number;
+    sort?: string;
+    condition?: SearchCondition;
+}
+```
+</details>
+
+<details>
+<summary>Webhooks Types</summary>
+
+### CreateWebhookRequest
+```typescript
+{
+    name: string;
+    url: string;
+    authentication?: NoAuthModel | BasicAuthModel | OAuth2AuthModel | HeaderAuthModel;
+    active?: boolean;
+    event_object: "All" | "People" | "Sms" | "Call" | "Email";
+    event_filter: string[];
+    event_names: string[];
+}
+```
+
+### Authentication Models
+
+#### NoAuthModel
+```typescript
+{
+    type: "none";
+}
+```
+
+#### BasicAuthModel
+```typescript
+{
+    type: "basic";
+    username: string;
+    password: string;
+}
+```
+
+#### OAuth2AuthModel
+```typescript
+{
+    type: "oauth2";
+    token_url: string;
+    client_id: string;
+    client_secret: string;
+    scope?: string[];
+}
+```
+
+#### HeaderAuthModel
+```typescript
+{
+    type: "header";
+    name: string;
+    value: string;
+}
+```
+</details>
+
+<details>
+<summary>Calendar Types</summary>
+
+### CreateCalendarRequest
+```typescript
+{
+    name: string;
+    timezone: string;
+    schedule: ScheduleObject[];
+}
+```
+
+### ScheduleObject
+```typescript
+{
+    day: number;         // 1-7 (Monday-Sunday)
+    open: boolean;
+    start: string;       // "HH:mm" format
+    stop: string;        // "HH:mm" format
+}
+```
+</details>
+
+## Error Handling
+
+<details>
+<summary>Common Errors</summary>
+
+| Error Class | HTTP Code | Description | Resolution |
+|-------------|-----------|-------------|------------|
+| `NaxaiAuthenticationError` | 401 | Invalid credentials | Check API credentials |
+| `NaxaiAuthorizationError` | 403 | Insufficient permissions | Verify account permissions |
+| `NaxaiRateLimitExceeded` | 429 | Too many requests | Implement backoff strategy |
+| `NaxaiAPIRequestError` | Various | General API error | Check error details |
+
+### Example Error Handling
+```python
+from naxai.base.exceptions import (
+    NaxaiAuthenticationError,
+    NaxaiRateLimitExceeded,
+    NaxaiAPIRequestError
+)
+
+try:
+    response = client.voice.call.create(...)
+except NaxaiAuthenticationError:
+    # Handle authentication error
+    print("Please check your credentials")
+except NaxaiRateLimitExceeded:
+    # Implement backoff
+    print("Rate limit exceeded, please retry later")
+except NaxaiAPIRequestError as e:
+    # Handle other API errors
+    print(f"API error: {e.message}")
+```
+</details>
+
+## Best Practices
+
+<details>
+<summary>Resource Management</summary>
+
+### Use Context Managers
+```python
+async with NaxaiAsyncClient() as client:
+    # Client is automatically closed after the block
+    await client.voice.call.create(...)
+```
+
+### Implement Rate Limiting
+```python
+from asyncio import sleep
+from naxai.base.exceptions import NaxaiRateLimitExceeded
+
+async def with_rate_limit(func, *args, max_retries=3):
+    for i in range(max_retries):
+        try:
+            return await func(*args)
+        except NaxaiRateLimitExceeded:
+            if i == max_retries - 1:
+                raise
+            await sleep(2 ** i)
+```
+
+### Proper Error Handling
+```python
+def handle_api_error(e: NaxaiAPIRequestError):
+    if isinstance(e, NaxaiRateLimitExceeded):
+        # Handle rate limiting
+        pass
+    elif isinstance(e, NaxaiAuthenticationError):
+        # Handle auth errors
+        pass
+    else:
+        # Handle other errors
+        pass
+```
+</details>
+
+## Version Compatibility
+
+| SDK Version | API Version | Python Version | Release Date | Status |
+|-------------|-------------|----------------|--------------|---------|
+| 1.0.0 | 2023-03-25 | ≥3.7 | 2023-03-25 | Stable |
+| 0.9.0 | 2023-02-15 | ≥3.7 | 2023-02-15 | Beta |
+| 0.8.0 | 2023-01-10 | ≥3.7 | 2023-01-10 | Beta |
+
+## Response Types
+
+<details>
+<summary>Voice API Responses</summary>
+
+### CreateCallResponse
+```typescript
+{
+    call_id: string;
+    status: "queued" | "in-progress" | "completed" | "failed";
+    created_at: number;  // Unix timestamp in milliseconds
+    updated_at: number;  // Unix timestamp in milliseconds
+    from: string;
+    to: string[];
+    // ...
+}
+```
+
+### ListBroadcastResponse
+```typescript
+{
+    broadcasts: Array<{
+        id: string;
+        status: string;
+        total_recipients: number;
+        completed: number;
+        // ...
+    }>;
+    pagination: {
+        page: number;
+        total_pages: number;
+        total_items: number;
+    };
+}
+```
+
+[View all response types](#)
+</details>
 
 ## Contributing
 
-Contributions to the Naxai Python SDK are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
