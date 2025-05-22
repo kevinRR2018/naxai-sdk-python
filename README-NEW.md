@@ -126,6 +126,7 @@ client = NaxaiClient(
 
 - **Activity Logs**
   - `list` - List voice activity logs
+  - `get` - Get specific call details
 </details>
 
 <details>
@@ -434,83 +435,4 @@ with NaxaiClient() as client:
 ### Activity Logs Resource
 | Method | Description | Parameters | Returns |
 |--------|-------------|------------|---------|
-| `get` | Get email activity details | `message_id: str, email: str` | `GetEmailActivityLogsResponse` |
-| `list` | List email activity logs | - `page?: int`<br>- `page_size?: int`<br>- `start?: int`<br>- `stop?: int`<br>- `sort?: str`<br>- `email?: str`<br>- `client_id?: str`<br>- `campaign_id?: str`<br>- `status?: Literal["sent", "delivered", "failed"]` | `ListEmailActivityLogsResponse` |
-
-### Reporting Resource
-
-#### Metrics Resource
-| Method | Description | Parameters | Returns |
-|--------|-------------|------------|---------|
-| `list` | List email metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["day", "month"]` | `ListMetricsResponse` |
-
-#### Clicked URLs Resource
-| Method | Description | Parameters | Returns |
-|--------|-------------|------------|---------|
-| `list` | List clicked URL metrics | - `start?: int`<br>- `stop?: int`<br>- `group?: Literal["day", "month"]` | `ListClickedUrlsMetricsResponse` |
-</details>
-
-<details>
-<summary>SMS Types</summary>
-
-### SendSMSRequest
-```typescript
-{
-    to: string[];         // List of recipient phone numbers (max 1000)
-    body: string;         // Message content (max 1530 chars)
-    from?: string;        // Sender's phone number (8-15 chars)
-    sender_service_id?: string;  // Alternative to from field
-    type?: "text" | "unicode" | "auto";  // Message encoding (default: "text")
-    scheduled_at?: string;  // ISO 8601 timestamp for scheduled delivery
-    validity?: number;    // Message validity period in minutes (5-4320)
-    idempotency_key?: string;  // Prevent duplicates (max 200 chars)
-    reference?: string;   // Custom tracking reference (max 128 chars)
-    calendar_id?: string; // Calendar ID for delivery constraints
-    max_parts?: number;   // Maximum message parts (1-10)
-    truncate?: boolean;   // Whether to truncate long messages
-}
-```
-
-### SendSMSResponse
-```typescript
-{
-    batch_id: string;     // Unique batch identifier
-    count: number;        // Number of messages in batch
-    messages: Array<{
-        to: string;       // Recipient phone number
-        message_id: string;  // Unique message identifier
-    }>;
-}
-```
-
-### SMSActivityLog
-```typescript
-{
-    message_id: string;   // Unique message identifier
-    direction: "inbound" | "outbound";
-    status: "delivered" | "failed";
-    from: string;         // Sender phone number
-    to: string;          // Recipient phone number
-    body: string;        // Message content
-    created_at: number;  // Timestamp in milliseconds
-    updated_at: number;  // Timestamp in milliseconds
-    client_id?: string;
-    campaign_id?: string;
-    broadcast_id?: string;
-}
-```
-
-### SMSMetrics
-```typescript
-{
-    group: "hour" | "day" | "month";
-    start_date?: string;  // ISO 8601 date
-    stop_date?: string;   // ISO 8601 date
-    metrics: Array<{
-        timestamp: number;
-        total: number;
-        delivered: number;
-        failed: number;
-    }>;
-}
-```
+| `
