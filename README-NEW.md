@@ -132,8 +132,7 @@ client = NaxaiClient(
 <details>
 <summary>SMS</summary>
 
-- **Send**
-  - `send` - Send SMS messages to one or more recipients
+- `send` - Send SMS messages to one or more recipients
 
 - **Activity Logs**
   - `list` - List SMS activity logs with filtering options
