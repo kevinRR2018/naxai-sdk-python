@@ -102,14 +102,18 @@ client = NaxaiClient(
   - `pause` - Pause a broadcast
   - `resume` - Resume a broadcast
   - `cancel` - Cancel a broadcast
+  - `delete` - Delete a broadcast
   
   - **Metrics**
     - `get` - Get broadcast metrics
+    - **Input**
+      - `get` - Get DTMF input metrics
   
   - **Recipients**
     - `list` - List broadcast recipients
+    - `get` - Get recipient details
     - **Calls**
-      - `get` - Get recipient call details
+      - `list` - List recipient call attempts
 
 - **Reporting**
   - **Inbound**
