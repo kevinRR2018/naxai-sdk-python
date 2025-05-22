@@ -5,6 +5,19 @@ This module provides methods for managing the primary identifier type for contac
 in the Naxai platform. It allows users to retrieve and update which identifier
 (email, phone, or externalId) is used as the unique key for contact records,
 which affects how contacts are referenced throughout the API.
+
+Available Functions:
+    get()
+        Retrieves the current primary identifier type for contacts.
+        Returns a GetContactIdentifierResponse containing the identifier type
+        (email, phone, or externalId).
+
+    update(identifier)
+        Updates the primary identifier type used for contacts.
+        Takes an identifier parameter specifying the new type to use
+        (email, phone, or externalId).
+        Returns an UpdateContactIdentifierResponse confirming the change.
+
 """
 
 import json

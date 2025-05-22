@@ -6,6 +6,25 @@ including searching, counting, creating, updating, and retrieving individual con
 profiles. It also serves as a container for more specialized contact resources such as
 events, identifiers, and segment memberships, enabling efficient contact management
 operations in high-performance asynchronous applications.
+
+Available Functions:
+    search(page, page_size, sort, condition) -> SearchContactsResponse
+        Search for contacts with pagination, sorting and filtering options.
+        
+    count(condition) -> CountContactsResponse 
+        Count total contacts matching the given search condition.
+        
+    create_or_update(contact_data) -> CreateOrUpdateContactResponse
+        Create a new contact or update an existing one.
+        
+    get(contact_id) -> GetContactResponse
+        Retrieve a specific contact by ID.
+
+Sub-resources:
+    events: Methods for managing contact events
+    identifier: Methods for contact identification 
+    segments: Methods for managing contact segments
+
 """
 
 import json

@@ -6,6 +6,18 @@ voice calls, including call volumes, answer rates, and duration statistics. Thes
 reports can be grouped by different time intervals and filtered by specific phone
 numbers to help users understand incoming call patterns and optimize their voice
 communication strategies.
+
+Available Functions:
+    list(group: Literal["hour", "day", "month"], start_date: str, stop_date: str, number: str)
+        Retrieves inbound call metrics grouped by time interval.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period 
+            number: Optional phone number to filter metrics by
+        Returns:
+            ListInboundMetricsResponse: Detailed inbound call metrics
+
 """
 
 import json

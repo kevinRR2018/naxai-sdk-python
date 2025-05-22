@@ -5,6 +5,14 @@ This module provides methods for sending transactional emails through the Naxai 
 including personalized, event-triggered communications such as account notifications,
 password resets, order confirmations, and receipts. It supports both direct HTML content
 and template-based emails with variable substitution.
+
+Available Functions:
+    send(data: SendTransactionalEmailRequest)
+        Send a transactional email to one or more recipients.
+        Supports personalized emails with HTML content or template-based emails with
+        variable substitution.
+        Returns a unique identifier for tracking the email's status.
+
 """
 
 import json

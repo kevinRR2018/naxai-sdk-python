@@ -7,6 +7,27 @@ These reports can be grouped by different time intervals or by country, and filt
 specific phone numbers to help users understand outbound call performance and optimize
 their voice communication strategies in a non-blocking manner suitable for high-performance
 asynchronous applications.
+
+Available Functions:
+    list(group: Literal["hour", "day", "month"], start_date: str, stop_date: str, number: str)
+        Retrieves outbound call metrics grouped by time interval.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+            number: Optional phone number to filter metrics by
+        Returns:
+            ListOutboundMetricsResponse: Detailed outbound call metrics
+
+    list_by_country(start_date: str, stop_date: str, number: str)
+        Retrieves outbound call metrics grouped by country.
+        Args:
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+            number: Optional phone number to filter metrics by
+        Returns:
+            ListOutboundCallsByCountryMetricsResponse: Country-wise outbound call metrics
+
 """
 
 import json

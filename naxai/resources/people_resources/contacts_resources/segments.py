@@ -5,6 +5,15 @@ This module provides methods for retrieving segment memberships for individual c
 in the Naxai platform. It allows users to determine which segments a specific contact
 belongs to, which is useful for understanding how contacts are categorized and which
 targeted communications they may receive.
+
+Available Functions:
+    list(identifier: str)
+        Retrieves all segments that a specific contact belongs to.
+        Args:
+            identifier (str): Contact's unique identifier (ID, email, phone, or external ID)
+        Returns:
+            ListSegmentsOfContactResponse: List of segments the contact belongs to
+
 """
 
 import json

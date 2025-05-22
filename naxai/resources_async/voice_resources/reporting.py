@@ -6,6 +6,23 @@ providing access to comprehensive metrics and analytics for different call types
 resources for analyzing outbound calls, inbound calls, and call transfers, enabling users to
 monitor and optimize their voice communication performance in a non-blocking manner suitable
 for high-performance asynchronous applications.
+
+Sub-resources:
+    outbound:
+        A subresource for retrieving and analyzing outbound call metrics.
+        Provides methods for analyzing call volumes, delivery rates, and geographical distribution.
+        See OutboundResource for detailed documentation.
+
+    inbound:
+        A subresource for retrieving and analyzing inbound call metrics.
+        Provides methods for analyzing incoming call patterns and handling statistics.
+        See InboundResource for detailed documentation.
+
+    transfer:
+        A subresource for retrieving and analyzing transferred call metrics.
+        Provides methods for analyzing call transfer volumes, success rates, and durations.
+        See TransferResource for detailed documentation.
+
 """
 
 from naxai.resources_async.voice_resources.reporting_resources.outbound import OutboundResource

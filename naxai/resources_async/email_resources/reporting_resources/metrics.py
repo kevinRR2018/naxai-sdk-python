@@ -6,6 +6,13 @@ metrics from the Naxai platform, including delivery rates, engagement statistics
 negative indicators. It enables non-blocking access to email analytics data, allowing
 applications to efficiently monitor campaign performance, identify trends, and optimize
 email marketing strategies without blocking the main execution thread.
+
+vailable Functions:
+    list(start: Optional[int], stop: Optional[int], group: Optional[Literal["day", "month"]])
+        Retrieve comprehensive email engagement metrics from the Naxai email system.
+        Fetches detailed statistics about email performance, including delivery rates,
+        open rates, click rates, and negative metrics such as bounces and complaints.
+
 """
 
 import datetime

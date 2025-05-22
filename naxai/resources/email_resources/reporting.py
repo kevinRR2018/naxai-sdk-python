@@ -4,6 +4,18 @@ Email reporting resource for the Naxai SDK.
 This module provides access to email reporting functionality, including metrics analysis
 and URL click tracking to help users understand email campaign performance and recipient
 engagement. It serves as a container for more specialized reporting resources.
+
+Sub-resources:
+    metrics
+        Provides methods for retrieving comprehensive email engagement metrics:
+        - list(): Retrieve email performance statistics including delivery rates,
+          open rates, click rates, and negative metrics like bounces and complaints.
+
+    cliqued_urls
+        Provides methods for analyzing URL click metrics:
+        - list(): Retrieve metrics about clicked URLs in emails, including click
+          statistics for each URL over time.
+
 """
 
 from .reporting_resources.metrics import MetricsResource

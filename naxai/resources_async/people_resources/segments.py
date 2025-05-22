@@ -6,6 +6,58 @@ including creating, retrieving, updating, and analyzing segments of contacts bas
 various criteria. It supports both manual segments (explicitly defined members) and
 dynamic segments (rule-based membership), and provides tools for tracking segment
 membership changes over time in high-performance asynchronous applications.
+
+Available Functions:
+    list(type_: Optional[str], exclude_predefined: Optional[bool], attribute: Optional[str])
+        List segments with optional filtering.
+        Args:
+            type_ (Optional[str]): Filter by segment type ("manual" or "dynamic")
+            exclude_predefined (Optional[bool]): Whether to exclude predefined segments
+            attribute (Optional[str]): Filter by segments using this attribute
+        Returns:
+            ListSegmentsResponse: List of segments matching the filters
+
+    get(segment_id: str)
+        Retrieve details of a specific segment.
+        Args:
+            segment_id (str): ID of the segment to retrieve
+        Returns:
+            GetSegmentResponse: Details of the requested segment
+
+    create(segment_data: CreateSegmentRequest)
+        Create a new segment.
+        Args:
+            segment_data (CreateSegmentRequest): Data for creating the segment
+        Returns:
+            CreateSegmentResponse: Details of the created segment
+
+    update(segment_id: str, segment_data: dict)
+        Update an existing segment.
+        Args:
+            segment_id (str): ID of the segment to update
+            segment_data (dict): Updated segment data
+        Returns:
+            UpdateSegmentResponse: Details of the updated segment
+
+    get_history(segment_id: str, start_date: datetime, end_date: datetime)
+        Get historical data for a segment.
+        Args:
+            segment_id (str): ID of the segment
+            start_date (datetime): Start of the date range
+            end_date (datetime): End of the date range
+        Returns:
+            GetSegmentsHistoryResponse: Historical data for the segment
+
+    get_usage(segment_id: str)
+        Get usage statistics for a segment.
+        Args:
+            segment_id (str): ID of the segment
+        Returns:
+            GetSegmentUsageResponse: Usage statistics for the segment
+
+Sub-resources:
+    contacts: Methods for managing contacts within segments
+
 """
 
 import datetime

@@ -6,6 +6,12 @@ in the Naxai platform, allowing users to track customer interactions, behaviors,
 activities without blocking the main execution thread. These events can be used for
 contact segmentation, automation triggers, and analytics to better understand customer
 engagement and journeys in high-performance asynchronous applications.
+
+Available Functions:
+    send(identifier, name=None, type_=None, timestamp=None, idempotency_key=None, data=None)
+        Send an event for a specific contact.
+        Records events like purchases, logins, page views etc. with optional metadata.
+
 """
 
 import datetime

@@ -6,6 +6,33 @@ including listing calls with various filtering options and retrieving comprehens
 about specific calls. These logs contain data about call routing, duration, status, and other
 attributes for inbound, outbound, and transferred calls, accessible in a non-blocking manner
 suitable for high-performance asynchronous applications.
+
+Available Functions:
+    list(page=1, page_size=25, start=None, stop=None, direction=None, status=None,
+         from_=None, to=None, client_id=None, campaign_id=None, broadcast_id=None)
+        Retrieves a paginated list of voice call activity logs with optional filtering.
+        Args:
+            page: Page number to retrieve (default: 1)
+            page_size: Number of items per page (default: 25, max: 100)
+            start: Start timestamp in milliseconds since epoch
+            stop: End timestamp in milliseconds since epoch
+            direction: Filter by call direction ("inbound", "outbound", "transfer")
+            status: Filter by call status ("delivered", "failed")
+            from_: Filter by originating phone number
+            to: Filter by destination phone number
+            client_id: Filter by client identifier
+            campaign_id: Filter by campaign identifier
+            broadcast_id: Filter by broadcast identifier
+        Returns:
+            ListActivityLogsResponse: List of call logs with pagination info
+
+    get(call_id: str)
+        Retrieves detailed information about a specific call.
+        Args:
+            call_id: ID of the call to retrieve
+        Returns:
+            GetActivityLogResponse: Detailed call information
+
 """
 
 import json

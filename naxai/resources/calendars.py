@@ -6,6 +6,35 @@ including creating, retrieving, updating, and checking calendars with their
 working hours, schedules, and exclusion dates. Calendars can be used to define
 business hours, holidays, and other time-based constraints for various Naxai
 services such as voice calls and other scheduled operations.
+
+Available functions:
+    check(calendar_id, timestamp) -> CheckCalendarResponse
+        Checks calendar availability at a specific time.
+        Returns whether timestamp is within working hours and next available time if not.
+
+    create(calendar_id, name, schedule, exclusions) -> CreateCalendarResponse
+        Creates a new calendar with specified working hours and exclusions.
+
+    update(calendar_id, name, schedule) -> UpdateCalendarResponse
+        Updates an existing calendar's name and/or schedule.
+
+    get(calendar_id) -> GetCalendarResponse
+        Retrieves details of a specific calendar.
+
+    list() -> ListCalendarsResponse
+        Lists all available calendars.
+
+    add_exclusions(calendar_id, exclusions) -> AddExclusionsResponse
+        Adds exclusion dates to a calendar.
+
+    delete_exclusions(calendar_id, exclusions) -> DeleteExclusionsResponse
+        Removes exclusion dates from a calendar.
+
+Sub-resources:
+    holidays_templates
+        Provides access to holiday templates that can be used with calendars.
+        See HolidaysTemplatesResource for detailed documentation.
+
 """
 
 import datetime

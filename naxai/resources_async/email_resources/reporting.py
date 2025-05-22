@@ -5,6 +5,18 @@ This module provides access to asynchronous email reporting functionality, inclu
 analysis and URL click tracking to help users understand email campaign performance and
 recipient engagement in a non-blocking manner. It serves as a container for more specialized
 reporting resources that provide detailed analytics on different aspects of email performance.
+
+Sub-resources:
+    metrics
+        Provides methods for retrieving comprehensive email engagement metrics:
+        - list(): Retrieve email performance statistics including delivery rates,
+          open rates, click rates, and negative metrics like bounces and complaints.
+
+    cliqued_urls
+        Provides methods for analyzing URL click metrics:
+        - list(): Retrieve metrics about clicked URLs in emails, including click
+          statistics for each URL over time.
+
 """
 
 from .reporting_resources.metrics import MetricsResource

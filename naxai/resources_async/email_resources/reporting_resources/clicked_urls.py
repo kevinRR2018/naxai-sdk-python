@@ -5,6 +5,12 @@ This module provides asynchronous methods for retrieving and analyzing metrics a
 URL clicks in emails sent through the Naxai platform. It enables non-blocking access
 to link engagement data, helping users understand which links receive the most clicks,
 identify popular content, and optimize email campaigns for better click-through rates.
+
+Available functions:
+    list(start: Optional[int], stop: Optional[int], group: Optional[Literal["day", "month"]])
+        Retrieves metrics about clicked URLs in emails over a specified time period.
+        Returns a ListClickedUrlsMetricsResponse containing click statistics for each URL.
+
 """
 
 import datetime

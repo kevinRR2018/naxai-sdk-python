@@ -14,6 +14,55 @@ The WebhooksResource class supports:
 Webhooks allow applications to receive push notifications rather than polling the API,
 providing a more efficient way to stay synchronized with changes in the Naxai platform.
 All methods in this module are asynchronous and designed for use with asyncio.
+
+Available Functions:
+    list() -> ListWebhooksResponse
+        Retrieves a list of all configured webhooks.
+        Returns:
+            ListWebhooksResponse: List of webhook configurations
+
+    create(url, events, auth=None, description=None) -> CreateWebhookResponse
+        Creates a new webhook endpoint configuration.
+        Args:
+            url: Webhook endpoint URL
+            events: List of event types to subscribe to
+            auth: Optional authentication configuration
+            description: Optional webhook description
+        Returns:
+            CreateWebhookResponse: Created webhook details
+
+    get(webhook_id) -> GetWebhookResponse
+        Retrieves details of a specific webhook.
+        Args:
+            webhook_id: ID of webhook to retrieve
+        Returns:
+            GetWebhookResponse: Webhook configuration details
+
+    delete(webhook_id)
+        Deletes a webhook configuration.
+        Args:
+            webhook_id: ID of webhook to delete
+
+    update(webhook_id, update_operations) -> UpdateWebhookResponse
+        Updates a webhook using JSON Patch operations.
+        Args:
+            webhook_id: ID of webhook to update
+            update_operations: List of JSON Patch operations
+        Returns:
+            UpdateWebhookResponse: Updated webhook details
+
+    list_last_events(webhook_id) -> ListLastWebhookEventsResponse
+        Retrieves recent events sent to a webhook.
+        Args:
+            webhook_id: ID of webhook to get events for
+        Returns:
+            ListLastWebhookEventsResponse: List of recent events
+
+    list_events() -> ListEventTypesResponse
+        Retrieves all available webhook event types.
+        Returns:
+            ListEventTypesResponse: List of available event types
+
 """
 import json
 from typing import Literal, List, Union

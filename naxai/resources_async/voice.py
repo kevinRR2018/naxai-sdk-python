@@ -7,6 +7,20 @@ detailed activity tracking, and comprehensive performance reporting. It supports
 voice features such as menus, voicemail handling, and call transfers to enable sophisticated
 voice communication workflows in a non-blocking manner suitable for high-performance
 asynchronous applications.
+
+Sub-resources:
+    call: CallResource
+        Manages individual call operations and voice communication workflows
+
+    broadcasts: BroadcastsResource  
+        Handles broadcast campaign operations for reaching multiple recipients
+
+    reporting: ReportingResource
+        Provides comprehensive reporting and analytics capabilities
+
+    activity_logs: ActivityLogsResource
+        Manages detailed activity logging and tracking
+
 """
 
 from .voice_resources.call import CallResource

@@ -6,6 +6,17 @@ including delivery status, engagement metrics, and event history for individual 
 and across multiple emails. It enables non-blocking access to detailed email tracking data,
 allowing applications to efficiently monitor email performance and recipient interactions
 without impacting application responsiveness.
+
+Available Functions:
+    get(message_id: str, email: str)
+        Retrieve detailed activity logs for a specific email message sent to a particular recipient.
+        Returns comprehensive information about delivery status, engagement metrics and event
+        history.
+
+    list(email: str, status: Optional[str] = None, page: int = 1, limit: int = 10)
+        List activity logs for multiple email messages sent to a recipient.
+        Returns paginated results with basic delivery and engagement information.
+
 """
 
 import json

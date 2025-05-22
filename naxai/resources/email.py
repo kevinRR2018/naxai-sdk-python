@@ -6,6 +6,39 @@ including transactional emails, newsletters, templates, domain management, sende
 activity tracking, and performance reporting. It serves as a central access point for all
 email-related functionality, enabling users to create and manage sophisticated email
 communication workflows.
+
+Available Functions:
+    send(sender_email, sender_name, subject, to, cc=None, bcc=None, reply_to=None, 
+         text=None, html=None, attachments=None, enable_tracking=None)
+        Sends a transactional email to one or more recipients.
+        Args:
+            sender_email: Email address of the sender
+            sender_name: Display name of the sender
+            subject: Email subject line
+            to: List of recipient DestinationObjects (1-1000 recipients)
+            cc: Optional list of CC recipients (max 50)
+            bcc: Optional list of BCC recipients (max 50) 
+            reply_to: Optional reply-to email address
+            text: Optional plain text email body
+            html: Optional HTML email body
+            attachments: Optional list of email attachments
+            enable_tracking: Optional flag to enable email tracking
+        Returns:
+            SendTransactionalEmailResponse: Details of the sent email
+
+Sub-resources:
+    transactional:
+        A subresource for managing transactional emails.
+        See TransactionalResource for detailed documentation.
+
+    activity_logs:
+        A subresource for accessing email activity logs.
+        See ActivityLogsResource for detailed documentation.
+
+    reporting:
+        A subresource for retrieving email metrics and analytics.
+        See ReportingResource for detailed documentation.
+
 """
 
 from typing import List, Optional

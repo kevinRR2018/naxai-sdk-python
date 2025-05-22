@@ -5,6 +5,36 @@ This module provides methods for managing custom contact attributes in the Naxai
 including creating, retrieving, listing, and deleting attributes that define the structure
 of contact profiles. These attributes can be used to store custom information about contacts
 and can be leveraged for segmentation, personalization, and analytics.
+
+Available Functions:
+    create(name: str, type: str, description: Optional[str])
+        Create a new custom attribute.
+        Args:
+            name (str): Name of the attribute
+            type (str): Data type of the attribute
+            description (Optional[str]): Description of the attribute
+        Returns:
+            CreateAttributeResponse: Details of the created attribute
+
+    get(name: str)
+        Retrieve details of a specific attribute.
+        Args:
+            name (str): Name of the attribute
+        Returns:
+            GetAttributeResponse: Details of the requested attribute
+
+    list()
+        List all available attributes.
+        Returns:
+            ListAttributesResponse: List of all attributes
+
+    delete(name: str)
+        Delete a custom attribute.
+        Args:
+            name (str): Name of the attribute to delete
+        Returns:
+            None
+
 """
 
 import json
