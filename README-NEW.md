@@ -126,35 +126,39 @@ client = NaxaiClient(
 <details>
 <summary>SMS</summary>
 
+- **Send**
+  - `send` - Send SMS messages to one or more recipients
+
 - **Activity Logs**
-  - `list` - List SMS activity logs
+  - `list` - List SMS activity logs with filtering options
+  - `get` - Get specific SMS activity details
 
 - **Reporting**
   - **Outgoing**
-    - `list` - List outgoing SMS metrics
+    - `list_outgoing_metrics` - List outgoing SMS metrics
   - **Incoming**
-    - `list` - List incoming SMS metrics
+    - `list_incoming_metrics` - List incoming SMS metrics
   - **Delivery Errors**
-    - `list` - List delivery error metrics
+    - `list_delivery_errors` - List delivery error metrics
   - **By Country**
-    - `list` - List metrics by country
+    - `list_by_country` - List metrics by country
 </details>
 
 <details>
 <summary>Email</summary>
 
+- **Transactional**
+  - `send` - Send transactional emails
+
 - **Activity Logs**
   - `get` - Get email activity details
-  - `list` - List email activity logs
+  - `list` - List email activity logs with filtering
 
 - **Reporting**
   - **Metrics**
     - `list` - List email metrics
   - **Clicked URLs**
     - `list` - List clicked URL metrics
-
-- **Transactional**
-  - `send` - Send a transactional email
 </details>
 
 <details>
