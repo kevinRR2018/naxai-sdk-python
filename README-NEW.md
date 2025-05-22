@@ -139,21 +139,16 @@ client = NaxaiClient(
   - `get` - Get specific SMS activity details
 
 - **Reporting**
-  - **Outgoing**
-    - `list_outgoing_metrics` - List outgoing SMS metrics
-  - **Incoming**
-    - `list_incoming_metrics` - List incoming SMS metrics
-  - **Delivery Errors**
-    - `list_delivery_errors` - List delivery error metrics
-  - **By Country**
-    - `list_by_country` - List metrics by country
+  - `list_outgoing_metrics` - List outgoing SMS metrics
+  - `list_incoming_metrics` - List incoming SMS metrics
+  - `list_delivery_errors` - List delivery error metrics
+  - `list_by_country` - List metrics by country
 </details>
 
 <details>
 <summary>Email</summary>
 
-- **Send**
-  - `send` - Send an email (convenience method)
+- `send` - Send an email (convenience method)
 
 - **Transactional**
   - `send` - Send transactional emails
@@ -180,7 +175,7 @@ client = NaxaiClient(
   - `delete` - Delete a contact
   
   - **Events**
-    - `list` - List contact events
+    - `send` - Send an event for a specific contact.
   - **Identifier**
     - `get` - Get contact by identifier
     - `update` - Update contact identifier
