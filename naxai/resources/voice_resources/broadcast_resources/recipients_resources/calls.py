@@ -5,6 +5,12 @@ This module provides methods for retrieving and analyzing call attempts made to 
 recipients within voice broadcast campaigns. It allows users to track call statuses,
 durations, outcomes, and retry attempts for specific recipients, helping to understand
 delivery effectiveness and recipient engagement patterns.
+
+Available Functions:
+    list(broadcast_id: str, recipient_id: str)
+        Retrieves a list of call attempts made to a specific recipient within a voice broadcast.
+        Returns details like call status, duration, attempt order and timestamps.
+
 """
 
 import json

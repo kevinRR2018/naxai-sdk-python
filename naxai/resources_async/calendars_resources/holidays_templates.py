@@ -6,6 +6,16 @@ allowing users to access predefined sets of dates that represent holidays or spe
 These templates can be used with calendars to automatically exclude specific dates from
 working hours calculations, supporting proper scheduling in voice calls and other
 time-sensitive operations.
+
+Available functions:
+    get(template_id: str)
+        Retrieves a specific holiday template by its ID.
+        Returns a GetHolidaysTemplateResponse object containing template details.
+
+    list()
+        Lists all available holiday templates.
+        Returns a ListHolidaysTemplatesResponse object containing multiple templates.
+
 """
 
 import json

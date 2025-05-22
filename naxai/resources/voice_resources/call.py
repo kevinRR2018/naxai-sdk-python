@@ -5,6 +5,28 @@ This module provides methods for creating and managing individual voice calls,
 including configuring welcome messages, interactive menus, voicemail handling,
 and call endings. It supports features such as machine detection, scheduling,
 and language selection to enable sophisticated voice communication workflows.
+
+Available Functions:
+    create(from_: str, to: str, welcome: Welcome, menu: Menu, voicemail: VoiceMail, end: End)
+        Creates a new voice call with the specified configuration.
+        Args:
+            from_: The phone number making the call
+            to: The phone number receiving the call
+            welcome: Welcome message configuration
+            menu: Interactive menu configuration
+            voicemail: Voicemail handling settings
+            end: Call ending configuration
+        Returns:
+            CreateCallResponse: Details of the created call
+
+    _create(data: CreateCallRequest)
+        Internal method to create a new voice call.
+        Args:
+            data: Call configuration including from/to numbers, welcome message,
+                 menu options, voicemail settings, and call ending parameters
+        Returns:
+            dict: API response containing created call details
+
 """
 
 import json

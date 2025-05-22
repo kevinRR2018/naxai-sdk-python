@@ -5,6 +5,12 @@ This module provides methods for recording and managing contact events in the Na
 allowing users to track customer interactions, behaviors, and activities. These events can
 be used for contact segmentation, automation triggers, and analytics to better understand
 customer engagement and journeys.
+
+Available Functions:
+    send(identifier, name=None, type_=None, timestamp=None, idempotency_key=None, data=None)
+        Send an event for a specific contact.
+        Records events like purchases, logins, page views etc. with optional metadata.
+
 """
 
 import datetime

@@ -7,6 +7,37 @@ delivery and engagement through activity logs, and analyzing messaging performan
 comprehensive reporting. It supports features such as message scheduling, unicode content,
 delivery constraints, and custom tracking references in a non-blocking manner suitable for
 high-performance asynchronous applications.
+
+Available Functions:
+    send(to, body, from_=None, sender_service_id=None, type_="text", scheduled_at=None,
+         validity=None, idempotency_key=None, reference=None, calendar_id=None,
+         max_parts=None, truncate=False) -> SendSMSResponse
+        Sends SMS messages to one or more recipients.
+        Args:
+            to: List of recipient phone numbers in E.164 format (max 1000)
+            body: Text content of the SMS message (max 1530 chars)
+            from_: Optional sender phone number
+            sender_service_id: Optional sender service ID
+            type_: Message type ("text", "unicode", or "auto")
+            scheduled_at: Optional scheduled delivery time
+            validity: Optional validity period in minutes (5-4320)
+            idempotency_key: Optional idempotency key (max 200 chars)
+            reference: Optional tracking reference (max 128 chars)
+            calendar_id: Optional calendar ID for delivery constraints
+            max_parts: Optional maximum message parts (1-10)
+            truncate: Optional flag to truncate long messages
+        Returns:
+            SendSMSResponse: Details of the sent messages
+
+Sub-resources:
+    activity_logs:
+        A subresource for accessing SMS activity and delivery logs.
+        See ActivityLogsResource for detailed documentation.
+
+    reporting:
+        A subresource for retrieving SMS metrics and analytics.
+        See ReportingResource for detailed documentation.
+
 """
 
 import json

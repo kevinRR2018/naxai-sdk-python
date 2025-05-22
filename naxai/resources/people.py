@@ -6,6 +6,20 @@ including contact profiles, custom attributes, segmentation, data imports, and e
 It serves as a central access point for all customer data operations, enabling users to
 create, manage, and analyze their customer database for targeted communications and
 personalized experiences.
+
+Sub-resources:
+    attributes:
+        A subresource for managing custom attributes for contacts.
+        See AttributesResource for detailed documentation.
+
+    contacts:
+        A subresource for managing contact profiles and data.
+        See ContactsResource for detailed documentation.
+
+    segments:
+        A subresource for managing contact segments and segmentation.
+        See SegmentsResource for detailed documentation.
+
 """
 
 from .people_resources.attributes import AttributesResource

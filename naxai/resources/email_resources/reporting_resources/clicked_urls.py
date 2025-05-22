@@ -4,6 +4,12 @@ Clicked URLs reporting resource for the Naxai SDK.
 This module provides methods for retrieving and analyzing metrics about URL clicks
 in emails sent through the Naxai platform, allowing users to track engagement
 and optimize email content based on link performance.
+
+Available functions:
+    list(start: Optional[int], stop: Optional[int], group: Optional[Literal["day", "month"]])
+        Retrieves metrics about clicked URLs in emails over a specified time period.
+        Returns a ListClickedUrlsMetricsResponse containing click statistics for each URL.
+
 """
 
 import datetime

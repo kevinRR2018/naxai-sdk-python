@@ -5,6 +5,15 @@ This module provides methods for retrieving and analyzing DTMF input metrics fro
 broadcasts, allowing users to track how recipients interact with interactive voice
 messages by pressing keys on their phone keypads. These metrics help measure engagement
 and response rates for voice broadcast campaigns.
+
+Available Functions:
+    get(broadcast_id: str)
+        Get DTMF input metrics for a specific voice broadcast.
+        Args:
+            broadcast_id (str): ID of the broadcast to get metrics for
+        Returns:
+            GetBroadcastInputMetricsResponse: Input metrics including counts for each DTMF key
+
 """
 
 import json

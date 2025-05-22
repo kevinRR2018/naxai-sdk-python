@@ -6,6 +6,48 @@ including outgoing message statistics, delivery error reports, incoming message
 volumes, and country-based performance data. These reports help users understand
 messaging patterns, delivery success rates, and geographical distribution of
 their SMS communications.
+
+Available Functions:
+    list_outgoing_metrics(group: Literal["hour", "day", "month"], start_date: str, stop_date: str)
+        Retrieves time-based metrics for outgoing SMS messages.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+        Returns:
+            ListOutgoingSMSMetricsResponse: Detailed outgoing SMS metrics
+
+    list_outgoing_by_country_metrics(group: Literal["hour", "day", "month"],
+                                     start_date: str,
+                                     stop_date: str)
+        Retrieves country-based metrics for outgoing SMS messages.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+        Returns:
+            ListOutgoingSMSByCountryMetricsResponse: Country-based SMS metrics
+
+    list_incoming_metrics(group: Literal["hour", "day", "month"], start_date: str, stop_date: str)
+        Retrieves metrics for incoming SMS messages.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+        Returns:
+            ListIncomingSMSMetricsResponse: Incoming SMS metrics
+
+    list_delivery_error_metrics(group: Literal["hour", "day", "month"],
+                                start_date: str,
+                                stop_date: str)
+        Retrieves metrics about SMS delivery errors.
+        Args:
+            group: Time interval for grouping ("hour", "day", "month")
+            start_date: Start date for reporting period
+            stop_date: End date for reporting period
+        Returns:
+            ListDeliveryErrorMetricsResponse: SMS delivery error metrics
+
 """
 
 import json

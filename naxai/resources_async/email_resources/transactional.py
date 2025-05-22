@@ -6,6 +6,14 @@ Naxai platform, including personalized, event-triggered communications such as a
 notifications, password resets, order confirmations, and receipts. It supports both
 direct HTML content and template-based emails with variable substitution, enabling
 non-blocking email sending operations in asynchronous applications.
+
+Available Functions:
+    send(data: SendTransactionalEmailRequest)
+        Send a transactional email to one or more recipients.
+        Supports personalized emails with HTML content or template-based emails with
+        variable substitution.
+        Returns a unique identifier for tracking the email's status.
+
 """
 
 import json

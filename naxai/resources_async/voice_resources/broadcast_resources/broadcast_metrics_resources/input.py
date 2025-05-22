@@ -6,6 +6,15 @@ from voice broadcasts, allowing users to track how recipients interact with inte
 voice messages by pressing keys on their phone keypads. These metrics help measure
 engagement and response rates for voice broadcast campaigns in a non-blocking manner
 suitable for high-performance asynchronous applications.
+
+Available Functions:
+    get(broadcast_id: str)
+        Get DTMF input metrics for a specific voice broadcast.
+        Args:
+            broadcast_id (str): ID of the broadcast to get metrics for
+        Returns:
+            GetBroadcastInputMetricsResponse: Input metrics including counts for each DTMF key
+
 """
 
 import json

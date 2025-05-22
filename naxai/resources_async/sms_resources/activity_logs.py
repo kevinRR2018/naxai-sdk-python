@@ -6,6 +6,17 @@ activity logs, including listing messages with various filtering options and ret
 detailed information about specific messages. These logs contain comprehensive data about
 message delivery, status, content, and associated metadata for both inbound and outbound
 SMS communications, accessible in a non-blocking manner for high-performance applications.
+
+Available Functions:
+    list(page=1, page_size=25, start=None, stop=None, direction=None, status=None, 
+         phone_number=None, client_id=None, campaign_id=None, broadcast_id=None)
+        Retrieves a paginated list of SMS activity logs with optional filtering.
+        Supports filtering by time range, direction, status, phone number and IDs.
+
+    get(message_id)
+        Retrieves detailed information about a specific SMS message by its ID.
+        Returns comprehensive data about the message's delivery, status and metadata.
+
 """
 
 import json

@@ -4,6 +4,13 @@ Email metrics reporting resource for the Naxai SDK.
 This module provides methods for retrieving and analyzing comprehensive email metrics
 from the Naxai platform, including delivery rates, engagement statistics, and
 performance indicators to help optimize email campaigns.
+
+Available Functions:
+    list(start: Optional[int], stop: Optional[int], group: Optional[Literal["day", "month"]])
+        Retrieve comprehensive email engagement metrics from the Naxai email system.
+        Fetches detailed statistics about email performance, including delivery rates,
+        open rates, click rates, and negative metrics such as bounces and complaints.
+
 """
 
 import datetime

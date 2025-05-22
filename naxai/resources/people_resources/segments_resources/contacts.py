@@ -5,6 +5,20 @@ This module provides methods for managing contacts within segments in the Naxai 
 including adding and removing contacts from manual segments, counting segment members,
 and retrieving contacts that belong to specific segments. These operations are essential
 for targeted audience management and campaign planning.
+
+Available Functions:
+    add(segment_id: str, contact_ids: list[str])
+        Add contacts to a manual segment.
+        
+    delete(segment_id: str, contact_ids: list[str]) 
+        Remove contacts from a manual segment.
+        
+    count(segment_id: str) -> CountContactsInSegmentResponse
+        Count the number of contacts in a segment.
+        
+    list(segment_id: str, page: Optional[int], size: Optional[int]) -> ListContactsOfSegmentResponse
+        List contacts that belong to a segment with pagination support.
+
 """
 
 import json

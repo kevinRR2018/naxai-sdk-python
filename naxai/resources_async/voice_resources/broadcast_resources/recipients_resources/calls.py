@@ -6,6 +6,12 @@ to individual recipients within voice broadcast campaigns. It allows users to tr
 statuses, durations, outcomes, and retry attempts for specific recipients in a non-blocking
 manner, helping to understand delivery effectiveness and recipient engagement patterns in
 high-performance asynchronous applications.
+
+Available Functions:
+    list(broadcast_id: str, recipient_id: str)
+        Retrieves a list of call attempts made to a specific recipient within a voice broadcast.
+        Returns details like call status, duration, attempt order and timestamps.
+
 """
 
 import json

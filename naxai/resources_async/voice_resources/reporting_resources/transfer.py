@@ -6,6 +6,12 @@ transferred voice calls, including transfer volumes, success rates, and duration
 These reports help users understand how often calls are being transferred to other destinations
 and the effectiveness of those transfers, supporting optimization of call routing and agent
 handoff processes in a non-blocking manner suitable for high-performance asynchronous applications.
+
+Available Functions:
+    list(group, start_date, stop_date, number):
+        Retrieves transferred call metrics grouped by specified time interval (hour/day/month).
+        Allows filtering by date range and specific phone numbers.
+
 """
 
 import json

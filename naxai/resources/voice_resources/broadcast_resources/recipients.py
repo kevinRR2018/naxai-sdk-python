@@ -6,6 +6,33 @@ campaigns, including listing recipients with various filtering options and retri
 detailed information about specific recipients. It also serves as a container for more
 specialized recipient resources such as call tracking, helping users understand delivery
 outcomes and recipient engagement.
+
+Available Functions:
+    list(broadcast_id: str, page=1, page_size=25, phone=None, completed=None, status=None)
+        Retrieves a paginated list of recipients for a voice broadcast with optional filtering.
+        Args:
+            broadcast_id: ID of the broadcast to get recipients for
+            page: Page number to retrieve (default: 1)
+            page_size: Number of items per page (default: 25, max: 100)
+            phone: Filter by recipient phone number
+            completed: Filter by completion status
+            status: Filter by delivery status
+        Returns:
+            ListBroadcastRecipientsResponse: List of recipients with pagination info
+
+    get(broadcast_id: str, recipient_id: str)
+        Retrieves detailed information about a specific recipient.
+        Args:
+            broadcast_id: ID of the broadcast
+            recipient_id: ID of the recipient
+        Returns:
+            GetBroadcastRecipientResponse: Detailed recipient information
+
+Sub-resources:
+    calls:
+        A subresource for tracking call attempts made to recipients.
+        See CallsResource for detailed documentation.
+
 """
 
 import json

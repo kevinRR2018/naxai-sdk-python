@@ -6,6 +6,75 @@ including creating, retrieving, updating, and controlling broadcasts. It support
 operations such as starting, pausing, resuming, and canceling broadcasts, as well
 as accessing detailed metrics and recipient information through specialized
 sub-resources.
+
+Available Functions:
+    list(page=1, page_size=25)
+        Retrieves a paginated list of all broadcasts.
+        Args:
+            page: Page number to retrieve (default: 1)
+            page_size: Number of items per page (default: 25, max: 100)
+        Returns:
+            ListBroadcastResponse: List of broadcasts with pagination info
+
+    create(request: CreateBroadcastRequest)
+        Creates a new broadcast campaign.
+        Args:
+            request: Broadcast configuration details
+        Returns:
+            CreateBroadcastResponse: Created broadcast details
+
+    get(broadcast_id: str)
+        Retrieves details about a specific broadcast.
+        Args:
+            broadcast_id: ID of the broadcast to retrieve
+        Returns:
+            GetBroadcastResponse: Detailed broadcast information
+
+    update(broadcast_id: str, request: UpdateBroadcastRequest)
+        Updates an existing broadcast's configuration.
+        Args:
+            broadcast_id: ID of the broadcast to update
+            request: Updated broadcast configuration
+        Returns:
+            UpdateBroadcastResponse: Updated broadcast details
+
+    start(broadcast_id: str)
+        Starts a broadcast campaign.
+        Args:
+            broadcast_id: ID of the broadcast to start
+        Returns:
+            StartBroadcastResponse: Start operation result
+
+    pause(broadcast_id: str)
+        Pauses an active broadcast campaign.
+        Args:
+            broadcast_id: ID of the broadcast to pause
+        Returns:
+            PauseBroadcastResponse: Pause operation result
+
+    resume(broadcast_id: str)
+        Resumes a paused broadcast campaign.
+        Args:
+            broadcast_id: ID of the broadcast to resume
+        Returns:
+            ResumeBroadcastResponse: Resume operation result
+
+    cancel(broadcast_id: str)
+        Cancels an active or paused broadcast campaign.
+        Args:
+            broadcast_id: ID of the broadcast to cancel
+        Returns:
+            CancelBroadcastResponse: Cancel operation result
+
+Sub-resources:
+    metrics:
+        A subresource for retrieving broadcast metrics and analytics.
+        See MetricsResource for detailed documentation.
+
+    recipients:
+        A subresource for managing broadcast recipients and tracking delivery.
+        See RecipientsResource for detailed documentation.
+
 """
 
 import json

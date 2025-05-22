@@ -4,6 +4,16 @@ Holiday templates resource for the Naxai SDK.
 This module provides methods for interacting with holiday templates in the Naxai API,
 including retrieving individual templates and listing all available templates.
 Holiday templates contain predefined sets of dates that can be used with calendars.
+
+Available functions:
+    get(template_id: str)
+        Retrieves a specific holiday template by its ID.
+        Returns a GetHolidaysTemplateResponse object containing template details.
+
+    list()
+        Lists all available holiday templates.
+        Returns a ListHolidaysTemplatesResponse object containing multiple templates.
+
 """
 
 import json

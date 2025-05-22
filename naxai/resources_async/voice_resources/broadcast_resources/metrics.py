@@ -6,6 +6,17 @@ for voice broadcast campaigns, including call outcome statistics, delivery rates
 engagement data. It also serves as a container for more specialized metrics resources such
 as input tracking, helping users evaluate the effectiveness of their voice broadcasts in a
 non-blocking manner suitable for high-performance asynchronous applications.
+
+Available Functions:
+    get(broadcast_id: str):
+        Retrieves detailed metrics for a specific voice broadcast campaign,
+        including call outcomes, delivery rates, and engagement statistics.
+
+Sub-resources:
+    input:
+        A subresource for tracking and analyzing input metrics in voice broadcasts.
+        See InputResource for detailed documentation.
+
 """
 
 import json
