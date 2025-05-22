@@ -38,6 +38,14 @@ Available Functions:
             segment_data (dict): Updated segment data
         Returns:
             UpdateSegmentResponse: Details of the updated segment
+    
+    delete(segment_id: str)
+        Delete a segment from the Naxai People API.
+        Permanently removes the segment (but not its contacts).
+        Args:
+            segment_id (str): The unique identifier of the segment to delete.
+        Returns:
+            None
 
     get_history(segment_id: str, start_date: datetime, end_date: datetime)
         Get historical data for a segment.
