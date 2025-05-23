@@ -86,26 +86,25 @@ Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalem
 
 Example:
 ```python
-response = client.email.transactional.send(data={
-    "sender": {
-        "email": "sender@yourdomain.com",
-        "name": "Your Name"
-    },
-    "subject": "Team Update",
-    "to": [
-        {"email": "team@example.com", "name": "Team"}
-    ],
-    "cc": [
-        {"email": "manager@example.com", "name": "Manager"}
-    ],
-    "bcc": [
-        {"email": "archive@example.com"}
-    ],
-    "html": "<p>Monthly team update...</p>",
-    "text": "Monthly team update...",
-    "reply_to": "replies@yourdomain.com",
-    "enable_tracking": True
-})
+request = SendTransactionalEmailRequest.model_validate(
+    {
+        "sender": {
+            "email": "sender@yourdomain.com",
+            "name": "Your Name"
+            },
+            "subject": "Team Update",
+            "to": [{"email": "team@example.com", "name": "Team"}],
+            "cc": [{"email": "manager@example.com", "name": "Manager"}],
+            "bcc": [{"email": "archive@example.com", "name": "Archive"}],
+            "html": "<p>Monthly team update...</p>",
+            "text": "Monthly team update...",
+            "reply_to": "replies@yourdomain.com",
+            "enable_tracking": True
+    })
+#Send an email
+response = client.email.transactional.send(data=request)
+
+print(f"Email sent with ID: {response.id}")
 ```
 
 ## Activity Logs
@@ -136,15 +135,15 @@ activity_logs = client.email.activity_logs.list(
     page=1,
     page_size=25
 )
-print(f"Found {activity_logs.pagination.total_items} emails")
-print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.total_pages}")
+print(f"Found {activity_logs.pagination.total_record} emails")
+print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.last}")
 for msg in activity_logs.messages:
     print(f"Email: {msg.subject} - Status: {msg.status}")
 
 # Filtering by date range, status, and recipient
 import time
-one_week_ago = int(time.time() * 1000) - (7 * 24 * 60 * 60 * 1000)
-now = int(time.time() * 1000)
+one_week_ago = int(time.time()) - (7 * 24 * 60 * 60)
+now = int(time.time())
 
 delivered_emails = client.email.activity_logs.list(
     start=one_week_ago,
@@ -284,7 +283,7 @@ metrics = client.email.reporting.metrics.list(
 )
 
 print(f"Email metrics from {datetime.fromtimestamp(metrics.start/1000)}")
-print(f"to {datetime.fromtimestamp(metrics.stop/1000)}")
+print(f"to {datetime.fromtimestamp(current_time)}")
 print(f"Grouped by: {metrics.group}")
 print(f"Data points: {len(metrics.stats)}")
 
@@ -316,14 +315,6 @@ if metrics.stats:
     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, "
           f"Clicked: {best_day.clicked_unique}")
 
-# Get monthly metrics for the current year
-year_start = int(datetime(datetime.now().year, 1, 1).timestamp())
-monthly_metrics = client.email.reporting.metrics.list(
-    start=year_start,
-    stop=current_time,
-    group="month"
-)
-print(f"\nMonthly email metrics for {datetime.now().year}")
 ```
 
 Notes:
