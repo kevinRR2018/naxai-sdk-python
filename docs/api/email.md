@@ -21,6 +21,12 @@ client.email.send(
 )
 ```
 
+Request Models:
+- [DestinationObject](../models/email.md#destinationobject)
+- [CCObject](../models/email.md#ccobject)
+- [BCCObject](../models/email.md#bccobject)
+- [Attachment](../models/email.md#attachment)
+
 Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
 
 Example:
@@ -75,6 +81,7 @@ client.email.transactional.send(
 )
 ```
 
+Request: [SendTransactionalEmailRequest](../models/email.md#sendtransactionalemailrequest)  
 Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
 
 Example:
