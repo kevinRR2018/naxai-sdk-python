@@ -61,29 +61,29 @@ response = client.sms.send(
 )
 ```
 
+
+
 ### Send an Email
 
 ```python
-email_data = {
-    "to": ["recipient@example.com"],
-    "from": "sender@yourdomain.com",
-    "subject": "Hello from Naxai",
-    "text": "This is a test email",
-    "html": "<p>This is a test email</p>"
-}
-
-response = client.email.send(data=email_data)
+# Send to recipient@example.com
+response = client.email.send(
+            sender_email="sender@yourdomain.com",
+            sender_name="sender",
+            subject="Hello from Naxai",
+            text="This is a test email",
+            to=[{"email": "recipient@example.com", "name": "Recipient"}])
 print(f"Email sent with ID: {response.message_id}")
 ```
 
 ### Manage Contacts
 
 ```python
-# Create or update a contact
+# Create or update a contact. Identifier = email
 contact = client.people.contacts.create_or_update(
     identifier="user@example.com",
     email="user@example.com",
-    phone="+1234567890",
+    phone="1234567890",
     language="en"
 )
 
