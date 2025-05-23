@@ -73,10 +73,19 @@ stop = int(datetime.now().timestamp() * 1000)
 start = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
 
 logs = client.sms.activity_logs.list(
+    page=1,
+    page_size=25,
     start=start,
     stop=stop,
     status="failed"
 )
+
+print(f"Found {logs.pagination.total_record} failed SMS")
+for log in logs.messages:
+    print(f"SMS {log.message_id} from {log.from_} to {log.to}")
+    print(f"Status: {log.status}")
+    print(f"Details: {log.status_details}")
+    print(f"Reason: {log.status_reason}")
 ```
 
 ### Get Message Details
@@ -132,28 +141,38 @@ Returns: [ListDeliveryErrorMetricsResponse](../models/sms.md#listdeliveryerrorme
 
 Example:
 ```python
-# Get daily metrics for the last 7 days
-from datetime import datetime, timedelta
-
-stop = "2025-05-23 00:00:00"               # format for hour grouping YYYY-MM-DD HH:MM:SS
-start = "2025-05-23 23:59:59"                   # format for hour grouping YYYY-MM-DD HH:MM:SS
-
+# Get daily metrics for a specific day
+# For hour grouping, use YYYY-MM-DD HH:MM:SS format
 metrics = client.sms.reporting.list_outgoing_metrics(
-    start_date=start,
-    stop_date=stop,
+    start_date="2023-05-23 00:00:00",
+    stop_date="2023-05-23 23:59:59",
     group="hour"
 )
 
 for stat in metrics.stats:
     print(f"Date: {stat.date}")
-    print(f"Sent: {stat.sms}")
+    print(f"SMS sent: {stat.sms}")
     print(f"Delivered: {stat.delivered}")
-    print(f"avgTimeToDeliver:" {stat.avg_time_to_deliver})
+    print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
+
+# Get country-based metrics
+country_metrics = client.sms.reporting.list_outgoing_metrics_by_country(
+    start_date="2023-05-23",  # YYYY-MM-DD format required
+    stop_date="2023-05-23"
+)
+
+for stat in country_metrics.stats:
+    if stat.sms > 0:
+        delivery_rate = (stat.delivered / stat.sms) * 100
+        print(f"Country: {stat.country} ({stat.mcc}-{stat.mnc})")
+        print(f"Delivery rate: {delivery_rate:.1f}%")
+        print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
 ```
 
 ## Best Practices
 
 1. Always use `idempotency_key` for important messages to prevent duplicates
+2. Use E.164 format for phone numbers (e.g., "32477112233")
 3. Monitor delivery errors regularly
 4. Use appropriate time ranges for metrics to avoid timeout issues
 
