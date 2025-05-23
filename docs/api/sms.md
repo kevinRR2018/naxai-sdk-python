@@ -22,6 +22,7 @@ client.sms.send(
 )
 ```
 
+Request: [SendSMSRequest](../models/sms.md#sendsmsrequest)  
 Returns: [SendSMSResponse](../models/sms.md#sendsmsresponse)
 
 Example:
