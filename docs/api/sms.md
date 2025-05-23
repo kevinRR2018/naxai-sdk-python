@@ -144,8 +144,8 @@ Example:
 # Get daily metrics for a specific day
 # For hour grouping, use YYYY-MM-DD HH:MM:SS format
 metrics = client.sms.reporting.list_outgoing_metrics(
-    start_date="2023-05-23 00:00:00",
-    stop_date="2023-05-23 23:59:59",
+    start_date="2025-05-23 00:00:00",
+    stop_date="2025-05-23 23:59:59",
     group="hour"
 )
 
