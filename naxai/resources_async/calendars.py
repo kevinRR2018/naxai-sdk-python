@@ -25,6 +25,9 @@ Available functions:
     list() -> ListCalendarsResponse
         Lists all available calendars.
 
+    delete(calendar_id) -> None
+        Deletes a calendar by its ID.
+
     add_exclusions(calendar_id, exclusions) -> AddExclusionsResponse
         Adds exclusion dates to a calendar.
 

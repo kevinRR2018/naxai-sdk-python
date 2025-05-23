@@ -20,6 +20,10 @@ Available Functions:
     get(contact_id) -> GetContactResponse
         Retrieve a specific contact by ID.
 
+    delete(identifier: str) -> None
+        Delete a contact from the system.
+        Permanently removes the contact and all associated data.
+
 Sub-resources:
     events: Methods for managing contact events
     identifier: Methods for contact identification 
