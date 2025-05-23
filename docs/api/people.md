@@ -100,6 +100,7 @@ client.people.contacts.search(
 )
 ```
 
+Request: [SearchCondition](../models/people.md#searchcondition)  
 Returns: [SearchContactsResponse](../models/people.md#searchcontactsresponse)
 
 Example:
@@ -153,6 +154,7 @@ client.people.contacts.create_or_update(
 )
 ```
 
+Request: [CreateOrUpdateContactRequest](../models/people.md#createorupdatecontactrequest)  
 Returns: [CreateOrUpdateContactResponse](../models/people.md#createorupdatecontactresponse)
 
 Example:
@@ -219,6 +221,7 @@ client.people.contacts.events.send(
 )
 ```
 
+Request: [SendContactEventRequest](../models/people.md#sendcontacteventrequest)  
 Returns: None
 
 Example:
@@ -298,6 +301,9 @@ client.people.segments.create(
 )
 ```
 
+Request: [CreateSegmentRequest](../models/people.md#createsegmentrequest)  
+Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
+
 Example:
 ```python
 from naxai.models.people.requests.segments_requests import CreateSegmentRequest
@@ -335,6 +341,9 @@ client.people.segments.update(
     data: CreateSegmentRequest    # Updated configuration
 )
 ```
+
+Request: [CreateSegmentRequest](../models/people.md#createsegmentrequest)  
+Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
 
 ### Delete Segment
 ```python
