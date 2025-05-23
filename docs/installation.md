@@ -10,17 +10,9 @@ This guide covers installing the Naxai SDK and setting up authentication for you
 pip install naxai
 ```
 
-### Using poetry
-
-```bash
-poetry add naxai
-```
-
 ### Requirements
 
-- Python 3.7 or higher
-- aiohttp (for async client)
-- requests (for sync client)
+- httpx
 - pydantic (for data validation)
 
 ## Authentication
@@ -62,8 +54,11 @@ Pass credentials directly when creating the client:
 from naxai import NaxaiClient
 
 client = NaxaiClient(
-    api_client_id="your_client_id",
-    api_client_secret="your_client_secret"
+    api_client_id="api_client_id",
+    api_client_secret="api_client_secret",
+    api_version="2023-03-25",                       # has default value
+    auth_url="https://auth.naxai.com/oauth2/token", # has default value
+    api_base_url="https://api.naxai.com"            # has default value
 )
 ```
 
@@ -99,33 +94,6 @@ async def main():
 asyncio.run(main())
 ```
 
-## Client Configuration
-
-### Timeout Settings
-
-```python
-client = NaxaiClient(
-    timeout=30,  # Request timeout in seconds
-    connect_timeout=10  # Connection timeout in seconds
-)
-```
-
-### Custom Base URL
-
-```python
-client = NaxaiClient(
-    base_url="https://api.custom-domain.com"
-)
-```
-
-### Proxy Configuration
-
-```python
-client = NaxaiClient(
-    proxy="http://proxy.example.com:8080"
-)
-```
-
 ## Best Practices
 
 1. **Environment Variables**
@@ -140,7 +108,6 @@ client = NaxaiClient(
 
 3. **Error Handling**
    - Handle authentication errors gracefully
-   - Implement proper retry logic for token expiration
    - Log authentication failures appropriately
 
 Example with best practices:
@@ -160,8 +127,7 @@ if not all([client_id, client_secret]):
 try:
     with NaxaiClient(
         api_client_id=client_id,
-        api_client_secret=client_secret,
-        timeout=30
+        api_client_secret=client_secret
     ) as client:
         # Your code here
         response = client.voice.call.create(...)
@@ -172,41 +138,6 @@ except Exception as e:
     logger.error(f"Unexpected error: {e}")
     # Handle other errors
 ```
-
-## Security Considerations
-
-1. Never hardcode credentials in your code
-2. Use environment variables or secure credential storage
-3. Rotate credentials regularly
-4. Use different credentials for different environments
-5. Monitor authentication failures for security issues
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Invalid Credentials**
-   ```python
-   NaxaiAuthError: Invalid client credentials
-   ```
-   - Check if credentials are correct
-   - Verify environment variables are set
-   - Ensure credentials have necessary permissions
-
-2. **Token Expiration**
-   ```python
-   NaxaiAuthError: Token expired
-   ```
-   - The SDK automatically handles token refresh
-   - If persistent, check system clock synchronization
-
-3. **Connection Issues**
-   ```python
-   NaxaiConnectionError: Failed to connect
-   ```
-   - Check network connectivity
-   - Verify proxy settings if using a proxy
-   - Check firewall rules
 
 ## Related Documentation
 
