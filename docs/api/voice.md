@@ -22,6 +22,13 @@ client.voice.call.create(
     voice: Optional[Literal["man", "woman"]] = "woman",  # Voice type
     idempotency_key: Optional[str] = Field(max_length=128, min_length=1),  # Prevent duplicates
     calendar_id: Optional[str] = Field(max_length=64),  # Calendar for scheduling
+    language: Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"],  # Voice language
+    to: list[str] = Field(min_length=1, max_length=1000),  # List of recipient phone numbers
+    from_: str = Field(min_length=8, max_length=15),  # Sender phone number
+    batch_id: Optional[str] = Field(max_length=64),  # Batch identifier
+    voice: Optional[Literal["man", "woman"]] = "woman",  # Voice type
+    idempotency_key: Optional[str] = Field(max_length=128, min_length=1),  # Prevent duplicates
+    calendar_id: Optional[str] = Field(max_length=64),  # Calendar for scheduling
     scheduled_at: Optional[int] = None,         # Schedule timestamp
     machine_detection: Optional[bool] = False,  # Enable answering machine detection
     voicemail: Optional[VoiceMail] = None,     # Voicemail configuration
@@ -50,12 +57,6 @@ Request Models:
 - [Menu](../models/voice.md#menu)
 - [End](../models/voice.md#end)
 
-Request Models:
-- [Welcome](../models/voice.md#welcome)
-- [VoiceMail](../models/voice.md#voicemail)
-- [Menu](../models/voice.md#menu)
-- [End](../models/voice.md#end)
-
 Returns: [CreateCallResponse](../models/voice.md#createcallresponse)
 
 Example:
@@ -68,11 +69,6 @@ response = client.voice.call.create(
     to=["1234567890"],
     from_="0987654321",
     voice="woman",
-    voice="woman",
-    welcome={"say": "Hello!"},
-    language="en-GB",
-    to=["1234567890"],
-    from_="0987654321",
     voice="woman",
     end={"say": "Goodbye!"}
 )
@@ -87,7 +83,6 @@ print(f"Call ID: {response.calls[0].call_id}")
 client.voice.broadcasts.create(data: CreateBroadcastRequest)
 ```
 
-Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
@@ -114,7 +109,6 @@ client.voice.broadcasts.update(
 )
 ```
 
-Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
@@ -226,42 +220,12 @@ Notes:
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
   - Both start_date and stop_date are required
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
 
 Returns: [ListInboundMetricsResponse](../models/voice.md#listinboundmetricsresponse)
 
 ### Outbound Metrics
 ```python
 client.voice.reporting.outbound.list(
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
     group: Literal["hour", "day", "month"],     # Time interval grouping
     start_date: Optional[str] = None,           # Start date for filtering
     stop_date: Optional[str] = None,            # End date for filtering
@@ -328,21 +292,6 @@ Notes:
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
   - Both start_date and stop_date are required
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
 
 Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsresponse)
 
@@ -351,17 +300,6 @@ Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsres
 ### List Activity Logs
 ```python
 client.voice.activity_logs.list(
-    page: Optional[int] = 1,                    # Page number (default: 1)
-    page_size: Optional[int] = 50,             # Items per page (1-100, default: 50)
-    start: Optional[int] = None,               # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                # End timestamp (milliseconds)
-    direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,  # Call direction
-    status: Optional[Literal["delivered", "failed"]] = None,  # Call status
-    from_: Optional[str] = None,               # Filter by originating number
-    to: Optional[str] = None,                  # Filter by destination number
-    client_id: Optional[str] = None,           # Filter by client ID
-    campaign_id: Optional[str] = None,         # Filter by campaign ID
-    broadcast_id: Optional[str] = None         # Filter by broadcast ID
     page: Optional[int] = 1,                    # Page number (default: 1)
     page_size: Optional[int] = 50,             # Items per page (1-100, default: 50)
     start: Optional[int] = None,               # Start timestamp (milliseconds)
@@ -397,8 +335,8 @@ logs = client.voice.activity_logs.list(
     page_size=25,
     status="failed"
 )
-print(f"Found {logs.pagination.total_record} failed calls")
-for call in logs.items:
+print(f"Found {logs.pagination.total_items} failed calls")
+for call in logs.calls:
     print(f"Call {call.call_id}: {call.from_} → {call.to}")
     print(f"Failed at: {call.call_date}, Reason: {call.reason}")
 ```
@@ -418,10 +356,7 @@ print(f"Call from {call.from_} to {call.to}")
 print(f"Status: {call.status}")
 print(f"Duration: {call.call_duration} seconds")
 if call.transferred:
-    transfer_call = client.voice.activity_logs.get(call.transfer_call_id)
-    print(f"Transfer from {transfer_call.from_} to {transfer_call.to}")
-    print(f"Transfer Status: {transfer_call.status}")
-    print(f"Transfer Duration: {transfer_call.call_duration} seconds")
+    print(f"Transferred to: {call.transfer_to}")
 ```
 
 ## Related Documentation
