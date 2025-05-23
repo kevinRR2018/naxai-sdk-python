@@ -1,51 +1,89 @@
 # Webhooks API Reference
 
-The Webhooks API allows you to configure and manage real-time event notifications for your Naxai account.
+The Webhooks API allows you to configure and manage real-time event notifications for your Naxai account. Webhooks enable your application to receive push notifications for various events rather than polling the API.
 
 ## Webhook Resource
 
 ### Create Webhook
 ```python
 client.webhooks.create(
-    data: Union[dict, CreateWebhookRequest],
-    # Required fields in data:
-    # - url: str  # Endpoint URL to receive events
-    # - events: List[str]  # List of event types to subscribe to
-    #
-    # Optional fields:
-    # - description: str
-    # - secret: str  # Secret for signature verification
-    # - metadata: Dict[str, Any]
-    # - active: bool = True
+    name: str,                # Descriptive name for the webhook
+    url: str,                # Endpoint URL to receive events
+    authentication: Union[    # Authentication configuration
+        NoAuthModel,         # No authentication
+        BasicAuthModel,      # Basic HTTP authentication
+        OAuth2AuthModel,     # OAuth 2.0
+        HeaderAuthModel      # Custom header authentication
+    ],
+    event_object: Literal[   # Event category to subscribe to
+        "All",              # All events
+        "People",           # Contact-related events
+        "Sms",             # SMS-related events
+        "Email",           # Email-related events
+        "Call"             # Voice call events
+    ],
+    event_filter: List[str], # Additional filtering criteria
+    event_names: List[str],  # Specific event names to subscribe to
+    active: bool = True      # Whether webhook is active upon creation
 )
 ```
 
 Example:
 ```python
-response = client.webhooks.create(data={
-    "url": "https://your-domain.com/webhooks/naxai",
-    "events": [
-        "voice.call.started",
-        "voice.call.ended",
+from naxai.models.webhooks.helper_models.authentication import BasicAuthModel
+
+# Create webhook with basic authentication
+response = client.webhooks.create(
+    name="Production Notifications",
+    url="https://your-domain.com/webhooks/naxai",
+    authentication=BasicAuthModel(
+        username="webhook_user",
+        password="webhook_password"
+    ),
+    event_object="Sms",
+    event_filter=["*"],  # Accept all events in category
+    event_names=[
+        "sms.message.sent",
         "sms.message.delivered",
-        "email.opened"
+        "sms.message.failed"
     ],
-    "description": "Production webhook endpoint",
-    "secret": "your-signing-secret",
-    "metadata": {
-        "environment": "production",
-        "version": "1.0"
-    }
-})
-print(f"Webhook ID: {response.webhook_id}")
+    active=True
+)
+print(f"Created webhook: {response.id}")
 ```
 
 ### Update Webhook
 ```python
 client.webhooks.update(
     webhook_id: str,
-    data: Union[dict, UpdateWebhookRequest]
+    update_operations: List[Union[
+        UpdateWebhookJsonPathRequestAddReplace,  # Add or replace fields
+        UpdateWebhookJsonPathRequestMoveCopy,    # Move or copy fields
+        UpdateWebhookJsonPathRequestRemove       # Remove fields
+    ]]
 )
+```
+
+The update method uses JSON Patch operations (RFC 6902) to modify webhook configurations:
+
+```python
+from naxai.models.webhooks.requests.webhooks_requests import (
+    UpdateWebhookJsonPathRequestAddReplace,
+    UpdateWebhookJsonPathRequestRemove
+)
+
+# Update webhook URL and remove a field
+updates = [
+    UpdateWebhookJsonPathRequestAddReplace(
+        path="/url",
+        value="https://new-endpoint.example.com/webhooks"
+    ),
+    UpdateWebhookJsonPathRequestRemove(
+        path="/metadata/deprecated_field"
+    )
+]
+
+updated = client.webhooks.update("whk_123", updates)
 ```
 
 ### Get Webhook
@@ -53,13 +91,27 @@ client.webhooks.update(
 client.webhooks.get(webhook_id: str)
 ```
 
+Example:
+```python
+webhook = client.webhooks.get("whk_123")
+print(f"Webhook: {webhook.name}")
+print(f"URL: {webhook.url}")
+print(f"Active: {webhook.active}")
+print(f"Event names: {webhook.event_names}")
+```
+
 ### List Webhooks
 ```python
-client.webhooks.list(
-    page: Optional[int] = None,
-    page_size: Optional[int] = None,
-    active: Optional[bool] = None
-)
+client.webhooks.list()
+```
+
+Example:
+```python
+webhooks = client.webhooks.list()
+for webhook in webhooks:
+    print(f"Webhook: {webhook.name} ({webhook.id})")
+    print(f"Event object: {webhook.event_object}")
+    print(f"Active: {webhook.active}")
 ```
 
 ### Delete Webhook
@@ -67,227 +119,135 @@ client.webhooks.list(
 client.webhooks.delete(webhook_id: str)
 ```
 
-## Event Types
+## Event Management
 
-The following event types are available for subscription:
-
-### Voice Events
-- `voice.call.queued` - Call has been queued
-- `voice.call.started` - Call has started
-- `voice.call.answered` - Call was answered
-- `voice.call.ended` - Call has ended
-- `voice.call.failed` - Call failed
-- `voice.broadcast.started` - Broadcast campaign started
-- `voice.broadcast.completed` - Broadcast campaign completed
-- `voice.broadcast.failed` - Broadcast campaign failed
-
-### SMS Events
-- `sms.message.sent` - Message has been sent
-- `sms.message.delivered` - Message was delivered
-- `sms.message.failed` - Message delivery failed
-- `sms.message.received` - Inbound message received
-- `sms.opt_out` - Contact opted out of messages
-
-### Email Events
-- `email.sent` - Email has been sent
-- `email.delivered` - Email was delivered
-- `email.opened` - Email was opened
-- `email.clicked` - Email link was clicked
-- `email.bounced` - Email bounced
-- `email.complained` - Spam complaint received
-- `email.unsubscribed` - Contact unsubscribed
-
-### Contact Events
-- `contact.created` - New contact created
-- `contact.updated` - Contact details updated
-- `contact.deleted` - Contact was deleted
-- `contact.preferences_updated` - Contact preferences changed
-- `contact.group_added` - Contact added to group
-- `contact.group_removed` - Contact removed from group
-
-## Webhook Delivery
-
-### Retry Policy
-Failed webhook deliveries are automatically retried with exponential backoff:
-- 1st retry: 5 minutes
-- 2nd retry: 15 minutes
-- 3rd retry: 30 minutes
-- 4th retry: 1 hour
-- 5th retry: 2 hours
-
-After 5 failed attempts, the webhook will be marked as failed and notifications will stop.
-
-### Security
-
-#### Signature Verification
-Each webhook request includes a signature header for verification:
+### List Available Events
 ```python
-from hmac import HMAC
-from hashlib import sha256
-
-def verify_webhook_signature(payload: bytes, signature: str, secret: str) -> bool:
-    """Verify the webhook signature."""
-    expected = HMAC(
-        key=secret.encode(),
-        msg=payload,
-        digestmod=sha256
-    ).hexdigest()
-    return hmac.compare_digest(signature, expected)
-
-# Example Flask webhook handler
-@app.route("/webhooks/naxai", methods=["POST"])
-def handle_webhook():
-    payload = request.get_data()
-    signature = request.headers.get("X-Naxai-Signature")
-    
-    if not verify_webhook_signature(payload, signature, WEBHOOK_SECRET):
-        return "Invalid signature", 401
-        
-    event = request.json
-    # Process the event
-    return "OK", 200
+client.webhooks.list_events()
 ```
 
-## Event Payloads
+Returns a list of all event types that can be subscribed to.
 
-### Base Event Structure
-All webhook events share this base structure:
+### List Recent Events
 ```python
-{
-    "id": "evt_123abc",
-    "type": "voice.call.started",
-    "created_at": 1634567890000,
-    "data": {
-        # Event-specific data
-    }
-}
-```
-
-### Example Event Payloads
-
-#### Voice Call Event
-```python
-{
-    "id": "evt_123abc",
-    "type": "voice.call.ended",
-    "created_at": 1634567890000,
-    "data": {
-        "call_id": "call_456def",
-        "duration": 120,
-        "from": "+1234567890",
-        "to": "+0987654321",
-        "status": "completed",
-        "direction": "outbound",
-        "recording_url": "https://api.naxai.com/recordings/xyz"
-    }
-}
-```
-
-#### Email Event
-```python
-{
-    "id": "evt_789ghi",
-    "type": "email.opened",
-    "created_at": 1634567890000,
-    "data": {
-        "message_id": "msg_456def",
-        "recipient": "user@example.com",
-        "subject": "Welcome to Naxai",
-        "opened_at": 1634567890000,
-        "user_agent": "Mozilla/5.0...",
-        "ip_address": "192.0.2.1"
-    }
-}
-```
-
-## Testing Webhooks
-
-### Send Test Event
-```python
-client.webhooks.test(
-    webhook_id: str,
-    event_type: str  # Event type to simulate
-)
+client.webhooks.list_last_events(webhook_id: str)
 ```
 
 Example:
 ```python
-# Send test event
-response = client.webhooks.test(
-    webhook_id="whk_123",
-    event_type="email.opened"
+events = client.webhooks.list_last_events("whk_123")
+for event in events:
+    print(f"Event: {event.event_name}")
+    print(f"Timestamp: {event.event_timestamp}")
+    print(f"Data: {event.event_data}")
+```
+
+## Event Types
+
+Available event categories and their associated events:
+
+### Voice Events (`event_object="Call"`)
+- `call.delivered.v1` - Call has been delivered
+- `call.failed.v1` - Call has failed
+- `call.recipient-completed.v1` - When a recipient of broadcast was completed.
+
+
+### SMS Events (`event_object="Sms"`)
+- `sms.incoming.v1` - Inbound message received
+- `sms.status.v1` - Status for message received
+
+### Email Events (`event_object="Email"`)
+- `email.sent.v1` - Email has been sent
+- `email.delivered.v1` - Email was delivered
+- `email.failed.v1` - Email was bounced
+- `email.opened.v1` - Email was opened
+- `email.clicked.v1` - Email link was clicked
+- `email.bounced` - Email bounced
+- `email.complained.v1` - Spam complaint received
+- `email.unsubscribed.v1` - Contact unsubscribed
+
+### Contact Events (`event_object="People"`)
+No events for the moment
+
+## Authentication Methods
+
+### No Authentication
+```python
+from naxai.models.webhooks.helper_models.authentication import NoAuthModel
+
+auth = NoAuthModel()
+```
+
+### Basic Authentication
+```python
+from naxai.models.webhooks.helper_models.authentication import BasicAuthModel
+
+auth = BasicAuthModel(
+    username="webhook_user",
+    password="webhook_password"
 )
+```
+
+### OAuth 2.0
+```python
+from naxai.models.webhooks.helper_models.authentication import OAuth2AuthModel
+
+auth = OAuth2AuthModel(
+    token_url="https://auth.example.com/token",
+    client_id="client_123",
+    client_secret="secret_456",
+    scope=["webhook.read", "webhook.write"]
+)
+```
+
+### Custom Header
+```python
+from naxai.models.webhooks.helper_models.authentication import HeaderAuthModel
+
+auth = HeaderAuthModel(
+    header_name="X-API-Key",
+    header_value="your-api-key"
+)
+```
+
+## Event Payloads
+
+All webhook events share this base structure:
+```python
+{
+    "event_name": str,           # Name of the event (e.g., "sms.message.delivered")
+    "event_webhook_id": str,     # ID of the receiving webhook
+    "event_timestamp": int,      # When the event occurred (milliseconds)
+    "event_id": str,            # Unique event identifier
+    "event_data": dict          # Event-specific payload data
+}
 ```
 
 ## Best Practices
 
 1. **Security**
-   - Always verify webhook signatures
-   - Use HTTPS endpoints
-   - Rotate webhook secrets periodically
+   - Use HTTPS endpoints only
+   - Implement authentication
+   - Validate webhook signatures
+   - Keep authentication credentials secure
 
 2. **Reliability**
-   - Implement idempotency checks
+   - Respond quickly to webhook requests (2xx)
    - Process events asynchronously
+   - Implement idempotency checks
    - Store raw events before processing
 
-3. **Performance**
-   - Respond quickly (2xx) to webhook requests
-   - Process events in background jobs
-   - Monitor webhook health
+3. **Event Handling**
+   - Subscribe only to needed events
+   - Use appropriate event filters
+   - Handle events idempotently
+   - Process events in order
 
 4. **Error Handling**
-   - Log failed deliveries
-   - Set up monitoring alerts
-   - Have a retry strategy
-
-Example implementation:
-```python
-from flask import Flask, request
-from hmac import HMAC
-from hashlib import sha256
-from typing import Dict
-import json
-
-app = Flask(__name__)
-
-def process_event(event_data: Dict):
-    """Process the webhook event asynchronously."""
-    event_type = event_data["type"]
-    
-    if event_type.startswith("voice."):
-        handle_voice_event(event_data)
-    elif event_type.startswith("email."):
-        handle_email_event(event_data)
-    elif event_type.startswith("sms."):
-        handle_sms_event(event_data)
-    elif event_type.startswith("contact."):
-        handle_contact_event(event_data)
-
-@app.route("/webhooks/naxai", methods=["POST"])
-def handle_webhook():
-    payload = request.get_data()
-    signature = request.headers.get("X-Naxai-Signature")
-    
-    # Verify signature
-    if not verify_webhook_signature(payload, signature, WEBHOOK_SECRET):
-        return "Invalid signature", 401
-    
-    # Parse event
-    try:
-        event = request.json
-        
-        # Store raw event
-        store_raw_event(event)
-        
-        # Process asynchronously
-        process_event(event)
-        
-        return "OK", 200
-    except Exception as e:
-        logger.error(f"Failed to process webhook: {e}")
-        return "Internal error", 500
-```
+   - Implement proper error handling
+   - Log failed webhook deliveries
+   - Monitor webhook health
+   - Set up failure alerts
 
 ## Related Documentation
 

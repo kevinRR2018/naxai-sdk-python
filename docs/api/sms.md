@@ -7,13 +7,18 @@ The SMS API allows you to send text messages and track their delivery status.
 ### Send SMS
 ```python
 client.sms.send(
-    to: Union[str, list[str]],     # Single number or list of numbers
-    from_: str,                     # Sender number
-    text: str,                      # Message content
-    idempotency_key: Optional[str] = None,  # Prevent duplicate sends
-    scheduled_at: Optional[int] = None,     # Schedule timestamp
-    calendar_id: Optional[str] = None,      # Calendar for scheduling
-    batch_id: Optional[str] = None          # Batch identifier
+    to: list[str],                          # List of recipient phone numbers in E.164 format (max 1000)
+    body: str,                              # Text content of the SMS message (max 1530 chars)
+    from_: str = None,                      # Sender phone number (max 15 chars)
+    sender_service_id: str = None,          # Optional sender service ID
+    type_: str = text,                      # Message encoding type ( text, unicode or auto )
+    scheduled_at: str = None,               # ISO 8601 timestamp for scheduled delivery
+    validity: int = None,                   # Validity period in minutes (5-4320)
+    idempotency_key: str = None,            # Prevent duplicates (max 200 chars)
+    reference: str = None,                  # Custom tracking reference (max 128 chars)
+    calendar_id: str = None,                # Calendar ID for delivery constraints
+    max_parts: int = None,                  # Maximum message parts (1-10)
+    truncate: bool = False                  # Whether to truncate long messages
 )
 ```
 
@@ -21,18 +26,17 @@ Example:
 ```python
 # Send to single recipient
 response = client.sms.send(
-    to="1234567890",
+    to=["1234567890"],
     from_="0987654321",
-    text="Hello from Naxai SDK!"
+    body="Hello from Naxai SDK!"
 )
-print(f"Message ID: {response.message_id}")
+print(f"Message ID: {response.messages[0].message_id}")
 
 # Send to multiple recipients
 response = client.sms.send(
     to=["1234567890", "1234567891"],
     from_="0987654321",
-    text="Bulk message from Naxai SDK!",
-    batch_id="batch_123"
+    body="Bulk message from Naxai SDK!"
 )
 print(f"Messages sent: {len(response.messages)}")
 ```
@@ -42,15 +46,16 @@ print(f"Messages sent: {len(response.messages)}")
 ### List Activity Logs
 ```python
 client.sms.activity_logs.list(
-    page: Optional[int] = None,
-    page_size: Optional[int] = None,
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
-    status: Optional[str] = None,
-    from_: Optional[str] = None,
-    to: Optional[str] = None,
-    batch_id: Optional[str] = None,
-    direction: Optional[Literal["inbound", "outbound"]] = None
+    page: int = 1,                                      # Page number to retrieve
+    page_size: int = 25,                               # Number of items per page
+    start: Optional[int] = None,                       # Start timestamp (milliseconds)
+    stop: Optional[int] = None,                        # End timestamp (milliseconds)
+    direction: Literal["inbound", "outbound"] = None,  # Filter by message direction
+    status: Literal["delivered", "failed"] = None,     # Filter by delivery status
+    phone_number: str = None,                          # Filter by phone number (7-15 chars)
+    client_id: str = None,                             # Filter by client identifier
+    campaign_id: str = None,                           # Filter by campaign identifier
+    broadcast_id: str = None                           # Filter by broadcast identifier
 )
 ```
 
@@ -79,69 +84,62 @@ client.sms.activity_logs.get(message_id: str)
 ### Outgoing Metrics
 ```python
 client.sms.reporting.list_outgoing_metrics(
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
-    group: Optional[Literal["hour", "day", "month"]] = None,
-    from_: Optional[str] = None,
-    to: Optional[str] = None
+    group: Literal["hour", "day", "month"],
+    start_date: str = None,
+    stop_date: str = None
+)
+```
+
+### Outgoing Metrics By Country
+```python
+client.sms.reporting.list_by_country(
+    start_date: str,            # YYYY-MM-DD
+    stop_date: str              # YYYY-MM-DD
 )
 ```
 
 ### Incoming Metrics
 ```python
 client.sms.reporting.list_incoming_metrics(
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
-    group: Optional[Literal["hour", "day", "month"]] = None,
-    from_: Optional[str] = None,
-    to: Optional[str] = None
+    group: Literal["hour", "day", "month"],
+    start_date: str = None,
+    stop_date: str = None
 )
 ```
 
 ### Delivery Errors
 ```python
-client.sms.reporting.list_delivery_errors(
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
-    group: Optional[Literal["hour", "day", "month"]] = None,
-    error_code: Optional[str] = None
+client.sms.reporting.list_delivery_errors_metrics(
+    start_date: str,           # YYYY-MM-DD
+    stop_date: str             # YYYY-MM-DD
 )
 ```
 
-### Country Metrics
-```python
-client.sms.reporting.list_by_country(
-    start: Optional[int] = None,
-    stop: Optional[int] = None,
-    group: Optional[Literal["hour", "day", "month"]] = None,
-    country: Optional[str] = None
-)
-```
 
 Example:
 ```python
 # Get daily metrics for the last 7 days
 from datetime import datetime, timedelta
 
-stop = int(datetime.now().timestamp() * 1000)
-start = int((datetime.now() - timedelta(days=7)).timestamp() * 1000)
+stop = "2025-05-23 00:00:00"               # format for hour grouping YYYY-MM-DD HH:MM:SS
+start = "2025-05-23 23:59:59"                   # format for hour grouping YYYY-MM-DD HH:MM:SS
 
 metrics = client.sms.reporting.list_outgoing_metrics(
-    start=start,
-    stop=stop,
-    group="day"
+    start_date=start,
+    stop_date=stop,
+    group="hour"
 )
 
-for stat in metrics:
+for stat in metrics.stats:
     print(f"Date: {stat.date}")
-    print(f"Sent: {stat.sent}")
+    print(f"Sent: {stat.sms}")
     print(f"Delivered: {stat.delivered}")
+    print(f"avgTimeToDeliver:" {stat.avg_time_to_deliver})
 ```
 
 ## Best Practices
 
 1. Always use `idempotency_key` for important messages to prevent duplicates
-2. Use batch_id for tracking groups of related messages
 3. Monitor delivery errors regularly
 4. Use appropriate time ranges for metrics to avoid timeout issues
 

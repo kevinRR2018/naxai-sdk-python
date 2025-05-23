@@ -7,13 +7,13 @@
 
 - [Quick Start Guide](./quick-start.md)
 - [Installation & Authentication](./installation.md)
-- API Reference
-  - [Voice API](./api/voice.md)
-  - [SMS API](./api/sms.md)
-  - [Email API](./api/email.md)
-  - [People API](./api/people.md)
-  - [Calendars API](./api/calendars.md)
-  - [Webhooks API](./api/webhooks.md)
+- Resources Reference
+  - [Voice](./api/voice.md)
+  - [SMS](./api/sms.md)
+  - [Email](./api/email.md)
+  - [People](./api/people.md)
+  - [Calendars](./api/calendars.md)
+  - [Webhooks](./api/webhooks.md)
 - [Models Reference](./models/README.md)
   - [Voice Models](./models/voice.md)
   - [SMS Models](./models/sms.md)

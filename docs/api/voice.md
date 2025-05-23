@@ -7,16 +7,16 @@ The Voice API allows you to make calls, manage broadcasts, and access call repor
 ### Create a Call
 ```python
 client.voice.call.create(
-    to: list[str],              # List of recipient phone numbers
-    from_: str,                 # Sender phone number
-    language: str,              # Voice language (e.g., "en-GB")
-    welcome: Welcome,           # Welcome message configuration
-    end: Optional[End] = None,  # End message configuration
-    voice: Optional[str] = None,# Voice type ("man" or "woman")
-    batch_id: Optional[str] = None,  # Batch identifier
-    calendar_id: Optional[str] = None,# Calendar for scheduling
-    scheduled_at: Optional[int] = None,# Schedule timestamp
-    machine_detection: Optional[bool] = None  # Enable answering machine detection
+    to: list[str],                              # List of recipient phone numbers
+    from_: str,                                 # Sender phone number
+    language: str,                              # Voice language (e.g., "en-GB")
+    welcome: Welcome,                           # Welcome message configuration
+    end: Optional[End] = None,                  # End message configuration
+    voice: Optional[str] = None,                # Voice type ("man" or "woman")
+    batch_id: Optional[str] = None,             # Batch identifier
+    calendar_id: Optional[str] = None,          # Calendar for scheduling
+    scheduled_at: Optional[int] = None,         # Schedule timestamp
+    machine_detection: Optional[bool] = None    # Enable answering machine detection
 )
 ```
 

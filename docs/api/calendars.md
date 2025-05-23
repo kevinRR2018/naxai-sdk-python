@@ -1,66 +1,100 @@
 # Calendars API Reference
 
-The Calendars API allows you to manage scheduling and time-based operations for voice calls, SMS, and emails.
+The Calendars API allows you to manage scheduling and time-based operations in your Naxai account. It provides comprehensive calendar management capabilities including working hours, schedules, exclusion dates, and holiday templates.
 
 ## Calendar Resource
 
 ### Create Calendar
 ```python
 client.calendars.create(
-    data: Union[dict, CreateCalendarRequest],
+    data: CreateCalendarRequest,
     # Required fields in data:
-    # - name: str
-    # - timezone: str  # IANA timezone (e.g., "America/New_York")
+    # - name: str                           # Calendar name
+    # - schedule: list[ScheduleObject]      # List of exactly 7 schedule objects
     #
     # Optional fields:
-    # - description: str
-    # - working_hours: List[WorkingHours]
-    # - holidays: List[Holiday]
-    # - metadata: Dict[str, Any]
+    # - timezone: str = "Europe/Brussels"   # IANA timezone
+    # - exclusions: list[str] = None        # List of excluded dates (YYYY-MM-DD)
 )
+```
+
+The `ScheduleObject` for each day contains:
+```python
+{
+    "day": int,              # Day of week (1-7, Monday to Sunday)
+    "open": bool,            # Whether the schedule is open
+    "start": str,            # Opening time ("HH:MM")
+    "stop": str,             # Closing time ("HH:MM")
+    "extended": bool,        # Whether extended hours are enabled
+    "extension_start": str,  # Extended hours start time ("HH:MM")
+    "extension_stop": str    # Extended hours end time ("HH:MM")
+}
 ```
 
 Example:
 ```python
-response = client.calendars.create(data={
-    "name": "Customer Support Hours",
-    "timezone": "America/New_York",
-    "description": "Support team availability",
-    "working_hours": [
-        {
-            "day": "monday",
-            "intervals": [
-                {"start": "09:00", "end": "17:00"}
-            ]
-        },
-        {
-            "day": "tuesday",
-            "intervals": [
-                {"start": "09:00", "end": "17:00"}
-            ]
-        }
-        # ... other days
-    ],
-    "holidays": [
-        {
-            "name": "New Year's Day",
-            "date": "2024-01-01"
-        }
-    ],
-    "metadata": {
-        "department": "support",
-        "region": "east_coast"
-    }
-})
-print(f"Calendar ID: {response.calendar_id}")
+from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
+from naxai.models.calendars.schedule_object import ScheduleObject
+
+# Create a calendar with business hours
+schedule = [
+    ScheduleObject(  # Monday
+        day=1,
+        open=True,
+        start="09:00",
+        stop="17:00",
+        extended=True,
+        extension_start="17:00",
+        extension_stop="20:00"
+    ),
+    ScheduleObject(  # Tuesday
+        day=2,
+        open=True,
+        start="09:00",
+        stop="17:00"
+    ),
+    # ... repeat for all 7 days
+]
+
+response = client.calendars.create(
+    data=CreateCalendarRequest(
+        name="Customer Support Hours",
+        timezone="America/New_York",  # Optional, defaults to "Europe/Brussels"
+        schedule=schedule,
+        exclusions=["2024-12-25", "2024-12-26"]  # Optional holiday closures
+    )
+)
+print(f"Calendar created with ID: {response.id}")
 ```
 
 ### Update Calendar
 ```python
 client.calendars.update(
-    calendar_id: str,
-    data: Union[dict, UpdateCalendarRequest]
+    calendar_id: str,              # Calendar identifier
+    data: CreateCalendarRequest    # Updated configuration using same model as create
 )
+```
+
+Example:
+```python
+# Update calendar configuration
+updated = client.calendars.update(
+    calendar_id="cal_123",
+    data=CreateCalendarRequest(
+        name="Updated Support Hours",
+        timezone="Europe/London",
+        schedule=[
+            ScheduleObject(
+                day=1,  # Monday
+                open=True,
+                start="08:00",
+                stop="16:00"
+            ),
+            # ... repeat for all 7 days (must provide all 7 days)
+        ]
+    )
+)
+print(f"Updated calendar: {updated.name}")
 ```
 
 ### Get Calendar
@@ -68,12 +102,25 @@ client.calendars.update(
 client.calendars.get(calendar_id: str)
 ```
 
+Example:
+```python
+calendar = client.calendars.get("cal_123")
+print(f"Calendar: {calendar.name}")
+print(f"Timezone: {calendar.timezone}")
+for day in calendar.schedule:
+    print(f"Day {day.day}: {'Open' if day.open else 'Closed'} {day.start}-{day.stop}")
+```
+
 ### List Calendars
 ```python
-client.calendars.list(
-    page: Optional[int] = None,
-    page_size: Optional[int] = None
-)
+client.calendars.list()
+```
+
+Example:
+```python
+calendars = client.calendars.list()
+for calendar in calendars:
+    print(f"Calendar: {calendar.name} (ID: {calendar.id})")
 ```
 
 ### Delete Calendar
@@ -81,194 +128,137 @@ client.calendars.list(
 client.calendars.delete(calendar_id: str)
 ```
 
-## Working Hours Resource
-
-### Update Working Hours
-```python
-client.calendars.working_hours.update(
-    calendar_id: str,
-    data: Union[dict, UpdateWorkingHoursRequest],
-    # Required fields in data:
-    # - working_hours: List[WorkingHours]
-)
-```
-
-Example:
-```python
-# Update working hours
-client.calendars.working_hours.update(
-    calendar_id="cal_123",
-    data={
-        "working_hours": [
-            {
-                "day": "monday",
-                "intervals": [
-                    {"start": "09:00", "end": "12:00"},
-                    {"start": "13:00", "end": "17:00"}
-                ]
-            },
-            {
-                "day": "tuesday",
-                "intervals": [
-                    {"start": "09:00", "end": "17:00"}
-                ]
-            }
-            # ... other days
-        ]
-    }
-)
-```
-
-## Holidays Resource
-
-### Add Holiday
-```python
-client.calendars.holidays.add(
-    calendar_id: str,
-    data: Union[dict, AddHolidayRequest],
-    # Required fields in data:
-    # - name: str
-    # - date: str  # YYYY-MM-DD format
-    #
-    # Optional fields:
-    # - description: str
-    # - recurring: bool
-)
-```
-
-### Remove Holiday
-```python
-client.calendars.holidays.remove(
-    calendar_id: str,
-    holiday_id: str
-)
-```
-
-### List Holidays
-```python
-client.calendars.holidays.list(
-    calendar_id: str,
-    start_date: Optional[str] = None,  # YYYY-MM-DD
-    end_date: Optional[str] = None     # YYYY-MM-DD
-)
-```
-
-Example:
-```python
-# Add holidays
-response = client.calendars.holidays.add(
-    calendar_id="cal_123",
-    data={
-        "name": "Company Anniversary",
-        "date": "2024-03-15",
-        "description": "Annual company celebration",
-        "recurring": True
-    }
-)
-
-# List upcoming holidays
-holidays = client.calendars.holidays.list(
-    calendar_id="cal_123",
-    start_date="2024-01-01",
-    end_date="2024-12-31"
-)
-```
-
-## Schedule Checking
-
-### Check Available Time
-```python
-client.calendars.check_availability(
-    calendar_id: str,
-    timestamp: int,  # Unix timestamp in milliseconds
-    duration: Optional[int] = None  # Duration in minutes
-)
-```
-
-### Get Next Available Time
-```python
-client.calendars.get_next_available(
-    calendar_id: str,
-    after: int,  # Unix timestamp in milliseconds
-    duration: Optional[int] = None  # Duration in minutes
-)
-```
-
-Example:
-```python
-from datetime import datetime, timedelta
-
-# Check if a specific time is available
-timestamp = int(datetime.now().timestamp() * 1000)
-is_available = client.calendars.check_availability(
-    calendar_id="cal_123",
-    timestamp=timestamp,
-    duration=30  # 30 minutes
-)
-
-# Get next available slot
-next_slot = client.calendars.get_next_available(
-    calendar_id="cal_123",
-    after=timestamp,
-    duration=60  # 60 minutes
-)
-```
-
-## Using with Other APIs
-
-### Schedule Voice Call
-```python
-# Schedule a call during working hours
-next_available = client.calendars.get_next_available(
-    calendar_id="cal_123",
-    after=int(datetime.now().timestamp() * 1000),
-    duration=15
-)
-
-if next_available:
-    response = client.voice.call.create(
-        to=["1234567890"],
-        from_="0987654321",
-        welcome={"say": "Hello!"},
-        calendar_id="cal_123",
-        scheduled_at=next_available.timestamp
-    )
-```
-
-### Schedule Email Campaign
-```python
-# Schedule email sending for working hours
-client.email.send(data={
-    "sender_email": "sender@yourdomain.com",
-    "sender_name": "Your Name",
-    "subject": "Important Update",
-    "to": [{"email": "recipient@example.com"}],
-    "html": "<p>Your important message here.</p>",
-    "calendar_id": "cal_123"  # Will send during next working hours
-})
-```
-
 ## Best Practices
 
 1. **Time Zone Management**
-   - Always specify explicit timezones
-   - Handle DST transitions
-   - Use IANA timezone names
+   - Default timezone is "Europe/Brussels" if not specified
+   - Always use IANA timezone identifiers
+   - Handle DST transitions appropriately
+   - Consider recipient time zones when scheduling
 
 2. **Working Hours**
-   - Define clear business hours
-   - Account for lunch breaks
-   - Consider multiple shifts
+   - Must provide schedule for all 7 days
+   - Use extended hours for flexible coverage
+   - Account for lunch breaks and regular closures
+   - Days can be marked as closed using `open=False`
 
-3. **Holiday Planning**
-   - Include recurring holidays
-   - Plan for regional differences
-   - Update annually
+3. **Exclusion Dates**
+   - Use ISO 8601 date format (YYYY-MM-DD)
+   - Maintain up-to-date holiday lists
+   - Consider regional variations
+   - Limit to 1000 exclusions per request
 
 4. **Schedule Optimization**
    - Check availability before scheduling
-   - Include buffer times
-   - Consider time zone differences
+   - Include buffer times between activities
+   - Consider load distribution
+   - Use extended hours for peak periods
+
+5. **Holiday Templates**
+   - Use predefined templates for common holidays
+   - Verify dates for your region
+   - Update templates annually
+   - Combine with custom exclusions as needed
+
+## Availability Management
+
+### Check Availability
+```python
+client.calendars.check(
+    calendar_id: str,
+    timestamp: Optional[int] = None  # Defaults to current UTC time
+)
+```
+
+Returns:
+- `match_`: Whether the timestamp falls within working hours
+- `next_`: If not a match, provides the next available timestamp
+
+Example:
+```python
+import time
+
+# Check if current time is within working hours
+result = client.calendars.check("cal_123")
+if result.match_:
+    print("Current time is within working hours")
+else:
+    next_time = datetime.fromtimestamp(result.next_ / 1000)
+    print(f"Next available time: {next_time}")
+
+# Check specific time
+future_time = int(time.time() * 1000) + (24 * 60 * 60 * 1000)  # Tomorrow
+result = client.calendars.check("cal_123", timestamp=future_time)
+```
+
+## Exclusion Management
+
+### Add Exclusions
+```python
+client.calendars.add_exclusions(
+    calendar_id: str,
+    exclusions: list[str]  # List of dates in YYYY-MM-DD format (max 1000)
+)
+```
+
+Example:
+```python
+# Add holiday closures
+response = client.calendars.add_exclusions(
+    "cal_123",
+    exclusions=["2024-12-25", "2024-12-26", "2025-01-01"]
+)
+print("Updated exclusions:", response.exclusions)
+```
+
+### Remove Exclusions
+```python
+client.calendars.delete_exclusions(
+    calendar_id: str,
+    exclusions: list[str]  # List of dates to remove (max 1000)
+)
+```
+
+Example:
+```python
+# Remove outdated exclusions
+response = client.calendars.delete_exclusions(
+    "cal_123",
+    exclusions=["2023-12-25", "2023-12-26"]
+)
+print("Remaining exclusions:", response.exclusions)
+```
+
+## Holiday Templates
+
+Holiday templates provide predefined sets of dates for common holidays in different regions.
+
+### List Holiday Templates
+```python
+client.calendars.holidays_templates.list()
+```
+
+Example:
+```python
+templates = client.calendars.holidays_templates.list()
+for template in templates:
+    print(f"Template: {template.name}")
+    print(f"Number of holidays: {len(template.dates)}")
+```
+
+### Get Holiday Template
+```python
+client.calendars.holidays_templates.get(template_id: str)
+```
+
+Example:
+```python
+template = client.calendars.holidays_templates.get("ht_123")
+print(f"Template: {template.name}")
+print("Holidays:")
+for date in template.dates:
+    print(f"- {date}")
+```
 
 ## Related Documentation
 
