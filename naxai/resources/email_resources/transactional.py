@@ -127,4 +127,5 @@ class TransactionalResource:
                                              self.root_path + "/send",
                                              json=data.model_dump(by_alias=True,
                                                                   exclude_none=True),
-                                             headers=self.headers)))
+                                             headers=self.headers,
+                                             timeout=30.0)))
