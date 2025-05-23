@@ -28,6 +28,7 @@ client.webhooks.create(
 )
 ```
 
+Request: [CreateWebhookRequest](../models/webhooks.md#createwebhookrequest)  
 Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
 
 Example:
@@ -65,6 +66,11 @@ client.webhooks.update(
     ]]
 )
 ```
+
+Request Models:
+- [UpdateWebhookJsonPathRequestAddReplace](../models/webhooks.md#updatewebhookjsonpathrequestaddreplace)
+- [UpdateWebhookJsonPathRequestMoveCopy](../models/webhooks.md#updatewebhookjsonpathrequestmovecopy)
+- [UpdateWebhookJsonPathRequestRemove](../models/webhooks.md#updatewebhookjsonpathrequestremove)
 
 Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
 

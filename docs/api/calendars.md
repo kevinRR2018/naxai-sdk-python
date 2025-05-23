@@ -18,6 +18,7 @@ client.calendars.create(
 )
 ```
 
+Request: [CreateCalendarRequest](../models/calendars.md#createcalendarrequest)  
 Returns: [CreateCalendarResponse](../models/calendars.md#createcalendarresponse)
 
 The `ScheduleObject` for each day contains:
@@ -77,6 +78,7 @@ client.calendars.update(
 )
 ```
 
+Request: [CreateCalendarRequest](../models/calendars.md#createcalendarrequest)  
 Returns: [UpdateCalendarResponse](../models/calendars.md#updatecalendarresponse)
 
 Example:
