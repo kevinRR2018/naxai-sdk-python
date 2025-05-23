@@ -252,8 +252,8 @@ logs = client.voice.activity_logs.list(
     page_size=25,
     status="failed"
 )
-print(f"Found {logs.pagination.total_items} failed calls")
-for call in logs.calls:
+print(f"Found {logs.pagination.total_record} failed calls")
+for call in logs.items:
     print(f"Call {call.call_id}: {call.from_} → {call.to}")
     print(f"Failed at: {call.call_date}, Reason: {call.reason}")
 ```
@@ -273,7 +273,10 @@ print(f"Call from {call.from_} to {call.to}")
 print(f"Status: {call.status}")
 print(f"Duration: {call.call_duration} seconds")
 if call.transferred:
-    print(f"Transferred to: {call.transfer_to}")
+    transfer_call = client.voice.activity_logs.get(call.transfer_call_id)
+    print(f"Transfer from {transfer_call.from_} to {transfer_call.to}")
+    print(f"Transfer Status: {transfer_call.status}")
+    print(f"Transfer Duration: {transfer_call.call_duration} seconds")
 ```
 
 ## Related Documentation
