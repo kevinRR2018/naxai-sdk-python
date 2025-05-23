@@ -22,6 +22,8 @@ client.sms.send(
 )
 ```
 
+Returns: [SendSMSResponse](../models/sms.md#sendsmsresponse)
+
 Example:
 ```python
 # Send to single recipient
@@ -59,6 +61,8 @@ client.sms.activity_logs.list(
 )
 ```
 
+Returns: [ListSMSActivityLogsResponse](../models/sms.md#listsmsactivitylogsresponse)
+
 Example:
 ```python
 # Get all failed messages from last 24 hours
@@ -79,6 +83,8 @@ logs = client.sms.activity_logs.list(
 client.sms.activity_logs.get(message_id: str)
 ```
 
+Returns: [GetSMSActivityLogsResponse](../models/sms.md#getsmsactivitylogsresponse)
+
 ## Reporting Resource
 
 ### Outgoing Metrics
@@ -90,6 +96,8 @@ client.sms.reporting.list_outgoing_metrics(
 )
 ```
 
+Returns: [ListOutgoingSMSMetricsResponse](../models/sms.md#listoutgoingsmsmetricsresponse)
+
 ### Outgoing Metrics By Country
 ```python
 client.sms.reporting.list_by_country(
@@ -97,6 +105,8 @@ client.sms.reporting.list_by_country(
     stop_date: str              # YYYY-MM-DD
 )
 ```
+
+Returns: [ListOutgoingSMSByCountryMetricsResponse](../models/sms.md#listoutgoingsmsbycountrymetricsresponse)
 
 ### Incoming Metrics
 ```python
@@ -107,6 +117,8 @@ client.sms.reporting.list_incoming_metrics(
 )
 ```
 
+Returns: [ListIncomingSMSMetricsResponse](../models/sms.md#listincomingsmsmetricsresponse)
+
 ### Delivery Errors
 ```python
 client.sms.reporting.list_delivery_errors_metrics(
@@ -115,6 +127,7 @@ client.sms.reporting.list_delivery_errors_metrics(
 )
 ```
 
+Returns: [ListDeliveryErrorMetricsResponse](../models/sms.md#listdeliveryerrormetricsresponse)
 
 Example:
 ```python

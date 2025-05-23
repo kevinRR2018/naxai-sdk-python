@@ -28,6 +28,8 @@ client.webhooks.create(
 )
 ```
 
+Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
+
 Example:
 ```python
 from naxai.models.webhooks.helper_models.authentication import BasicAuthModel
@@ -64,6 +66,8 @@ client.webhooks.update(
 )
 ```
 
+Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
+
 The update method uses JSON Patch operations (RFC 6902) to modify webhook configurations:
 
 ```python
@@ -91,6 +95,8 @@ updated = client.webhooks.update("whk_123", updates)
 client.webhooks.get(webhook_id: str)
 ```
 
+Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
+
 Example:
 ```python
 webhook = client.webhooks.get("whk_123")
@@ -104,6 +110,8 @@ print(f"Event names: {webhook.event_names}")
 ```python
 client.webhooks.list()
 ```
+
+Returns: [ListWebhooksResponse](../models/webhooks.md#listwebhooksresponse)
 
 Example:
 ```python
@@ -119,6 +127,8 @@ for webhook in webhooks:
 client.webhooks.delete(webhook_id: str)
 ```
 
+Returns: None
+
 ## Event Management
 
 ### List Available Events
@@ -126,12 +136,14 @@ client.webhooks.delete(webhook_id: str)
 client.webhooks.list_events()
 ```
 
-Returns a list of all event types that can be subscribed to.
+Returns: [ListEventTypesResponse](../models/webhooks.md#listeventtypesresponse)
 
 ### List Recent Events
 ```python
 client.webhooks.list_last_events(webhook_id: str)
 ```
+
+Returns: [ListLastWebhookEventsResponse](../models/webhooks.md#listlastwebhookeventsresponse)
 
 Example:
 ```python

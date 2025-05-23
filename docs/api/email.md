@@ -21,6 +21,8 @@ client.email.send(
 )
 ```
 
+Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
+
 Example:
 ```python
 # Basic email with both HTML and text content
@@ -73,6 +75,7 @@ client.email.transactional.send(
 )
 ```
 
+Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
 
 Example:
 ```python
@@ -116,6 +119,8 @@ client.email.activity_logs.list(
     status: Optional[Literal["sent", "delivered", "failed"]] = None  # Filter by status
 )
 ```
+
+Returns: [ListEmailActivityLogsResponse](../models/email.md#listemailactivitylogsresponse)
 
 Example:
 ```python
@@ -189,6 +194,8 @@ client.email.activity_logs.get(
     email: str        # Recipient email address
 )
 ```
+
+Returns: [GetEmailActivityLogsResponse](../models/email.md#getemailactivitylogsresponse)
 
 Example:
 ```python

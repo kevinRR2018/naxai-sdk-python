@@ -1,210 +1,260 @@
 # Error Handling
 
-This guide covers error handling in the Naxai SDK, including common exceptions, error types, and best practices for handling errors.
+This guide covers error handling in the Naxai SDK, including exception types, error handling strategies, and best practices.
 
-## Exception Types
+## Exception Hierarchy
 
-### NaxaiError
+### NaxaiException
 Base exception class for all Naxai SDK errors.
 
 ```python
-class NaxaiError(Exception):
-    """Base exception for all Naxai SDK errors."""
-    pass
-```
-
-### APIError
-Raised when the API returns an error response.
-
-```python
-class APIError(NaxaiError):
-    def __init__(self, message: str, status_code: int, error_code: str, request_id: str):
+class NaxaiException(Exception):
+    def __init__(self, message: str,
+                 status_code: Optional[int] = None,
+                 error_code: Optional[str] = None,
+                 details: Optional[Any] = None):
+        self.message = message
         self.status_code = status_code
         self.error_code = error_code
-        self.request_id = request_id
-        super().__init__(message)
+        self.details = details
 ```
 
-### ValidationError
-Raised when request validation fails.
+### Specific Exception Types
 
+#### NaxaiAuthenticationError
+Raised for authentication failures (401 errors).
 ```python
-class ValidationError(NaxaiError):
-    def __init__(self, message: str, errors: Dict[str, List[str]]):
-        self.errors = errors
-        super().__init__(message)
+class NaxaiAuthenticationError(NaxaiException):
+    """Raised when API credentials are invalid or expired."""
 ```
 
-### AuthenticationError
-Raised for authentication failures.
-
+#### NaxaiAuthorizationError
+Raised for authorization failures (403 errors).
 ```python
-class AuthenticationError(APIError):
-    pass
+class NaxaiAuthorizationError(NaxaiException):
+    """Raised when the request lacks sufficient permissions."""
 ```
 
-### RateLimitError
-Raised when API rate limits are exceeded.
-
+#### NaxaiResourceNotFound
+Raised when requested resources don't exist (404 errors).
 ```python
-class RateLimitError(APIError):
-    def __init__(self, message: str, retry_after: int, *args, **kwargs):
-        self.retry_after = retry_after
-        super().__init__(message, *args, **kwargs)
+class NaxaiResourceNotFound(NaxaiException):
+    """Raised when the requested resource is not found."""
 ```
 
-## Common Error Codes
-
-| Error Code | Description | HTTP Status | Handling Strategy |
-|------------|-------------|-------------|-------------------|
-| `authentication_failed` | Invalid API credentials | 401 | Verify API key and permissions |
-| `invalid_request` | Malformed request data | 400 | Check request parameters |
-| `rate_limit_exceeded` | Too many requests | 429 | Implement backoff and retry |
-| `resource_not_found` | Requested resource doesn't exist | 404 | Verify resource IDs |
-| `permission_denied` | Insufficient permissions | 403 | Check account permissions |
-| `service_error` | Internal service error | 500 | Retry with exponential backoff |
-
-## Error Handling Best Practices
-
-### 1. Use Try-Except Blocks
-
+#### NaxaiRateLimitExceeded
+Raised when API rate limits are exceeded (429 errors).
 ```python
-try:
-    response = client.email.send(data={
-        "to": "recipient@example.com",
-        "subject": "Test Email",
-        "content": "Hello World"
-    })
-except ValidationError as e:
-    logger.error(f"Invalid request data: {e.errors}")
-    # Handle validation errors
-except RateLimitError as e:
-    logger.warning(f"Rate limit exceeded. Retry after {e.retry_after} seconds")
-    time.sleep(e.retry_after)
-    # Retry request
-except APIError as e:
-    logger.error(f"API error: {e.error_code} ({e.status_code})")
-    # Handle API errors
-except NaxaiError as e:
-    logger.error(f"Unexpected error: {e}")
-    # Handle unexpected errors
+class NaxaiRateLimitExceeded(NaxaiException):
+    """Raised when too many requests are made in a given time period."""
 ```
 
-### 2. Implement Retry Logic
-
+#### NaxaiInvalidRequestError
+Raised for invalid request data (422 errors).
 ```python
-from tenacity import retry, stop_after_attempt, wait_exponential
-
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=4, max=10),
-    retry=retry_if_exception_type(RateLimitError)
-)
-def send_email_with_retry(client, data):
-    return client.email.send(data=data)
+class NaxaiInvalidRequestError(NaxaiException):
+    """Raised when the request contains invalid data."""
 ```
 
-### 3. Log Error Details
-
+#### NaxaiAPIRequestError
+Raised for other API errors.
 ```python
-def log_api_error(e: APIError):
-    logger.error({
-        "error": str(e),
-        "status_code": e.status_code,
-        "error_code": e.error_code,
-        "request_id": e.request_id,
-        "timestamp": datetime.utcnow().isoformat()
-    })
+class NaxaiAPIRequestError(NaxaiException):
+    """Raised for general API errors not covered by other exceptions."""
 ```
 
-### 4. Handle Async Errors
-
+#### NaxaiValueError
+Raised for invalid client configuration.
 ```python
-async def handle_webhook_async(event_data):
-    try:
-        await process_event(event_data)
-    except ValidationError as e:
-        await log_validation_error(e)
-        raise
-    except APIError as e:
-        await log_api_error(e)
-        # Determine if event should be retried
-        if is_retryable_error(e):
-            await requeue_event(event_data)
+class NaxaiValueError(NaxaiException):
+    """Raised when client initialization parameters are invalid."""
 ```
 
 ## Error Response Structure
 
 API errors follow this structure:
-
 ```python
 {
     "error": {
-        "code": "rate_limit_exceeded",
-        "message": "API rate limit exceeded",
-        "request_id": "req_abc123",
-        "details": {
-            "retry_after": 30
+        "code": "error_code",        # Error type identifier
+        "message": "Error message",   # Human-readable description
+        "details": {                  # Additional error context
+            "field1": "detail1",
+            "field2": "detail2"
         }
     }
 }
 ```
 
-## Handling Specific Scenarios
+## Handling Errors
 
-### Rate Limiting
+### Synchronous Usage
 
 ```python
-def handle_rate_limit(e: RateLimitError):
-    """Handle rate limit errors with exponential backoff."""
-    retry_after = e.retry_after
-    
-    for attempt in range(3):
+from naxai import NaxaiClient
+from naxai.base.exceptions import (
+    NaxaiAuthenticationError,
+    NaxaiRateLimitExceeded,
+    NaxaiException
+)
+
+try:
+    with NaxaiClient(
+        api_client_id="your_client_id",
+        api_client_secret="your_client_secret"
+    ) as client:
+        response = client.email.transactional.send(
+            sender={"email": "sender@domain.com", "name": "Sender"},
+            to=[{"email": "recipient@domain.com", "name": "Recipient"}],
+            subject="Test Email",
+            text="Hello World"
+        )
+except NaxaiAuthenticationError as e:
+    print(f"Authentication failed: {e.message}")
+    print(f"Status code: {e.status_code}")
+    print(f"Error code: {e.error_code}")
+except NaxaiRateLimitExceeded as e:
+    print(f"Rate limit exceeded: {e.message}")
+    print(f"Details: {e.details}")  # May contain retry_after information
+except NaxaiException as e:
+    print(f"API error: {e.message}")
+    print(f"Status: {e.status_code}")
+    print(f"Error code: {e.error_code}")
+    print(f"Details: {e.details}")
+```
+
+### Asynchronous Usage
+
+```python
+from naxai import NaxaiAsyncClient
+from naxai.base.exceptions import NaxaiException
+import asyncio
+
+async def send_email():
+    try:
+        async with NaxaiAsyncClient(
+            api_client_id="your_client_id",
+            api_client_secret="your_client_secret"
+        ) as client:
+            return await client.email.transactional.send(
+                sender={"email": "sender@domain.com", "name": "Sender"},
+                to=[{"email": "recipient@domain.com", "name": "Recipient"}],
+                subject="Test Email",
+                text="Hello World"
+            )
+    except NaxaiException as e:
+        print(f"Error: {e.message} (Status: {e.status_code}, Code: {e.error_code})")
+        raise
+
+# Run the async function
+asyncio.run(send_email())
+```
+
+## Best Practices
+
+### 1. Use Context Managers
+
+Always use the client with context managers to ensure proper resource cleanup:
+
+```python
+# Synchronous
+with NaxaiClient(...) as client:
+    client.sms.send(...)
+
+# Asynchronous
+async with NaxaiAsyncClient(...) as client:
+    await client.sms.send(...)
+```
+
+### 2. Implement Retries for Rate Limits
+
+```python
+import time
+from naxai.base.exceptions import NaxaiRateLimitExceeded
+
+def send_with_retry(client, max_retries=3):
+    for attempt in range(max_retries):
         try:
+            return client.sms.send(...)
+        except NaxaiRateLimitExceeded as e:
+            if attempt == max_retries - 1:
+                raise
+            retry_after = e.details.get('retry_after', 60)
             time.sleep(retry_after)
-            # Retry the request
-            return make_request()
-        except RateLimitError as e:
-            retry_after *= 2
-    
-    # Max retries exceeded
-    raise MaxRetriesExceeded()
 ```
 
-### Validation Errors
+### 3. Handle Authentication Errors
 
 ```python
-def handle_validation_error(e: ValidationError):
-    """Handle validation errors with detailed logging."""
-    for field, errors in e.errors.items():
-        for error in errors:
-            logger.error(f"Validation error in {field}: {error}")
-    
-    # Clean/fix data if possible
-    if can_fix_data(e.errors):
-        return fix_and_retry()
+from naxai.base.exceptions import NaxaiAuthenticationError
+
+try:
+    client.voice.call.create(...)
+except NaxaiAuthenticationError as e:
+    if e.status_code == 401:
+        # Token expired, client will automatically refresh
+        retry_request()
     else:
-        raise DataValidationFailed()
+        # Invalid credentials
+        log_authentication_failure(e)
+        raise
 ```
 
-### Network Errors
+### 4. Log Error Details
 
 ```python
-def handle_network_error(e: RequestException):
-    """Handle network-related errors."""
-    if isinstance(e, ConnectTimeout):
-        logger.warning("Connection timeout - retrying")
-        return retry_with_backoff()
-    elif isinstance(e, ReadTimeout):
-        logger.warning("Read timeout - retrying")
-        return retry_with_backoff()
-    else:
-        logger.error(f"Network error: {e}")
-        raise NetworkError(str(e))
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    client.webhooks.create(...)
+except NaxaiException as e:
+    logger.error(
+        "API error occurred",
+        extra={
+            "status_code": e.status_code,
+            "error_code": e.error_code,
+            "message": e.message,
+            "details": e.details
+        }
+    )
 ```
+
+### 5. Validate Input Before Sending
+
+```python
+from pydantic import ValidationError
+
+try:
+    request = SendTransactionalEmailRequest(
+        sender=sender_data,
+        to=recipient_data,
+        subject=subject,
+        text=text_content
+    )
+    client.email.transactional.send(request)
+except ValidationError as e:
+    # Handle validation error before API call
+    print(f"Invalid request data: {e.errors()}")
+except NaxaiInvalidRequestError as e:
+    # Handle API validation error
+    print(f"API rejected request: {e.message}")
+```
+
+## Common Error Codes
+
+| HTTP Status | Error Code | Description | Handling Strategy |
+|------------|------------|-------------|-------------------|
+| 401 | authentication_failed | Invalid or expired credentials | Refresh credentials or re-authenticate |
+| 403 | permission_denied | Insufficient permissions | Check API key permissions |
+| 404 | resource_not_found | Resource doesn't exist | Verify resource IDs and paths |
+| 422 | invalid_request | Invalid request data | Validate input data |
+| 429 | rate_limit_exceeded | Too many requests | Implement backoff and retry |
+| 500 | server_error | Internal server error | Retry with exponential backoff |
 
 ## Related Documentation
 
-- [Best Practices](best-practices.md)
-- [Response Types](response-types.md)
-- [Version Compatibility](version-compatibility.md) 
+- [API Reference](./api-reference.md)
+- [Client Configuration](./configuration.md)
+- [Best Practices](./best-practices.md) 

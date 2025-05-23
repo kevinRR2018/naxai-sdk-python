@@ -2,271 +2,276 @@
 
 This guide outlines best practices for using the Naxai SDK effectively, securely, and efficiently.
 
-## SDK Initialization
+## Client Configuration
 
-### Client Configuration
+### Synchronous Client
 
 ```python
-from naxai import Client
+from naxai import NaxaiClient
 
-# Best Practice: Use environment variables for sensitive data
-client = Client(
-    api_key=os.environ.get("NAXAI_API_KEY"),
-    environment="production",  # or "sandbox" for testing
-    timeout=30,  # Set reasonable timeouts
-    max_retries=3  # Configure retry behavior
+# Use environment variables for credentials
+client = NaxaiClient(
+    api_client_id=os.environ.get("NAXAI_CLIENT_ID"),
+    api_client_secret=os.environ.get("NAXAI_SECRET"),
+    api_version=os.environ.get("NAXAI_API_VERSION"),  # Optional, defaults to latest
+    auth_url=os.environ.get("NAXAI_AUTH_URL"),       # Optional, defaults to standard URL
+    api_base_url=os.environ.get("NAXAI_API_URL")     # Optional, defaults to standard URL
 )
 ```
 
-### Async Client Configuration
+### Asynchronous Client
 
 ```python
-from naxai import AsyncClient
+from naxai import NaxaiAsyncClient
 
 async def initialize_client():
-    client = AsyncClient(
-        api_key=os.environ.get("NAXAI_API_KEY"),
-        environment="production",
-        max_connections=10  # Limit concurrent connections
+    client = NaxaiAsyncClient(
+        api_client_id=os.environ.get("NAXAI_CLIENT_ID"),
+        api_client_secret=os.environ.get("NAXAI_SECRET")
     )
     return client
 ```
 
-## Performance Optimization
+## Resource Management
 
-### 1. Connection Pooling
+### Using Context Managers
+
+Always use context managers to ensure proper resource cleanup:
 
 ```python
-# Reuse client instances
-client = Client(
-    api_key=os.environ.get("NAXAI_API_KEY"),
-    pool_connections=10,
-    pool_maxsize=10
-)
+# Synchronous usage
+with NaxaiClient(api_client_id="id", api_client_secret="secret") as client:
+    response = client.email.send(
+        sender={"email": "sender@domain.com", "name": "Sender"},
+        to=[{"email": "recipient@domain.com", "name": "Recipient"}],
+        subject="Hello",
+        text="Hello World!"
+    )
 
-# Don't do this
-def bad_practice():
-    client = Client(api_key="...")  # Creates new connection pool each time
-    client.email.send(...)
+# Asynchronous usage
+async with NaxaiAsyncClient(api_client_id="id", api_client_secret="secret") as client:
+    response = await client.email.send(
+        sender={"email": "sender@domain.com", "name": "Sender"},
+        to=[{"email": "recipient@domain.com", "name": "Recipient"}],
+        subject="Hello",
+        text="Hello World!"
+    )
 ```
 
-### 2. Batch Operations
+### Manual Resource Cleanup
+
+If not using context managers, ensure proper cleanup:
 
 ```python
-# Good: Use batch operations when possible
-contacts = client.people.create_batch(data=[
-    {"email": "user1@example.com", "name": "User 1"},
-    {"email": "user2@example.com", "name": "User 2"},
-    {"email": "user3@example.com", "name": "User 3"}
-])
+# Synchronous
+client = NaxaiClient(api_client_id="id", api_client_secret="secret")
+try:
+    # Use client
+    response = client.sms.send(...)
+finally:
+    client.close()
 
-# Bad: Multiple individual requests
-def bad_practice():
-    for user in users:
-        client.people.create(data=user)  # Creates separate request for each
-```
-
-### 3. Async Operations
-
-```python
-async def process_contacts(contacts):
-    async with AsyncClient(api_key=os.environ.get("NAXAI_API_KEY")) as client:
-        tasks = [
-            client.people.get(contact_id)
-            for contact_id in contacts
-        ]
-        results = await asyncio.gather(*tasks)
-        return results
-```
-
-## Security Best Practices
-
-### 1. API Key Management
-
-```python
-# Good: Use environment variables
-api_key = os.environ.get("NAXAI_API_KEY")
-
-# Good: Use secrets manager
-from aws_secretsmanager_caching import SecretCache
-secret_cache = SecretCache()
-api_key = secret_cache.get_secret_string("NAXAI_API_KEY")
-
-# Bad: Hardcoded credentials
-api_key = "sk_live_..."  # Never do this
-```
-
-### 2. Webhook Security
-
-```python
-def verify_webhook(request):
-    payload = request.get_data()
-    signature = request.headers.get("X-Naxai-Signature")
-    
-    # Always verify webhook signatures
-    if not client.webhooks.verify_signature(
-        payload=payload,
-        signature=signature,
-        secret=os.environ.get("WEBHOOK_SECRET")
-    ):
-        raise SecurityError("Invalid webhook signature")
-```
-
-### 3. Data Validation
-
-```python
-# Validate input data before sending
-def send_email(recipient, subject, content):
-    if not is_valid_email(recipient):
-        raise ValidationError("Invalid email address")
-        
-    if len(content) > MAX_CONTENT_LENGTH:
-        raise ValidationError("Content exceeds maximum length")
-        
-    return client.email.send(data={
-        "to": recipient,
-        "subject": subject,
-        "content": content
-    })
+# Asynchronous
+client = NaxaiAsyncClient(api_client_id="id", api_client_secret="secret")
+try:
+    # Use client
+    response = await client.sms.send(...)
+finally:
+    await client.aclose()
 ```
 
 ## Error Handling
 
-### 1. Proper Exception Handling
+### Comprehensive Exception Handling
 
 ```python
-try:
-    result = client.email.send(data=email_data)
-except ValidationError as e:
-    # Handle validation errors
-    logger.error(f"Validation error: {e.errors}")
-    raise
-except RateLimitError as e:
-    # Implement backoff and retry
-    logger.warning(f"Rate limit hit, retry after {e.retry_after}s")
-    time.sleep(e.retry_after)
-    retry_request()
-except APIError as e:
-    # Handle API errors
-    logger.error(f"API error: {e.error_code}")
-    handle_api_error(e)
-```
-
-### 2. Retry Strategy
-
-```python
-from tenacity import retry, stop_after_attempt, wait_exponential
-
-@retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=4, max=10),
-    retry=retry_if_exception_type((RateLimitError, NetworkError))
+from naxai.base.exceptions import (
+    NaxaiAuthenticationError,
+    NaxaiAuthorizationError,
+    NaxaiResourceNotFound,
+    NaxaiRateLimitExceeded,
+    NaxaiInvalidRequestError,
+    NaxaiException
 )
-def send_with_retry(client, data):
-    return client.email.send(data=data)
-```
 
-## Resource Management
-
-### 1. Context Managers
-
-```python
-# Use context managers for proper cleanup
-async with AsyncClient(api_key=api_key) as client:
-    await client.email.send(data=email_data)
-```
-
-### 2. Connection Cleanup
-
-```python
-# Ensure proper cleanup of resources
-client = Client(api_key=api_key)
 try:
-    # Use client
-    client.email.send(data=email_data)
-finally:
-    client.close()  # Always close when done
+    response = client.voice.call.create(
+        to=["+1234567890"],
+        from_="+0987654321",
+        welcome={"say": "Welcome message"}
+    )
+except NaxaiAuthenticationError as e:
+    # Handle authentication failures
+    logger.error(f"Authentication failed: {e.message}")
+    refresh_credentials()
+except NaxaiRateLimitExceeded as e:
+    # Handle rate limiting
+    retry_after = e.details.get('retry_after', 60)
+    logger.warning(f"Rate limit exceeded, retry after {retry_after}s")
+    time.sleep(retry_after)
+except NaxaiResourceNotFound as e:
+    # Handle missing resources
+    logger.error(f"Resource not found: {e.message}")
+    cleanup_invalid_reference()
+except NaxaiException as e:
+    # Handle all other API errors
+    logger.error(f"API error: {e.message}", extra={
+        "status_code": e.status_code,
+        "error_code": e.error_code,
+        "details": e.details
+    })
 ```
 
-## Testing Best Practices
-
-### 1. Use Test Environment
+### Implementing Retries
 
 ```python
-# Use sandbox environment for testing
-test_client = Client(
-    api_key=os.environ.get("NAXAI_TEST_API_KEY"),
-    environment="sandbox"
+import time
+from naxai.base.exceptions import NaxaiRateLimitExceeded
+
+def send_with_retry(client, max_retries=3, base_delay=1):
+    for attempt in range(max_retries):
+        try:
+            return client.sms.send(...)
+        except NaxaiRateLimitExceeded as e:
+            if attempt == max_retries - 1:
+                raise
+            delay = e.details.get('retry_after', base_delay * (2 ** attempt))
+            time.sleep(delay)
+```
+
+## Authentication Best Practices
+
+### Token Management
+
+The SDK handles token management automatically:
+- Tokens are acquired during the first API request
+- Tokens are refreshed automatically when expired
+- Token expiration is checked with a 60-second buffer
+
+```python
+# Token is managed automatically
+with NaxaiClient(api_client_id="id", api_client_secret="secret") as client:
+    # Token acquired on first request
+    response1 = client.sms.send(...)
+    
+    # Same token reused if valid
+    response2 = client.email.transactional.send(...)
+    
+    # Token refreshed automatically if expired
+    response3 = client.voice.call.create(...)
+```
+
+### Secure Credential Storage
+
+```python
+# Use environment variables
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+client = NaxaiClient(
+    api_client_id=os.environ["NAXAI_CLIENT_ID"],
+    api_client_secret=os.environ["NAXAI_SECRET"]
+)
+
+# Or use a secrets manager
+from aws_secretsmanager_caching import SecretCache
+
+secret_cache = SecretCache()
+credentials = secret_cache.get_secret_string("naxai/credentials")
+
+client = NaxaiClient(
+    api_client_id=credentials["client_id"],
+    api_client_secret=credentials["client_secret"]
 )
 ```
 
-### 2. Mock API Responses
+## Logging
 
-```python
-from unittest.mock import patch
-
-def test_send_email():
-    with patch("naxai.resources.EmailResource.send") as mock_send:
-        mock_send.return_value = {"message_id": "msg_123"}
-        result = client.email.send(data=email_data)
-        assert result["message_id"] == "msg_123"
-```
-
-### 3. Integration Tests
-
-```python
-def test_email_workflow():
-    # Create test contact
-    contact = client.people.create(data={
-        "email": "test@example.com",
-        "name": "Test User"
-    })
-    
-    # Send test email
-    email = client.email.send(data={
-        "to": contact["email"],
-        "subject": "Test Email",
-        "content": "Hello World"
-    })
-    
-    # Verify delivery
-    status = client.email.get_status(email["message_id"])
-    assert status["delivered"] is True
-```
-
-## Logging and Monitoring
-
-### 1. Request Logging
+The SDK includes built-in logging:
 
 ```python
 import logging
 
-logging.basicConfig(level=logging.INFO)
+# Configure logging
 logger = logging.getLogger("naxai")
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
-def log_request(method, path, response):
-    logger.info({
-        "method": method,
-        "path": path,
-        "status": response.status_code,
-        "duration": response.elapsed.total_seconds()
-    })
+# Create client with configured logger
+client = NaxaiClient(
+    api_client_id="id",
+    api_client_secret="secret",
+    logger=logger
+)
 ```
 
-### 2. Error Tracking
+## Model Validation
+
+Use Pydantic models for request validation:
 
 ```python
-def track_error(e: APIError):
-    logger.error({
-        "error_code": e.error_code,
-        "status_code": e.status_code,
-        "request_id": e.request_id,
-        "timestamp": datetime.utcnow().isoformat()
-    })
+from naxai.models.email import SendTransactionalEmailRequest
+from pydantic import ValidationError
+
+try:
+    request = SendTransactionalEmailRequest(
+        sender={
+            "email": "sender@domain.com",
+            "name": "Sender Name"
+        },
+        to=[{
+            "email": "recipient@domain.com",
+            "name": "Recipient Name"
+        }],
+        subject="Hello",
+        text="Hello World!",
+        html="<p>Hello World!</p>"
+    )
+    response = client.email.transactional.send(request)
+except ValidationError as e:
+    logger.error("Invalid request data:", e.errors())
+```
+
+## Testing
+
+### Using Environment Variables
+
+```python
+# test_config.py
+import os
+os.environ["NAXAI_CLIENT_ID"] = "test_client_id"
+os.environ["NAXAI_SECRET"] = "test_client_secret"
+os.environ["NAXAI_API_URL"] = "https://api.test.naxai.com"
+```
+
+### Mocking API Responses
+
+```python
+from unittest.mock import patch
+
+def test_send_sms():
+    with patch("naxai.client.NaxaiClient._request") as mock_request:
+        mock_request.return_value = {
+            "batch_id": "batch_123",
+            "messages": [{"message_id": "msg_123"}]
+        }
+        
+        with NaxaiClient(api_client_id="test", api_client_secret="test") as client:
+            response = client.sms.send(
+                to=["+1234567890"],
+                text="Test message"
+            )
+            
+        assert response["batch_id"] == "batch_123"
 ```
 
 ## Related Documentation
 
-- [Error Handling](error-handling.md)
-- [Response Types](response-types.md)
-- [Version Compatibility](version-compatibility.md) 
+- [API Reference](./api-reference.md)
+- [Error Handling](./error-handling.md)
+- [Models Reference](./models/README.md) 

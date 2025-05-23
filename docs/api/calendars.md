@@ -18,6 +18,8 @@ client.calendars.create(
 )
 ```
 
+Returns: [CreateCalendarResponse](../models/calendars.md#createcalendarresponse)
+
 The `ScheduleObject` for each day contains:
 ```python
 {
@@ -75,6 +77,8 @@ client.calendars.update(
 )
 ```
 
+Returns: [UpdateCalendarResponse](../models/calendars.md#updatecalendarresponse)
+
 Example:
 ```python
 # Update calendar configuration
@@ -102,6 +106,8 @@ print(f"Updated calendar: {updated.name}")
 client.calendars.get(calendar_id: str)
 ```
 
+Returns: [GetCalendarResponse](../models/calendars.md#getcalendarresponse)
+
 Example:
 ```python
 calendar = client.calendars.get("cal_123")
@@ -116,6 +122,8 @@ for day in calendar.schedule:
 client.calendars.list()
 ```
 
+Returns: [ListCalendarsResponse](../models/calendars.md#listcalendarsresponse)
+
 Example:
 ```python
 calendars = client.calendars.list()
@@ -127,6 +135,8 @@ for calendar in calendars:
 ```python
 client.calendars.delete(calendar_id: str)
 ```
+
+Returns: None
 
 ## Best Practices
 

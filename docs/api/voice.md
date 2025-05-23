@@ -20,6 +20,8 @@ client.voice.call.create(
 )
 ```
 
+Returns: [CreateCallResponse](../models/voice.md#createcallresponse)
+
 Example:
 ```python
 response = client.voice.call.create(
@@ -39,15 +41,21 @@ print(f"Call ID: {response.call_id}")
 client.voice.broadcasts.create(data: CreateBroadcastRequest)
 ```
 
+Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
+
 ### List Broadcasts
 ```python
 client.voice.broadcasts.list()
 ```
 
+Returns: [ListBroadcastsResponse](../models/voice.md#listbroadcastsresponse)
+
 ### Get Broadcast Details
 ```python
 client.voice.broadcasts.get(broadcast_id: str)
 ```
+
+Returns: [GetBroadcastResponse](../models/voice.md#getbroadcastresponse)
 
 ### Update a Broadcast
 ```python
@@ -56,6 +64,8 @@ client.voice.broadcasts.update(
     data: CreateBroadcastRequest
 )
 ```
+
+Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
 
 ### Control Broadcast
 ```python
@@ -75,6 +85,8 @@ client.voice.broadcasts.cancel(broadcast_id: str)
 client.voice.broadcasts.delete(broadcast_id: str)
 ```
 
+All control operations return: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
+
 ## Broadcast Metrics
 
 ### Get Metrics
@@ -82,10 +94,14 @@ client.voice.broadcasts.delete(broadcast_id: str)
 client.voice.broadcasts.metrics.get(broadcast_id: str)
 ```
 
+Returns: [GetBroadcastMetricsResponse](../models/voice.md#getbroadcastmetricsresponse)
+
 ### Get Input Metrics
 ```python
 client.voice.broadcasts.metrics.input.get(broadcast_id: str)
 ```
+
+Returns: [GetBroadcastInputMetricsResponse](../models/voice.md#getbroadcastinputmetricsresponse)
 
 ## Recipients Resource
 
@@ -101,6 +117,8 @@ client.voice.broadcasts.recipients.list(
 )
 ```
 
+Returns: [ListBroadcastRecipientsResponse](../models/voice.md#listbroadcastrecipientsresponse)
+
 ### Get Recipient Details
 ```python
 client.voice.broadcasts.recipients.get(
@@ -109,6 +127,8 @@ client.voice.broadcasts.recipients.get(
 )
 ```
 
+Returns: [GetBroadcastRecipientResponse](../models/voice.md#getbroadcastrecipientresponse)
+
 ### List Recipient Calls
 ```python
 client.voice.broadcasts.recipients.calls.list(
@@ -116,6 +136,8 @@ client.voice.broadcasts.recipients.calls.list(
     recipient_id: str
 )
 ```
+
+Returns: [ListBroadcastRecipientCallsResponse](../models/voice.md#listbroadcastrecipientcallsresponse)
 
 ## Reporting Resource
 
@@ -129,6 +151,8 @@ client.voice.reporting.inbound.list(
 )
 ```
 
+Returns: [ListInboundMetricsResponse](../models/voice.md#listinboundmetricsresponse)
+
 ### Outbound Metrics
 ```python
 client.voice.reporting.outbound.list(
@@ -139,6 +163,8 @@ client.voice.reporting.outbound.list(
 )
 ```
 
+Returns: [ListOutboundMetricsResponse](../models/voice.md#listoutboundmetricsresponse)
+
 ### Transfer Metrics
 ```python
 client.voice.reporting.transfer.list(
@@ -148,6 +174,8 @@ client.voice.reporting.transfer.list(
     phone: Optional[str] = None
 )
 ```
+
+Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsresponse)
 
 ## Activity Logs
 
@@ -168,10 +196,14 @@ client.voice.activity_logs.list(
 )
 ```
 
+Returns: [ListVoiceActivityLogsResponse](../models/voice.md#listvoiceactivitylogsresponse)
+
 ### Get Call Details
 ```python
 client.voice.activity_logs.get(call_id: str)
 ```
+
+Returns: [GetVoiceActivityLogResponse](../models/voice.md#getvoiceactivitylogresponse)
 
 ## Related Documentation
 

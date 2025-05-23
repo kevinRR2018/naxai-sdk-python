@@ -13,6 +13,8 @@ client.people.attributes.create(
 )
 ```
 
+Returns: [CreateAttributeResponse](../models/people.md#createattributeresponse)
+
 Example:
 ```python
 # Create a custom attribute
@@ -27,6 +29,8 @@ client.people.attributes.get(
 )
 ```
 
+Returns: [CreateAttributeResponse](../models/people.md#createattributeresponse)
+
 Example:
 ```python
 # Get attribute details
@@ -40,6 +44,8 @@ if attribute.segment_ids:
 ```python
 client.people.attributes.list()
 ```
+
+Returns: [ListAttributesResponse](../models/people.md#listattributesresponse)
 
 Example:
 ```python
@@ -72,6 +78,8 @@ client.people.attributes.delete(
 )
 ```
 
+Returns: None
+
 Example:
 ```python
 # Delete a custom attribute
@@ -91,6 +99,8 @@ client.people.contacts.search(
     condition: Optional[SearchCondition] = None  # Search conditions
 )
 ```
+
+Returns: [SearchContactsResponse](../models/people.md#searchcontactsresponse)
 
 Example:
 ```python
@@ -121,6 +131,8 @@ for contact in results.contacts:
 client.people.contacts.count()
 ```
 
+Returns: [CountContactsResponse](../models/people.md#countcontactsresponse)
+
 Example:
 ```python
 # Get total number of contacts
@@ -140,6 +152,8 @@ client.people.contacts.create_or_update(
     **kwargs  # Additional custom attributes
 )
 ```
+
+Returns: [CreateOrUpdateContactResponse](../models/people.md#createorupdatecontactresponse)
 
 Example:
 ```python
@@ -165,6 +179,8 @@ client.people.contacts.get(
 )
 ```
 
+Returns: [ContactBaseModel](../models/people.md#contactbasemodel)
+
 Example:
 ```python
 # Get contact details
@@ -179,6 +195,8 @@ client.people.contacts.delete(
     identifier: str    # Contact identifier
 )
 ```
+
+Returns: None
 
 Example:
 ```python
@@ -200,6 +218,8 @@ client.people.contacts.events.send(
     data: Optional[dict]       # Additional event data
 )
 ```
+
+Returns: None
 
 Example:
 ```python
@@ -229,6 +249,8 @@ print(f"Current identifier type: {identifier.identifier}")
 updated = client.people.contacts.identifier.update()
 print(f"Updated to: {updated.identifier}")
 ```
+
+Returns: [GetContactIdentifierResponse](../models/people.md#getcontactidentifierresponse)
 
 ## Segments Resource
 

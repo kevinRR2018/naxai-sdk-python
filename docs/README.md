@@ -23,8 +23,7 @@
   - [Webhook Models](./models/webhooks.md)
 - [Error Handling](./error-handling.md)
 - [Best Practices](./best-practices.md)
-- [Version Compatibility](./version-compatibility.md)
-- [Response Types](./response-types.md)
+
 
 ## Overview
 
