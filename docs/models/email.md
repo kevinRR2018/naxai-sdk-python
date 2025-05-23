@@ -9,40 +9,46 @@ Main model for sending transactional emails.
 
 ```python
 class SendTransactionalEmailRequest(BaseModel):
-    sender_email: str           # Sender's email address
-    sender_name: str           # Sender's display name
-    subject: str               # Email subject line
-    to: List[DestinationObject] # List of recipients (max 1000)
-    cc: Optional[List[CCObject]] = None  # CC recipients (max 50)
-    bcc: Optional[List[BCCObject]] = None  # BCC recipients (max 50)
+    sender: SenderObject           # Sender information
+    to: list[DestinationObject]   # List of recipients
+    cc: Optional[list[CCObject]] = None  # CC recipients
+    bcc: Optional[list[BCCObject]] = None  # BCC recipients
     reply_to: Optional[str] = None  # Reply-to email address
-    text: Optional[str] = None  # Plain text content
-    html: Optional[str] = None  # HTML content
-    attachments: Optional[List[Attachment]] = None  # File attachments
+    subject: str                  # Email subject line
+    text: Optional[str] = None    # Plain text content
+    html: Optional[str] = None    # HTML content
+    attachments: Optional[list[Attachment]] = None  # File attachments
     enable_tracking: Optional[bool] = None  # Enable open/click tracking
 ```
 
-### DestinationObject
-Model for email recipients.
+### SenderObject
+Model for email sender information.
 
 ```python
-class DestinationObject(BaseModel):
-    email: str                # Recipient email address
-    name: Optional[str] = None  # Recipient display name
-    metadata: Optional[Dict[str, Any]] = None  # Custom metadata
+class SenderObject(BaseObject):
+    email: str                # Sender's email address
+    name: str                # Sender's display name
 ```
 
-### CCObject and BCCObject
-Models for CC and BCC recipients.
+### DestinationObject, CCObject, BCCObject
+Models for email recipients.
 
 ```python
-class CCObject(BaseModel):
-    email: str                # CC recipient email
-    name: Optional[str] = None  # CC recipient name
+class BaseObject(BaseModel):
+    email: str                # Email address
+    name: str                # Display name
 
-class BCCObject(BaseModel):
-    email: str                # BCC recipient email
-    name: Optional[str] = None  # BCC recipient name
+class DestinationObject(BaseObject):
+    # Inherits email and name from BaseObject
+    pass
+
+class CCObject(BaseObject):
+    # Inherits email and name from BaseObject
+    pass
+
+class BCCObject(BaseObject):
+    # Inherits email and name from BaseObject
+    pass
 ```
 
 ### Attachment
@@ -50,31 +56,35 @@ Model for email attachments.
 
 ```python
 class Attachment(BaseModel):
-    filename: str             # Attachment filename
-    content: str             # Base64 encoded content
-    type: str                # MIME type
-    disposition: Optional[str] = "attachment"  # Content disposition
+    id: str                  # Unique attachment identifier
+    name: str               # Attachment filename
+    content_type: str       # MIME type
+    data: str              # Base64 encoded content
 ```
 
 Example usage:
 ```python
 # Creating a request with attachments
 request = SendTransactionalEmailRequest(
-    sender_email="sender@yourdomain.com",
-    sender_name="Your Name",
-    subject="Document Attached",
+    sender=SenderObject(
+        email="sender@yourdomain.com",
+        name="Your Name"
+    ),
     to=[
         DestinationObject(
             email="recipient@example.com",
-            name="Recipient Name",
-            metadata={"user_id": "123"}
+            name="Recipient Name"
         )
     ],
+    subject="Document Attached",
+    html="<h1>Hello</h1><p>Please find the document attached.</p>",
+    text="Hello\n\nPlease find the document attached.",
     attachments=[
         Attachment(
-            filename="document.pdf",
-            content=base64_encoded_content,
-            type="application/pdf"
+            id="att_123",
+            name="document.pdf",
+            content_type="application/pdf",
+            data=base64_encoded_content
         )
     ],
     enable_tracking=True
@@ -83,151 +93,194 @@ request = SendTransactionalEmailRequest(
 
 ## Response Models
 
-### EmailResponse
+### SendTransactionalEmailResponse
 Response model for email sending operations.
 
 ```python
-class EmailResponse(BaseModel):
-    id: str                  # Message ID
-    status: str             # Initial status
-    created_at: int         # Creation timestamp
+class SendTransactionalEmailResponse(BaseModel):
+    id: str                  # Unique email identifier
 ```
 
-### EmailActivityLog
-Model for email activity logs.
+### BaseActivityLogs
+Base model for email activity tracking.
 
 ```python
-class EmailActivityLog(BaseModel):
+class BaseActivityLogs(BaseModel):
     message_id: str          # Message ID
-    email: str              # Recipient email
-    status: str             # Current status
-    created_at: int         # Creation timestamp
-    updated_at: Optional[int] # Last update timestamp
-    error_code: Optional[str] # Error code if failed
-    error_message: Optional[str] # Error description
-    metadata: Optional[Dict[str, Any]] # Custom metadata
+    from_email: str         # Sender email
+    to_email: Optional[str] # Recipient email
+    subject: Optional[str]  # Email subject
+    status: Optional[Literal["sent", "delivered", "failed"]]  # Current status
+    created_at: Optional[int] # Creation timestamp (ms)
+    updated_at: Optional[int] # Last update timestamp (ms)
+    opens: Optional[int]    # Number of opens
+    clicks: Optional[int]   # Number of clicks
 ```
 
-Example:
+### EmailEvents
+Model for detailed email event tracking.
+
 ```python
-# Checking email status
-log = client.email.activity_logs.get(
-    message_id="msg_123abc",
-    email="recipient@example.com"
-)
-print(f"Status: {log.status}")
-if log.error_code:
-    print(f"Error: {log.error_message}")
+class EmailEvents(BaseModel):
+    name: Optional[str]     # Event name
+    processed: Optional[int] # Event timestamp
+    reason: Optional[Union[dict, str]] # Additional event details
+```
+
+### GetEmailActivityLogsResponse
+Detailed activity log response model.
+
+```python
+class GetEmailActivityLogsResponse(BaseActivityLogs):
+    events: Optional[list[EmailEvents]] = None  # Event history
+    email: Optional[str] = None        # Alternative recipient email
+    client_id: Optional[str] = None    # Client identifier
+    campaign_id: Optional[str] = None  # Campaign identifier
+```
+
+### ListEmailActivityLogsResponse
+Model for paginated activity logs.
+
+```python
+class ListEmailActivityLogsResponse(BaseModel):
+    pagination: Pagination  # Pagination information
+    messages: list[BaseActivityLogs]  # List of activity logs
 ```
 
 ## Metrics Models
 
-### EmailMetrics
-Model for email delivery and engagement metrics.
+### BaseStats
+Model for email engagement metrics.
 
 ```python
-class EmailMetrics(BaseModel):
-    date: str               # Date in YYYY-MM-DD format
-    sent: int              # Total emails sent
-    delivered: int         # Successfully delivered
-    failed: int           # Failed deliveries
-    opened: int           # Total opens
-    opened_unique: int    # Unique opens
-    clicked: int          # Total clicks
-    clicked_unique: int   # Unique clicks
-    unsubscribed: int    # Unsubscribe count
-    complained: int      # Spam complaints
+class BaseStats(BaseModel):
+    date: Optional[int]     # Timestamp for stats period
+    sent: Optional[int]     # Emails sent
+    delivered: Optional[int] # Successfully delivered
+    opened: Optional[int]   # Total opens
+    opened_unique: Optional[int] # Unique opens
+    cliqued: Optional[int]  # Total clicks
+    cliqued_unique: Optional[int] # Unique clicks
+    failed: Optional[int]   # Failed deliveries
+    suppress_bound: Optional[int] # Suppressed (bounces)
+    suppress_unsubscribe: Optional[int] # Suppressed (unsubscribes)
+    bounced: Optional[int]  # Bounced emails
+    rejected: Optional[int] # Rejected emails
+    complained: Optional[int] # Spam complaints
+    unsubscribed: Optional[int] # Unsubscribe requests
 ```
 
-### ClickedURLMetrics
-Model for URL click tracking metrics.
+### BaseClickedUrlsStats
+Model for URL click tracking.
 
 ```python
-class ClickedURLMetrics(BaseModel):
-    url: str              # Tracked URL
-    clicks: int          # Total clicks
-    unique_clicks: int   # Unique clicks
-    first_click: int    # First click timestamp
-    last_click: int     # Last click timestamp
+class BaseClickedUrlsStats(BaseModel):
+    url: Optional[str]      # Tracked URL
+    clicked: Optional[int]  # Total clicks
+    clicked_unique: Optional[int] # Unique clicks
 ```
 
-Example:
-```python
-# Analyzing email metrics
-metrics = client.email.reporting.metrics.list(
-    start=start_time,
-    stop=end_time,
-    group="day"
-)
+### ListMetricsResponse
+Response model for time-based metrics.
 
-for day in metrics:
-    engagement_rate = day.opened_unique / day.delivered * 100
-    print(f"Date: {day.date}")
-    print(f"Delivery rate: {day.delivered/day.sent*100:.1f}%")
-    print(f"Engagement rate: {engagement_rate:.1f}%")
+```python
+class ListMetricsResponse(BaseModel):
+    start: Optional[int]    # Start timestamp
+    stop: Optional[int]     # End timestamp
+    group: Optional[str]    # Grouping interval
+    stats: list[BaseStats]  # List of stats entries
 ```
 
-## Constants
+### ListClickedUrlsMetricsResponse
+Response model for URL metrics.
 
-### Email Status
 ```python
-EMAIL_STATUS = Literal[
-    "queued",        # Email is queued for sending
-    "sending",       # Currently being sent
-    "delivered",     # Successfully delivered
-    "opened",        # Email was opened
-    "clicked",       # Links were clicked
-    "failed",        # Delivery failed
-    "bounced",       # Email bounced
-    "complained",    # Marked as spam
-    "unsubscribed"   # Recipient unsubscribed
-]
+class ListClickedUrlsMetricsResponse(BaseModel):
+    start: Optional[int]    # Start timestamp
+    stop: Optional[int]     # End timestamp
+    stats: list[BaseClickedUrlsStats]  # URL stats list
 ```
 
 ## Best Practices
 
-1. **Model Validation**
-   - Always validate email addresses
-   - Check attachment sizes
-   - Verify required fields
+1. **Email Content**
+   - Provide both HTML and text versions
+   - Keep HTML content responsive
+   - Follow email design best practices
+   - Test content rendering in various clients
 
-2. **Error Handling**
-   - Handle validation errors gracefully
-   - Check for delivery failures
+2. **Attachments**
+   - Use appropriate MIME types
+   - Keep attachments under size limits
+   - Base64 encode attachment data
+   - Consider attachment compatibility
+
+3. **Tracking and Metrics**
+   - Monitor delivery rates
+   - Track engagement metrics
+   - Analyze click patterns
+   - Use unique tracking for accurate stats
+
+4. **Error Handling**
+   - Check response status
    - Monitor bounce rates
-
-3. **Metadata Usage**
-   - Use metadata for tracking
-   - Include user identifiers
-   - Add campaign information
+   - Handle failed deliveries
+   - Track spam complaints
 
 Example with best practices:
 ```python
+from naxai.models.email import (
+    SendTransactionalEmailRequest,
+    SenderObject,
+    DestinationObject,
+    Attachment
+)
+
 try:
+    # Create email request with tracking
     request = SendTransactionalEmailRequest(
-        sender_email="sender@yourdomain.com",
-        sender_name="Your Name",
-        subject="Welcome!",
+        sender=SenderObject(
+            email="notifications@yourdomain.com",
+            name="Your Service"
+        ),
         to=[
             DestinationObject(
-                email=email,
-                name=name,
-                metadata={
-                    "user_id": user_id,
-                    "campaign": "welcome_series",
-                    "sequence": 1
-                }
+                email=recipient_email,
+                name=recipient_name
             )
         ],
+        subject="Welcome to Our Service",
+        html="""
+        <html>
+            <body>
+                <h1>Welcome!</h1>
+                <p>Thank you for joining our service.</p>
+                <p><a href="https://example.com/start">Get Started</a></p>
+            </body>
+        </html>
+        """,
+        text="""
+        Welcome!
+        
+        Thank you for joining our service.
+        
+        Get started: https://example.com/start
+        """,
         enable_tracking=True
     )
-    response = client.email.send(data=request)
-except ValidationError as e:
-    logger.error(f"Invalid email request: {e}")
-    # Handle validation error
+    
+    # Send email and get response
+    response = client.email.send(request)
+    
+    # Track delivery status
+    status = client.email.activity_logs.get(
+        message_id=response.id,
+        email=recipient_email
+    )
+    
 except Exception as e:
     logger.error(f"Failed to send email: {e}")
-    # Handle other errors
+    # Handle error appropriately
 ```
 
 ## Related Documentation

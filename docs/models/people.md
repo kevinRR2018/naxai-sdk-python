@@ -4,271 +4,285 @@ This page documents the models used in the People API of the Naxai SDK.
 
 ## Contact Models
 
-### BaseContactModel
+### ContactBaseModel
 Base model for contact information.
 
 ```python
-class BaseContactModel(BaseModel):
-    email: str                # Contact email address
-    phone: str               # Contact phone number
-    first_name: Optional[str] = None  # First name
-    last_name: Optional[str] = None   # Last name
-    company: Optional[str] = None     # Company name
-    title: Optional[str] = None       # Job title
-    custom_fields: Optional[Dict[str, Any]] = None  # Custom field values
-    groups: Optional[List[str]] = None  # Group IDs
-    preferences: Optional[Dict[str, bool]] = None  # Communication preferences
+class ContactBaseModel(BaseModel):
+    nx_id: str                # Unique Naxai identifier
+    email: Optional[str]      # Email address
+    phone: Optional[str]      # Phone number
+    sms_capable: Optional[bool]  # Can receive SMS
+    external_id: Optional[str]   # External identifier
+    unsubscribed: Optional[bool] # Unsubscribed status
+    language: Optional[str]      # Preferred language
+    created_at: Optional[int]    # Creation timestamp
+    created_at_naxai: Optional[int]  # Naxai creation timestamp
 ```
 
-### CreateContactRequest
-Model for creating new contacts.
+### SearchContactsResponse
+Model for contact search results.
 
 ```python
-class CreateContactRequest(BaseContactModel):
-    pass  # Inherits all fields from BaseContactModel
+class SearchContactsResponse(BaseModel):
+    pagination: Pagination           # Pagination information
+    items: list[ContactBaseModel]    # List of matching contacts
 ```
 
-### UpdateContactRequest
-Model for updating existing contacts.
+### CountContactsResponse
+Model for contact count operations.
 
 ```python
-class UpdateContactRequest(BaseModel):
-    email: Optional[str] = None
-    phone: Optional[str] = None
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    company: Optional[str] = None
-    title: Optional[str] = None
-    custom_fields: Optional[Dict[str, Any]] = None
-    groups: Optional[List[str]] = None
-    preferences: Optional[Dict[str, bool]] = None
+class CountContactsResponse(BaseModel):
+    count: int  # Number of contacts matching criteria
 ```
 
-### ContactResponse
-Response model for contact operations.
+### GetContactIdentifierResponse
+Model for contact identifier type.
 
 ```python
-class ContactResponse(BaseContactModel):
-    contact_id: str          # Unique contact identifier
-    created_at: int         # Creation timestamp
-    updated_at: int         # Last update timestamp
+class GetContactIdentifierResponse(BaseModel):
+    identifier: Literal["phone", "email", "externalId"]  # Primary identifier type
+```
+
+### CreateOrUpdateContactResponse
+Response model for contact creation/update.
+
+```python
+class CreateOrUpdateContactResponse(ContactBaseModel):
+    # Inherits all fields from ContactBaseModel
+    pass
 ```
 
 Example:
 ```python
 # Creating a new contact
-contact = CreateContactRequest(
+contact = CreateOrUpdateContactResponse(
+    nx_id="cnt_123abc",
     email="jane.smith@example.com",
     phone="+1234567890",
-    first_name="Jane",
-    last_name="Smith",
-    company="Tech Corp",
-    title="Product Manager",
-    custom_fields={
-        "industry": "Technology",
-        "lead_source": "Website"
-    },
-    preferences={
-        "email_marketing": True,
-        "sms_notifications": False
-    }
+    sms_capable=True,
+    external_id="cust_456",
+    language="en",
+    created_at=1703066400000
 )
 ```
 
-## Group Models
+## Segment Models
 
-### BaseGroupModel
-Base model for contact groups.
+### SegmentBaseModel
+Base model for segments.
 
 ```python
-class BaseGroupModel(BaseModel):
-    name: str               # Group name
-    description: Optional[str] = None  # Group description
-    metadata: Optional[Dict[str, Any]] = None  # Custom metadata
+class SegmentBaseModel(BaseModel):
+    id: str                   # Unique segment identifier
+    name: str                 # Segment name
+    description: Optional[str]  # Segment description
+    state: Optional[Literal["ready", "building"]]  # Current state
+    predefined: Optional[bool]  # Is predefined segment
+    condition: Optional[Condition]  # Segment criteria
+    modified_by: Optional[str]  # Last modifier ID
+    modified_at: Optional[int]  # Last modification timestamp
+    type_: Optional[Literal["manual", "dynamic"]]  # Segment type
 ```
 
-### CreateGroupRequest
-Model for creating new groups.
+### ListSegmentsResponse
+Model for listing segments.
 
 ```python
-class CreateGroupRequest(BaseGroupModel):
-    pass  # Inherits all fields from BaseGroupModel
+class ListSegmentsResponse(BaseModel):
+    root: List[SegmentBaseModel]  # List of segments
+
+    def __len__(self) -> int      # Get number of segments
+    def __getitem__(self, index)  # Access segment by index
+    def __iter__(self)            # Iterate through segments
 ```
 
-### UpdateGroupRequest
-Model for updating existing groups.
+### SegmentHistoryDay
+Model for segment history entries.
 
 ```python
-class UpdateGroupRequest(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
+class SegmentHistoryDay(BaseModel):
+    date: Optional[int]      # Day timestamp
+    added: Optional[int]     # Contacts added
+    removed: Optional[int]   # Contacts removed
+    change: Optional[int]    # Net change
+    current: Optional[int]   # Total contacts
 ```
 
-### GroupResponse
-Response model for group operations.
+### GetSegmentsHistoryResponse
+Model for segment history.
 
 ```python
-class GroupResponse(BaseGroupModel):
-    group_id: str           # Unique group identifier
-    contact_count: int     # Number of contacts in group
-    created_at: int        # Creation timestamp
-    updated_at: int        # Last update timestamp
+class GetSegmentsHistoryResponse(BaseModel):
+    history: list[SegmentHistoryDay]  # List of daily history records
 ```
 
-Example:
+## Attribute Models
+
+### BaseListObject
+Base model for attributes.
+
 ```python
-# Creating a new group
-group = CreateGroupRequest(
-    name="VIP Customers",
-    description="High-value customers with premium support",
-    metadata={
-        "priority_level": "high",
-        "support_tier": "premium"
-    }
-)
+class BaseListObject(BaseModel):
+    name: str  # Attribute name
 ```
 
-## Preference Models
-
-### UpdatePreferencesRequest
-Model for updating contact preferences.
+### CreateAttributeResponse
+Response model for attribute creation.
 
 ```python
-class UpdatePreferencesRequest(BaseModel):
-    email_marketing: Optional[bool] = None  # Email marketing consent
-    sms_notifications: Optional[bool] = None  # SMS notifications consent
-    voice_calls: Optional[bool] = None  # Voice calls consent
-    custom_preferences: Optional[Dict[str, bool]] = None  # Custom preferences
+class CreateAttributeResponse(BaseModel):
+    name: str           # Attribute name
+    segment_ids: list[str]  # Associated segment IDs
 ```
 
-### PreferencesResponse
-Response model for preference operations.
+### ListAttributesResponse
+Model for listing attributes.
 
 ```python
-class PreferencesResponse(BaseModel):
-    contact_id: str         # Contact identifier
-    preferences: Dict[str, bool]  # All preferences
-    updated_at: int        # Last update timestamp
+class ListAttributesResponse(BaseModel):
+    root: List[BaseListObject]  # List of attributes
+
+    def __len__(self) -> int      # Get number of attributes
+    def __getitem__(self, index)  # Access attribute by index
+    def __iter__(self)            # Iterate through attributes
 ```
 
-## Custom Field Models
+## Search and Segment Conditions
 
-### CustomFieldDefinition
-Model for custom field definitions.
+### SearchCondition
+Model for complex contact search queries.
 
 ```python
-class CustomFieldDefinition(BaseModel):
-    name: str              # Field name
-    type: str             # Field type
-    description: Optional[str] = None  # Field description
-    required: bool = False  # Whether field is required
-    default_value: Optional[Any] = None  # Default value
+class SearchCondition(BaseModel):
+    all: Optional[list[Union[
+        AttributeCondSimple,
+        AttributeCondArray,
+        EventCond,
+        AllCondGroup,
+        AnyCondGroup
+    ]]]  # AND conditions
+    any: Optional[list[Union[
+        AttributeCondSimple,
+        AttributeCondArray,
+        EventCond,
+        AllCondGroup,
+        AnyCondGroup
+    ]]]  # OR conditions
 ```
 
-### CreateCustomFieldRequest
-Model for creating custom fields.
+### EventObject
+Model for event-based conditions.
 
 ```python
-class CreateCustomFieldRequest(CustomFieldDefinition):
-    pass  # Inherits all fields from CustomFieldDefinition
+class EventObject(BaseModel):
+    name: str                # Event name
+    count: int = 1          # Occurrence count
+    count_boundary: Literal["at-least", "at-most"] = "at-least"
+    time_boundary: Literal["all-time", "within-last", "before", "after"] = "all-time"
+    period_boundary: Literal["day", "month"] = "day"
+    interval_boundary: int = 1  # Time period value (1-366)
+    date: Optional[int]     # Reference timestamp
+    properties: EventProperties  # Event property conditions
 ```
 
-Example:
-```python
-# Creating a custom field
-field = CreateCustomFieldRequest(
-    name="account_balance",
-    type="number",
-    description="Current account balance in USD",
-    required=False,
-    default_value=0.0
-)
-```
-
-## Activity Models
-
-### ContactActivity
-Model for contact activity logs.
+### AttributeObject
+Model for attribute conditions.
 
 ```python
-class ContactActivity(BaseModel):
-    activity_id: str        # Unique activity identifier
-    contact_id: str        # Contact identifier
-    type: str             # Activity type
-    timestamp: int        # Activity timestamp
-    details: Dict[str, Any]  # Activity details
+class AttributeObject(BaseModel):
+    operator: CONDITIONS    # Comparison operator
+    field: str            # Field name
+    value: Optional[Union[str, int, bool]]  # Comparison value
 ```
 
 ## Constants
 
-### Activity Types
+### Condition Operators
 ```python
-ACTIVITY_TYPES = Literal[
-    "email_sent",      # Email was sent
-    "email_opened",    # Email was opened
-    "email_clicked",   # Email link was clicked
-    "sms_sent",        # SMS was sent
-    "sms_delivered",   # SMS was delivered
-    "voice_call",      # Voice call was made
-    "preference_update",  # Preferences were updated
-    "group_added",     # Added to group
-    "group_removed"    # Removed from group
-]
-```
-
-### Field Types
-```python
-FIELD_TYPES = Literal[
-    "text",     # Text field
-    "number",   # Numeric field
-    "boolean",  # Boolean field
-    "date"      # Date field
+CONDITIONS = Literal[
+    "eq", "not-eq", "gt", "lt", "exists", "not-exists", 
+    "contains", "not-contains", "is-true", "is-false",
+    "is-timestamp", "is-timestamp-before", "is-timestamp-after",
+    "is-mobile", "is-not-mobile"
 ]
 ```
 
 ## Best Practices
 
-1. **Model Validation**
-   - Validate email and phone formats
-   - Check required fields
-   - Validate custom field types
+1. **Contact Management**
+   - Use appropriate identifier types
+   - Handle unsubscribe status
+   - Consider SMS capabilities
+   - Respect language preferences
 
-2. **Error Handling**
-   - Handle validation errors
-   - Check for duplicate contacts
-   - Validate group operations
+2. **Segment Operations**
+   - Monitor segment building state
+   - Track membership changes
+   - Use appropriate condition types
+   - Consider performance impact
 
-3. **Data Management**
-   - Keep custom fields consistent
-   - Maintain clean group structure
-   - Regular data cleanup
+3. **Search and Filtering**
+   - Build efficient conditions
+   - Use appropriate operators
+   - Combine conditions logically
+   - Consider pagination
 
 Example with best practices:
 ```python
-try:
-    # Create contact with validation
-    contact = CreateContactRequest(
-        email=validate_email(email),
-        phone=validate_phone(phone),
-        first_name=first_name,
-        last_name=last_name,
-        custom_fields=validate_custom_fields(custom_fields)
-    )
-    response = client.people.contacts.create(data=contact)
-    
-    # Add to appropriate groups
-    if response.contact_id:
-        client.people.groups.add_contacts(
-            group_id="new_customers",
-            contact_ids=[response.contact_id]
+from naxai.models.people import (
+    SearchCondition,
+    AttributeCondSimple,
+    AttributeObject,
+    EventCond,
+    EventObject,
+    EventProperties
+)
+
+# Create a search condition for active US customers
+condition = SearchCondition(
+    all=[
+        AttributeCondSimple(
+            attribute=AttributeObject(
+                operator="eq",
+                field="country",
+                value="US"
+            )
+        ),
+        EventCond(
+            event=EventObject(
+                name="login",
+                count=1,
+                time_boundary="within-last",
+                period_boundary="day",
+                interval_boundary=30,
+                properties=EventProperties(all=[])
+            )
         )
-except ValidationError as e:
-    logger.error(f"Invalid contact data: {e}")
-    # Handle validation error
+    ]
+)
+
+try:
+    # Search for contacts
+    response = client.people.contacts.search(condition)
+    
+    # Process results with pagination
+    while response.items:
+        for contact in response.items:
+            process_contact(contact)
+            
+        if response.pagination.has_more:
+            response = client.people.contacts.search(
+                condition,
+                page=response.pagination.next_page
+            )
+        else:
+            break
+            
 except Exception as e:
-    logger.error(f"Failed to create contact: {e}")
-    # Handle other errors
+    logger.error(f"Search failed: {e}")
+    # Handle error appropriately
 ```
 
 ## Related Documentation

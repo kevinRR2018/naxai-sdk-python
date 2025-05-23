@@ -9,8 +9,8 @@ Base model for SMS messages.
 
 ```python
 class BaseMessageModel(BaseModel):
-    to: str                  # Recipient phone number
-    message_id: Optional[str] # Unique message identifier
+    to: str                  # Recipient phone number (optional)
+    message_id: str          # Unique message identifier (optional)
 ```
 
 ### SendSMSResponse
@@ -18,127 +18,215 @@ Response model for SMS sending operations.
 
 ```python
 class SendSMSResponse(BaseModel):
-    messages: list[BaseMessageModel]  # List of sent messages
+    batch_id: str                    # Unique batch identifier (optional)
+    count: int                       # Number of messages in batch (optional)
+    messages: list[BaseMessageModel]  # List of sent messages (optional)
 ```
 
 Example:
 ```python
-response = client.sms.send(
-    to=["1234567890", "1234567891"],
-    from_="0987654321",
-    text="Hello!"
+response = SendSMSResponse(
+    batch_id="batch_123abc",
+    count=3,
+    messages=[
+        BaseMessageModel(to="+1234567890", message_id="msg_123abc"),
+        BaseMessageModel(to="+2345678901", message_id="msg_456def"),
+        BaseMessageModel(to="+3456789012", message_id="msg_789ghi")
+    ]
 )
-
-for msg in response.messages:
-    print(f"Message to {msg.to} has ID: {msg.message_id}")
 ```
 
 ## Activity Log Models
 
-### SMSActivityLog
-Model representing a message's activity log.
+### BaseMessage
+Detailed model for SMS message activity logs.
 
 ```python
-class SMSActivityLog(BaseModel):
+class BaseMessage(BaseModel):
     message_id: str          # Unique message identifier
-    from_: str              # Sender number
+    from_: str              # Sender number (optional)
     to: str                 # Recipient number
-    status: str             # Message status
-    direction: str          # "inbound" or "outbound"
-    created_at: int         # Creation timestamp
-    updated_at: Optional[int] # Last update timestamp
-    error_code: Optional[str] # Error code if failed
-    error_message: Optional[str] # Error description
+    mcc: str               # Mobile Country Code (optional)
+    mnc: str               # Mobile Network Code (optional)
+    body: str              # Message content
+    parts: int             # Number of message segments (optional)
+    encoding: Literal["unicode", "text", "binary"]  # Message encoding
+    direction: Literal["outgoing", "incoming"]      # Message direction
+    sent_at: int           # Sending timestamp (optional)
+    submitted_at: int      # Carrier submission timestamp (optional)
+    delivered_at: int      # Delivery timestamp (optional)
+    received_at: int       # Reception timestamp (optional)
+    status: Literal["delivered", "failed"]  # Delivery status (optional)
+    status_code: int       # Status code (optional)
+    status_reason: str     # Status description (optional)
+    status_details: str    # Detailed status info (optional)
+    opt_out: bool         # Opt-out flag (optional)
+    reference: str        # Custom reference (optional)
+    client_id: str        # Client identifier (optional)
+    campaign_id: str      # Campaign identifier (optional)
+    broadcast_id: str     # Broadcast identifier (optional)
 ```
 
-Example:
+### ListSMSActivityLogsResponse
+Model for paginated activity logs.
+
 ```python
-log = client.sms.activity_logs.get("msg_123abc")
-print(f"Status: {log.status}")
-if log.error_code:
-    print(f"Error: {log.error_message}")
+class ListSMSActivityLogsResponse(BaseModel):
+    pagination: Pagination      # Pagination information
+    messages: list[BaseMessage] # List of message logs
+```
+
+### GetSMSActivityLogsResponse
+Model for single message activity log.
+
+```python
+class GetSMSActivityLogsResponse(BaseMessage):
+    # Inherits all fields from BaseMessage
+    pass
 ```
 
 ## Metrics Models
 
-### SMSMetrics
-Base model for SMS metrics data.
+### BaseStats
+Base model for SMS statistics.
 
 ```python
-class SMSMetrics(BaseModel):
-    date: Optional[str]      # Date in YYYY-MM-DD format
-    sent: int               # Total messages sent
+class BaseStats(BaseModel):
+    sms: int                # Total messages
     delivered: int          # Successfully delivered
     failed: int            # Failed deliveries
-    cost: Optional[float]   # Total cost if available
+    expired: int           # Expired messages
+    unknown: int           # Unknown status
+    canceled: int          # Canceled messages
+    rejected: int          # Rejected messages
+    blocked: int           # Blocked messages (optional)
+    avg_time_to_deliver: int  # Average delivery time (ms)
+    avg_time_to_submit: int   # Average submission time (ms)
 ```
 
-### DeliveryError
-Model for delivery error statistics.
+### OutgoingStats
+Model for time-based outgoing metrics.
 
 ```python
-class DeliveryError(BaseModel):
-    error_code: str         # Error code
-    count: int             # Number of occurrences
-    description: str       # Error description
+class OutgoingStats(BaseStats):
+    date: str  # Metrics date/timestamp
 ```
 
-### CountryMetrics
-Model for country-specific metrics.
+### OutgoingCountryStats
+Model for country-based metrics.
 
 ```python
-class CountryMetrics(BaseModel):
-    country: str           # Country code
-    sent: int             # Messages sent
-    delivered: int        # Messages delivered
-    failed: int          # Failed deliveries
-    cost: Optional[float] # Cost for this country
+class OutgoingCountryStats(BaseStats):
+    country: str  # Country code (optional)
+    mcc: str     # Mobile Country Code
+    mnc: str     # Mobile Network Code
 ```
 
-Example:
-```python
-# Get metrics by country
-metrics = client.sms.reporting.list_by_country(
-    start=start_time,
-    stop=end_time,
-    group="day"
-)
+### IncomingStats
+Model for incoming message metrics.
 
-for country in metrics:
-    print(f"Country: {country.country}")
-    print(f"Sent: {country.sent}")
-    print(f"Delivery rate: {country.delivered/country.sent*100:.1f}%")
+```python
+class IncomingStats(BaseModel):
+    date: str  # Metrics date/timestamp
+    sms: int   # Total incoming messages
 ```
 
-## Constants
+### DeliveryErrorStats
+Model for error statistics.
 
-### Message Status
 ```python
-MESSAGE_STATUS = Literal[
-    "accepted",      # Message accepted for delivery
-    "scheduled",     # Scheduled for future delivery
-    "sending",       # Currently being sent
-    "delivered",     # Successfully delivered
-    "failed",        # Delivery failed
-    "undelivered",   # Could not be delivered
-    "rejected"       # Rejected by carrier
-]
+class DeliveryErrorStats(BaseModel):
+    status_category: str  # Error category
+    status_code: str     # Error code
+    sms: int            # Number of affected messages
 ```
 
-### Direction Types
+### ListOutgoingSMSMetricsResponse
+Response model for outgoing metrics.
+
 ```python
-DIRECTION_TYPES = Literal[
-    "inbound",      # Incoming message
-    "outbound"      # Outgoing message
-]
+class ListOutgoingSMSMetricsResponse(BaseResponse):
+    direction: Literal["outgoing"]
+    group: Literal["hour", "day", "month"]
+    stats: list[OutgoingStats]
+```
+
+### ListOutgoingSMSByCountryMetricsResponse
+Response model for country-based metrics.
+
+```python
+class ListOutgoingSMSByCountryMetricsResponse(BaseResponse):
+    direction: Literal["outgoing"]
+    stats: list[OutgoingCountryStats]
+```
+
+### ListIncomingSMSMetricsResponse
+Response model for incoming metrics.
+
+```python
+class ListIncomingSMSMetricsResponse(BaseResponse):
+    direction: Literal["incoming"]
+    group: Literal["hour", "day", "month"]
+    stats: list[IncomingStats]
+```
+
+### ListDeliveryErrorMetricsResponse
+Response model for error metrics.
+
+```python
+class ListDeliveryErrorMetricsResponse(BaseResponse):
+    stats: list[DeliveryErrorStats]
 ```
 
 ## Best Practices
 
-1. Always handle all possible message statuses in your application
-2. Store message_id for future status queries
-3. Use appropriate error handling for failed deliveries
-4. Monitor metrics regularly for delivery performance
+1. **Message Tracking**
+   - Store message_id for future status queries
+   - Use batch_id for tracking multiple messages
+   - Monitor delivery status through activity logs
+
+2. **Performance Monitoring**
+   - Track delivery rates by country
+   - Monitor error patterns
+   - Analyze timing metrics
+   - Use appropriate time groupings for metrics
+
+3. **Error Handling**
+   - Handle all possible message statuses
+   - Check error categories and codes
+   - Monitor blocked and rejected messages
+   - Implement appropriate retry strategies
+
+Example:
+```python
+# Send messages and track delivery
+response = client.sms.send(
+    to=["+1234567890", "+2345678901"],
+    from_="SENDER",
+    text="Hello!"
+)
+
+# Store message IDs for tracking
+message_ids = [msg.message_id for msg in response.messages]
+
+# Monitor delivery status
+for msg_id in message_ids:
+    status = client.sms.activity_logs.get(msg_id)
+    print(f"Message {msg_id}: {status.status}")
+    if status.status == "failed":
+        print(f"Error: {status.status_reason}")
+
+# Get delivery metrics
+metrics = client.sms.reporting.list_by_country(
+    start_date="2023-01-01",
+    end_date="2023-01-31"
+)
+
+# Analyze delivery performance
+for country in metrics.stats:
+    delivery_rate = country.delivered / country.sms * 100
+    print(f"{country.country}: {delivery_rate:.1f}% delivery rate")
+```
 
 ## Related Documentation
 
