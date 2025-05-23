@@ -30,13 +30,13 @@ class BaseStats(BaseModel):
         opened_unique (Optional[int]): 
             Number of unique recipients who opened the email at least once.
             Mapped from JSON key 'openedUnique'. May be None if not available or not applicable.
-        cliqued (Optional[int]): 
+        clicked (Optional[int]): 
             Total number of link clicks within emails, including multiple clicks by the 
             same recipient.
             May be None if not available or not applicable.
-        cliqued_unique (Optional[int]): 
+        clicked_unique (Optional[int]): 
             Number of unique recipients who clicked at least one link in the email.
-            Mapped from JSON key 'cliquedUnique'. May be None if not available or not applicable.
+            Mapped from JSON key 'clickedUnique'. May be None if not available or not applicable.
         failed (Optional[int]): Number of emails that failed to deliver for any reason.
             May be None if not available or not applicable.
         suppress_bound (Optional[int]): Number of emails suppressed due to hard bounces.
@@ -61,8 +61,8 @@ class BaseStats(BaseModel):
         ...     delivered=980,
         ...     opened=450,
         ...     openedUnique=320,
-        ...     cliqued=200,
-        ...     cliquedUnique=150,
+        ...     clicked=200,
+        ...     clickedUnique=150,
         ...     failed=20,
         ...     suppressBound=5,
         ...     suppressUnsubscribe=3,
@@ -81,10 +81,10 @@ class BaseStats(BaseModel):
         >>> 
         >>> if stats.delivered > 0:
         ...     open_rate = stats.opened_unique / stats.delivered * 100
-        ...     click_rate = stats.cliqued_unique / stats.delivered * 100
+        ...     click_rate = stats.clicked_unique / stats.delivered * 100
         ...     print(f"Open rate: {open_rate:.1f}%")
         ...     print(f"Click rate: {click_rate:.1f}%")
-        ...     print(f"Click-to-open rate:{stats.cliqued_unique / stats.opened_unique * 100:.1f}%"\
+        ...     print(f"Click-to-open rate:{stats.clicked_unique / stats.opened_unique * 100:.1f}%"\
         ...          if stats.opened_unique > 0 else "Click-to-open rate: N/A")
         >>> 
         >>> # Calculate negative metrics
@@ -110,8 +110,8 @@ class BaseStats(BaseModel):
         - Key engagement metrics to monitor include:
           * Delivery rate: delivered / sent
           * Open rate: opened_unique / delivered
-          * Click rate: cliqued_unique / delivered
-          * Click-to-open rate: cliqued_unique / opened_unique
+          * Click rate: clicked_unique / delivered
+          * Click-to-open rate: clicked_unique / opened_unique
         - Key negative metrics to monitor include:
           * Bounce rate: bounced / sent
           * Complaint rate: complained / sent
@@ -129,8 +129,8 @@ class BaseStats(BaseModel):
     delivered: Optional[int] = Field(default=None)
     opened: Optional[int] = Field(default=None)
     opened_unique: Optional[int] = Field(default=None, alias="openedUnique")
-    cliqued: Optional[int] = Field(default=None)
-    cliqued_unique: Optional[int] = Field(default=None, alias="cliquedUnique")
+    clicked: Optional[int] = Field(default=None)
+    clicked_unique: Optional[int] = Field(default=None, alias="clickedUnique")
     failed: Optional[int] = Field(default=None)
     suppress_bound: Optional[int] = Field(default=None, alias="suppressBound")
     suppress_unsubscribe: Optional[int] = Field(default=None, alias="suppressUnsubscribe")
@@ -229,8 +229,8 @@ class ListMetricsResponse(BaseModel):
         ...             delivered=980,
         ...             opened=450,
         ...             openedUnique=320,
-        ...             cliqued=200,
-        ...             cliquedUnique=150
+        ...             clicked=200,
+        ...             clickedUnique=150
         ...         ),
         ...         BaseStats(
         ...             date=1703116800000,  # January 21, 2023
@@ -238,8 +238,8 @@ class ListMetricsResponse(BaseModel):
         ...             delivered=1170,
         ...             opened=520,
         ...             openedUnique=380,
-        ...             cliqued=240,
-        ...             cliquedUnique=180
+        ...             clicked=240,
+        ...             clickedUnique=180
         ...         )
         ...     ]
         ... )
@@ -253,8 +253,8 @@ class ListMetricsResponse(BaseModel):
         >>>                    if day.delivered is not None)
         >>> total_opened = sum(day.opened_unique for day in response.stats \
         >>>                 if day.opened_unique is not None)
-        >>> total_clicked = sum(day.cliqued_unique for day in response.stats \
-        >>>                 if day.cliqued_unique is not None)
+        >>> total_clicked = sum(day.clicked_unique for day in response.stats \
+        >>>                 if day.clicked_unique is not None)
         >>> 
         >>> print(f"Total sent: {total_sent}")
         >>> if total_sent > 0:

@@ -159,8 +159,8 @@ class BaseStats(BaseModel):
     delivered: Optional[int] # Successfully delivered
     opened: Optional[int]   # Total opens
     opened_unique: Optional[int] # Unique opens
-    cliqued: Optional[int]  # Total clicks
-    cliqued_unique: Optional[int] # Unique clicks
+    clicked: Optional[int]  # Total clicks
+    clicked_unique: Optional[int] # Unique clicks
     failed: Optional[int]   # Failed deliveries
     suppress_bound: Optional[int] # Suppressed (bounces)
     suppress_unsubscribe: Optional[int] # Suppressed (unsubscribes)

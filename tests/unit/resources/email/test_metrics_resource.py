@@ -43,8 +43,8 @@ class TestMetricsResource:
                     "delivered": 950,
                     "opened": 500,
                     "openedUnique": 400,
-                    "cliqued": 250,
-                    "cliquedUnique": 200,
+                    "clicked": 250,
+                    "clickedUnique": 200,
                     "bounced": 30,
                     "rejected": 20
                 },
@@ -54,8 +54,8 @@ class TestMetricsResource:
                     "delivered": 1150,
                     "opened": 600,
                     "openedUnique": 500,
-                    "cliqued": 300,
-                    "cliquedUnique": 250,
+                    "clicked": 300,
+                    "clickedUnique": 250,
                     "bounced": 35,
                     "rejected": 15
                 }
@@ -80,8 +80,8 @@ class TestMetricsResource:
         assert result.stats[0].delivered == 950
         assert result.stats[0].opened == 500
         assert result.stats[0].opened_unique == 400
-        assert result.stats[0].cliqued == 250
-        assert result.stats[0].cliqued_unique == 200
+        assert result.stats[0].clicked == 250
+        assert result.stats[0].clicked_unique == 200
         assert result.stats[0].bounced == 30
         assert result.stats[0].rejected == 20
         
@@ -115,8 +115,8 @@ class TestMetricsResource:
                     "delivered": 29000,
                     "opened": 15000,
                     "openedUnique": 12000,
-                    "cliqued": 7500,
-                    "cliquedUnique": 6000
+                    "clicked": 7500,
+                    "clickedUnique": 6000
                 },
                 {
                     "date": 1675209600000,  # February 2023
@@ -124,8 +124,8 @@ class TestMetricsResource:
                     "delivered": 27000,
                     "opened": 14000,
                     "openedUnique": 11000,
-                    "cliqued": 7000,
-                    "cliquedUnique": 5500
+                    "clicked": 7000,
+                    "clickedUnique": 5500
                 }
             ]
         }
@@ -149,7 +149,7 @@ class TestMetricsResource:
         assert result.stats[0].sent == 30000
         assert result.stats[0].delivered == 29000
         assert result.stats[0].opened_unique == 12000
-        assert result.stats[0].cliqued_unique == 6000
+        assert result.stats[0].clicked_unique == 6000
         
         # Check second stats entry (February)
         assert result.stats[1].date == 1675209600000

@@ -30,8 +30,8 @@ class TestReportingResource:
         
         # Verify sub-resources are initialized
         assert isinstance(reporting_resource.metrics, MetricsResource)
-        assert isinstance(reporting_resource.cliqued_urls, ClickedUrlsResource)
+        assert isinstance(reporting_resource.clicked_urls, ClickedUrlsResource)
         
         # Verify sub-resources have correct root paths
         assert reporting_resource.metrics.root_path == "/email/reporting/metrics"
-        assert reporting_resource.cliqued_urls.root_path == "/email/reporting/clicks"
+        assert reporting_resource.clicked_urls.root_path == "/email/reporting/clicks"

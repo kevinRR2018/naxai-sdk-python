@@ -18,7 +18,7 @@ from typing import Optional, Literal
 from naxai.models.email.responses.metrics_responses import ListClickedUrlsMetricsResponse
 
 class ClickedUrlsResource:
-    """ cliqued_urls resource for email.reporting resource """
+    """ clicked_urls resource for email.reporting resource """
 
     def __init__(self, client, root_path):
         self._client = client

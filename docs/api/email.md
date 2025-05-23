@@ -251,8 +251,8 @@ The response includes detailed statistics for each time interval:
 - `delivered`: Successfully delivered emails
 - `opened`: Total number of opens
 - `opened_unique`: Unique recipients who opened
-- `cliqued`: Total number of link clicks
-- `cliqued_unique`: Unique recipients who clicked
+- `clicked`: Total number of link clicks
+- `clicked_unique`: Unique recipients who clicked
 - `failed`: Failed deliveries
 - `suppress_bound`: Suppressed due to hard bounces
 - `suppress_unsubscribe`: Suppressed due to unsubscribes
@@ -285,7 +285,7 @@ print(f"Data points: {len(metrics.stats)}")
 total_sent = sum(day.sent for day in metrics.stats if day.sent is not None)
 total_delivered = sum(day.delivered for day in metrics.stats if day.delivered is not None)
 total_opened = sum(day.opened_unique for day in metrics.stats if day.opened_unique is not None)
-total_clicked = sum(day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None)
+total_clicked = sum(day.clicked_unique for day in metrics.stats if day.clicked_unique is not None)
 
 # Calculate key performance indicators
 if total_sent > 0:
@@ -307,7 +307,7 @@ if metrics.stats:
     best_day = max(metrics.stats, key=lambda day: day.opened_unique or 0)
     print(f"\nBest performing day: {datetime.fromtimestamp(best_day.date/1000)}")
     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, "
-          f"Clicked: {best_day.cliqued_unique}")
+          f"Clicked: {best_day.clicked_unique}")
 
 # Get monthly metrics for the current year
 year_start = int(datetime(datetime.now().year, 1, 1).timestamp())
@@ -327,8 +327,8 @@ Notes:
 - Key metrics to monitor:
   * Delivery rate = delivered / sent
   * Open rate = opened_unique / delivered
-  * Click rate = cliqued_unique / delivered
-  * Click-to-open rate = cliqued_unique / opened_unique
+  * Click rate = clicked_unique / delivered
+  * Click-to-open rate = clicked_unique / opened_unique
 - Negative metrics to watch:
   * Bounce rate = bounced / sent
   * Complaint rate = complained / sent
