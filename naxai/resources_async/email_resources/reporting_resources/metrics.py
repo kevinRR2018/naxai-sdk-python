@@ -67,8 +67,8 @@ class MetricsResource:
                     - delivered: Number of emails successfully delivered
                     - opened: Total number of email opens
                     - opened_unique: Number of unique recipients who opened
-                    - cliqued: Total number of link clicks
-                    - cliqued_unique: Number of unique recipients who clicked
+                    - clicked: Total number of link clicks
+                    - clicked_unique: Number of unique recipients who clicked
                     - failed: Number of emails that failed to deliver
                     - suppress_bound: Number of emails suppressed due to hard bounces
                     - suppress_unsubscribe: Number of emails suppressed due to unsubscribes
@@ -106,7 +106,7 @@ class MetricsResource:
             >>> total_opened = sum(
             >>>     day.opened_unique for day in metrics.stats if day.opened_unique is not None)
             >>> total_clicked = sum(
-            >>>     day.cliqued_unique for day in metrics.stats if day.cliqued_unique is not None)
+            >>>     day.clicked_unique for day in metrics.stats if day.clicked_unique is not None)
             >>> 
             >>> # Calculate key performance indicators
             >>> if total_sent > 0:
@@ -129,7 +129,7 @@ class MetricsResource:
             ...     print(f"\nBest performing day: "
             ...           f"{datetime.datetime.fromtimestamp(best_day.date/1000)}")
             ...     print(f"Sent: {best_day.sent}, Opened: "
-            ...           f"{best_day.opened_unique}, Clicked: {best_day.cliqued_unique}")
+            ...           f"{best_day.opened_unique}, Clicked: {best_day.clicked_unique}")
             Email metrics from 1703066400000 to 1705658400000
             Grouped by: day
             Data points: 30
@@ -159,8 +159,8 @@ class MetricsResource:
             - Key engagement metrics to monitor include:
             * Delivery rate: delivered / sent
             * Open rate: opened_unique / delivered
-            * Click rate: cliqued_unique / delivered
-            * Click-to-open rate: cliqued_unique / opened_unique
+            * Click rate: clicked_unique / delivered
+            * Click-to-open rate: clicked_unique / opened_unique
             - Key negative metrics to monitor include:
             * Bounce rate: bounced / sent
             * Complaint rate: complained / sent

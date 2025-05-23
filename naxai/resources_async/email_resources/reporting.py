@@ -12,7 +12,7 @@ Sub-resources:
         - list(): Retrieve email performance statistics including delivery rates,
           open rates, click rates, and negative metrics like bounces and complaints.
 
-    cliqued_urls
+    clicked_urls
         Provides methods for analyzing URL click metrics:
         - list(): Retrieve metrics about clicked URLs in emails, including click
           statistics for each URL over time.
@@ -36,4 +36,4 @@ class ReportingResource:
         self._client = client
         self.root_path = root_path + "/reporting"
         self.metrics = MetricsResource(client, self.root_path)
-        self.cliqued_urls = ClickedUrlsResource(client, self.root_path)
+        self.clicked_urls = ClickedUrlsResource(client, self.root_path)
