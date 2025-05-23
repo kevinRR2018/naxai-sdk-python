@@ -364,7 +364,7 @@ metrics = client.email.reporting.clicked_urls.list(
 )
 
 print(f"URL click metrics from {datetime.fromtimestamp(metrics.start/1000)}")
-print(f"to {datetime.fromtimestamp(metrics.stop/1000)}")
+print(f"to {datetime.fromtimestamp(current_time)}")
 print(f"Found data for {len(metrics.stats)} URLs")
 
 # Find and display the most clicked URLs
