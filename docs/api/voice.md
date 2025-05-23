@@ -77,6 +77,7 @@ response = client.voice.call.create(
     end={"say": "Goodbye!"}
 )
 print(f"Call ID: {response.calls[0].call_id}")
+print(f"Call ID: {response.calls[0].call_id}")
 ```
 
 ## Broadcasts Resource
@@ -402,20 +403,6 @@ for call in logs.items:
     print(f"Failed at: {call.call_date}, Reason: {call.reason}")
 ```
 
-Example:
-```python
-# Get recent failed calls
-logs = client.voice.activity_logs.list(
-    page=1,
-    page_size=25,
-    status="failed"
-)
-print(f"Found {logs.pagination.total_items} failed calls")
-for call in logs.calls:
-    print(f"Call {call.call_id}: {call.from_} → {call.to}")
-    print(f"Failed at: {call.call_date}, Reason: {call.reason}")
-```
-
 ### Get Call Details
 ```python
 client.voice.activity_logs.get(call_id: str)
@@ -435,17 +422,6 @@ if call.transferred:
     print(f"Transfer from {transfer_call.from_} to {transfer_call.to}")
     print(f"Transfer Status: {transfer_call.status}")
     print(f"Transfer Duration: {transfer_call.call_duration} seconds")
-```
-
-Example:
-```python
-# Get detailed call information
-call = client.voice.activity_logs.get("call_123abc")
-print(f"Call from {call.from_} to {call.to}")
-print(f"Status: {call.status}")
-print(f"Duration: {call.call_duration} seconds")
-if call.transferred:
-    print(f"Transferred to: {call.transfer_to}")
 ```
 
 ## Related Documentation
