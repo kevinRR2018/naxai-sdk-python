@@ -394,15 +394,15 @@ class ListContactsOfSegmentResponse(BaseModel):
     Example:
         >>> response = ListContactsOfSegmentResponse(
         ...     pagination=Pagination(page=1, page_size=25, total_pages=5, total_items=123),
-        ...     contacts=[
+        ...     items=[
         ...         ContactBaseModel(nx_id="cnt_123", email="john@example.com"),
         ...         ContactBaseModel(nx_id="cnt_456", email="jane@example.com")
         ...     ]
         ... )
         >>> print(f"Page {response.pagination.page} of {response.pagination.total_pages}")
-        >>> print(f"Showing {len(response.contacts)} of {response.pagination.total_items} contacts")
+        >>> print(f"Showing {len(response.items)} of {response.pagination.total_record} contacts")
         Page 1 of 5
         Showing 2 of 123 contacts
     """
     pagination: Pagination
-    contacts: list[ContactBaseModel]
+    items: list[ContactBaseModel]
