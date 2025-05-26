@@ -107,13 +107,10 @@ Example:
 ```python
 from naxai.models.people.helper_models.search_condition import SearchCondition
 
-# Search for active US customers
-condition = SearchCondition(
-    all=[
-        {"attribute": {"field": "country", "operator": "eq", "value": "US"}},
-        {"attribute": {"field": "status", "operator": "eq", "value": "active"}}
-    ]
-)
+# Search for vip customers
+condition = {"all": [{"attribute": {"field": "loyalty_tier", "operator": "eq", "value": "vip"}}
+            ]
+        }
 
 results = client.people.contacts.search(
     page=1,
@@ -122,8 +119,8 @@ results = client.people.contacts.search(
     condition=condition
 )
 
-print(f"Found {results.pagination.total_items} matching contacts")
-for contact in results.contacts:
+print(f"Found {results.pagination.total_record} matching contacts")
+for contact in results.items:
     print(f"- {contact.email} (ID: {contact.nx_id})")
 ```
 
