@@ -7,19 +7,19 @@ The Voice API allows you to make calls, manage broadcasts, and access call repor
 ### Create a Call
 ```python
 client.voice.call.create(
-    welcome: Welcome,                           # Welcome message configuration
-    language: Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"],  # Voice language
-    to: list[str] = Field(min_length=1, max_length=1000),  # List of recipient phone numbers
-    from_: str = Field(min_length=8, max_length=15),  # Sender phone number
-    batch_id: Optional[str] = Field(max_length=64),  # Batch identifier
-    voice: Optional[Literal["man", "woman"]] = "woman",  # Voice type
-    idempotency_key: Optional[str] = Field(max_length=128, min_length=1),  # Prevent duplicates
-    calendar_id: Optional[str] = Field(max_length=64),  # Calendar for scheduling
-    scheduled_at: Optional[int] = None,         # Schedule timestamp
-    machine_detection: Optional[bool] = False,  # Enable answering machine detection
-    voicemail: Optional[VoiceMail] = None,     # Voicemail configuration
-    menu: Optional[Menu] = None,               # Interactive menu configuration
-    end: Optional[End] = None                  # End message configuration
+    welcome: Welcome,                                                           # Welcome message configuration
+    language: Literal["fr-BE", "fr-FR", "nl-BE", "nl-NL", "en-GB", "de-DE"],    # Voice language
+    to: list[str] = Field(min_length=1, max_length=1000),                       # List of recipient phone numbers
+    from_: str = Field(min_length=8, max_length=15),                            # Sender phone number
+    batch_id: Optional[str] = Field(max_length=64),                             # Batch identifier
+    voice: Optional[Literal["man", "woman"]] = "woman",                         # Voice type
+    idempotency_key: Optional[str] = Field(max_length=128, min_length=1),       # Prevent duplicates
+    calendar_id: Optional[str] = Field(max_length=64),                          # Calendar for scheduling
+    scheduled_at: Optional[int] = None,                                         # Schedule timestamp
+    machine_detection: Optional[bool] = False,                                  # Enable answering machine detection
+    voicemail: Optional[VoiceMail] = None,                                      # Voicemail configuration
+    menu: Optional[Menu] = None,                                                # Interactive menu configuration
+    end: Optional[End] = None                                                   # End message configuration
 )
 ```
 
@@ -221,17 +221,17 @@ Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsres
 ### List Activity Logs
 ```python
 client.voice.activity_logs.list(
-    page: Optional[int] = 1,                    # Page number (default: 1)
-    page_size: Optional[int] = 50,             # Items per page (1-100, default: 50)
-    start: Optional[int] = None,               # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                # End timestamp (milliseconds)
-    direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,  # Call direction
-    status: Optional[Literal["delivered", "failed"]] = None,  # Call status
-    from_: Optional[str] = None,               # Filter by originating number
-    to: Optional[str] = None,                  # Filter by destination number
-    client_id: Optional[str] = None,           # Filter by client ID
-    campaign_id: Optional[str] = None,         # Filter by campaign ID
-    broadcast_id: Optional[str] = None         # Filter by broadcast ID
+    page: Optional[int] = 1,                                                    # Page number (default: 1)
+    page_size: Optional[int] = 50,                                              # Items per page (1-100, default: 50)
+    start: Optional[int] = None,                                                # Start timestamp (milliseconds)
+    stop: Optional[int] = None,                                                 # End timestamp (milliseconds)
+    direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,     # Call direction
+    status: Optional[Literal["delivered", "failed"]] = None,                    # Call status
+    from_: Optional[str] = None,                                                # Filter by originating number
+    to: Optional[str] = None,                                                   # Filter by destination number
+    client_id: Optional[str] = None,                                            # Filter by client ID
+    campaign_id: Optional[str] = None,                                          # Filter by campaign ID
+    broadcast_id: Optional[str] = None                                          # Filter by broadcast ID
 )
 ```
 
@@ -275,5 +275,4 @@ if call.transferred:
 ## Related Documentation
 
 - [Voice Models](../models/voice.md)
-- [Call Flow Guide](../guides/call-flow.md)
 - [Error Handling](../error-handling.md) 
