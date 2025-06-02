@@ -181,6 +181,34 @@ for stat in country_metrics.stats:
         print(f"Country: {stat.country} ({stat.mcc}-{stat.mnc})")
         print(f"Delivery rate: {delivery_rate:.1f}%")
         print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
+    print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
+
+# Get country-based metrics
+country_metrics = client.sms.reporting.list_outgoing_metrics_by_country(
+    start_date="2023-05-23",  # YYYY-MM-DD format required
+    stop_date="2023-05-23"
+)
+
+for stat in country_metrics.stats:
+    if stat.sms > 0:
+        delivery_rate = (stat.delivered / stat.sms) * 100
+        print(f"Country: {stat.country} ({stat.mcc}-{stat.mnc})")
+        print(f"Delivery rate: {delivery_rate:.1f}%")
+        print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
+    print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
+
+# Get country-based metrics
+country_metrics = client.sms.reporting.list_outgoing_metrics_by_country(
+    start_date="2023-05-23",  # YYYY-MM-DD format required
+    stop_date="2023-05-23"
+)
+
+for stat in country_metrics.stats:
+    if stat.sms > 0:
+        delivery_rate = (stat.delivered / stat.sms) * 100
+        print(f"Country: {stat.country} ({stat.mcc}-{stat.mnc})")
+        print(f"Delivery rate: {delivery_rate:.1f}%")
+        print(f"Average delivery time: {stat.avg_time_to_deliver} ms")
 ```
 
 ## Best Practices

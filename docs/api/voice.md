@@ -20,18 +20,8 @@ client.voice.call.create(
     voicemail: Optional[VoiceMail] = None,     # Voicemail configuration
     menu: Optional[Menu] = None,               # Interactive menu configuration
     end: Optional[End] = None                  # End message configuration
-    machine_detection: Optional[bool] = False,  # Enable answering machine detection
-    voicemail: Optional[VoiceMail] = None,     # Voicemail configuration
-    menu: Optional[Menu] = None,               # Interactive menu configuration
-    end: Optional[End] = None                  # End message configuration
 )
 ```
-
-Request Models:
-- [Welcome](../models/voice.md#welcome)
-- [VoiceMail](../models/voice.md#voicemail)
-- [Menu](../models/voice.md#menu)
-- [End](../models/voice.md#end)
 
 Request Models:
 - [Welcome](../models/voice.md#welcome)
@@ -46,11 +36,8 @@ Example:
 response = client.voice.call.create(
     welcome={"say": "Hello!"},
     language="en-GB",
-    welcome={"say": "Hello!"},
-    language="en-GB",
     to=["1234567890"],
     from_="0987654321",
-    voice="woman",
     voice="woman",
     end={"say": "Goodbye!"}
 )
@@ -64,7 +51,6 @@ print(f"Call ID: {response.calls[0].call_id}")
 client.voice.broadcasts.create(data: CreateBroadcastRequest)
 ```
 
-Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
 
@@ -90,7 +76,6 @@ client.voice.broadcasts.update(
 )
 ```
 
-Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Request: [CreateBroadcastRequest](../models/voice.md#createbroadcastrequest)  
 Returns: [BroadcastStatusResponse](../models/voice.md#broadcaststatusresponse)
 
@@ -186,42 +171,12 @@ Notes:
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
   - Both start_date and stop_date are required
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
 
 Returns: [ListInboundMetricsResponse](../models/voice.md#listinboundmetricsresponse)
 
 ### Outbound Metrics
 ```python
 client.voice.reporting.outbound.list(
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
     group: Literal["hour", "day", "month"],     # Time interval grouping
     start_date: Optional[str] = None,           # Start date for filtering
     stop_date: Optional[str] = None,            # End date for filtering
@@ -258,21 +213,6 @@ Notes:
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
   - Both start_date and stop_date are required
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
-    number: Optional[str] = None                # Filter by phone number
-)
-```
-
-Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
-- For "day"/"month" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
 
 Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsresponse)
 
@@ -281,17 +221,6 @@ Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsres
 ### List Activity Logs
 ```python
 client.voice.activity_logs.list(
-    page: Optional[int] = 1,                    # Page number (default: 1)
-    page_size: Optional[int] = 50,             # Items per page (1-100, default: 50)
-    start: Optional[int] = None,               # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                # End timestamp (milliseconds)
-    direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,  # Call direction
-    status: Optional[Literal["delivered", "failed"]] = None,  # Call status
-    from_: Optional[str] = None,               # Filter by originating number
-    to: Optional[str] = None,                  # Filter by destination number
-    client_id: Optional[str] = None,           # Filter by client ID
-    campaign_id: Optional[str] = None,         # Filter by campaign ID
-    broadcast_id: Optional[str] = None         # Filter by broadcast ID
     page: Optional[int] = 1,                    # Page number (default: 1)
     page_size: Optional[int] = 50,             # Items per page (1-100, default: 50)
     start: Optional[int] = None,               # Start timestamp (milliseconds)
