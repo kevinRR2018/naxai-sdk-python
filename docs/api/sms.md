@@ -23,6 +23,7 @@ client.sms.send(
 ```
 
 Request: [SendSMSRequest](../models/sms.md#sendsmsrequest)  
+Request: [SendSMSRequest](../models/sms.md#sendsmsrequest)  
 Returns: [SendSMSResponse](../models/sms.md#sendsmsresponse)
 
 Example:
@@ -49,6 +50,7 @@ print(f"Messages sent: {len(response.messages)}")
 ### List Activity Logs
 ```python
 client.sms.activity_logs.list(
+    page: int = 1,                                     # Page number to retrieve
     page: int = 1,                                     # Page number to retrieve
     page_size: int = 25,                               # Number of items per page
     start: Optional[int] = None,                       # Start timestamp (milliseconds)
@@ -155,6 +157,8 @@ Example:
 # Get daily metrics for a specific day
 # For hour grouping, use YYYY-MM-DD HH:MM:SS format
 metrics = client.sms.reporting.list_outgoing_metrics(
+    start_date="2025-05-23 00:00:00",
+    stop_date="2025-05-23 23:59:59",
     start_date="2025-05-23 00:00:00",
     stop_date="2025-05-23 23:59:59",
     group="hour"
