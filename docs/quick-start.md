@@ -50,14 +50,14 @@ print(f"Call initiated with ID: {response.call_id}")
 response = client.sms.send(
     to="1234567890",
     from_="0987654321",
-    text="Hello from Naxai SDK!"
+    body="Hello from Naxai SDK!"
 )
 
 # Send to multiple recipients
 response = client.sms.send(
     to=["1234567890", "1234567891"],
     from_="0987654321",
-    text="Bulk message from Naxai SDK!"
+    body="Bulk message from Naxai SDK!"
 )
 ```
 

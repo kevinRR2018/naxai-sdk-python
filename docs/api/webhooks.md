@@ -33,26 +33,22 @@ Returns: [WebhookBaseModel](../models/webhooks.md#webhookbasemodel)
 
 Example:
 ```python
-from naxai.models.webhooks.helper_models.authentication import BasicAuthModel
+from naxai.models.webhooks.helper_models.authentication import NoAuthModel
 
-# Create webhook with basic authentication
-response = client.webhooks.create(
-    name="Production Notifications",
-    url="https://your-domain.com/webhooks/naxai",
-    authentication=BasicAuthModel(
-        username="webhook_user",
-        password="webhook_password"
-    ),
-    event_object="Sms",
-    event_filter=["*"],  # Accept all events in category
-    event_names=[
-        "sms.message.sent",
-        "sms.message.delivered",
-        "sms.message.failed"
-    ],
-    active=True
-)
-print(f"Created webhook: {response.id}")
+    # Create webhook with basic authentication
+    response = client.webhooks.create(
+        name="Production Notifications",
+        url="https://your-domain.com/webhooks/naxai",
+        authentication=NoAuthModel(),
+        event_object="Sms",
+        event_filter=["*"],  # Accept all events in category
+        event_names=[
+            "sms.incoming.v1",
+            "sms.status.v1"
+        ],
+        active=False
+    )
+    print(f"Created webhook: {response.id}")
 ```
 
 ### Update Webhook
