@@ -262,8 +262,8 @@ class ContactsResource:
             language (Optional[str]): The contact's preferred language code (e.g., "en", "fr").
                 Defaults to None.
             created_at (Optional[int]): Timestamp when the contact was created in your system.
-                Must be between Jan 1, 2040 and Jan 1, 2100 (Unix timestamp in milliseconds).
-                Defaults to None.
+                Must be less than Jan 1, 2100 (Unix timestamp in milliseconds).
+                Defaults to current timestamp.
             **kwargs: Additional fields to set on the contact, including custom attributes.
                 These will be sent as-is to the API.
         
