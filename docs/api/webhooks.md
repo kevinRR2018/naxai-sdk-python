@@ -74,22 +74,18 @@ The update method uses JSON Patch operations (RFC 6902) to modify webhook config
 
 ```python
 from naxai.models.webhooks.requests.webhooks_requests import (
-    UpdateWebhookJsonPathRequestAddReplace,
-    UpdateWebhookJsonPathRequestRemove
+    UpdateWebhookJsonPathRequestAddReplace
 )
 
 # Update webhook URL and remove a field
-updates = [
-    UpdateWebhookJsonPathRequestAddReplace(
-        path="/url",
-        value="https://new-endpoint.example.com/webhooks"
-    ),
-    UpdateWebhookJsonPathRequestRemove(
-        path="/metadata/deprecated_field"
-    )
-]
+        updates = [
+            UpdateWebhookJsonPathRequestAddReplace(
+                path="/url",
+                value="https://new-endpoint.example.com/webhooks"
+            )
+        ]
 
-updated = client.webhooks.update("whk_123", updates)
+        updated = client.webhooks.update("992cbf38-53ce-415f-8479-d440775315bd", updates)
 ```
 
 ### Get Webhook
