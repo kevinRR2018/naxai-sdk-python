@@ -302,7 +302,7 @@ Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
 Example:
 ```python
 from naxai.models.people.requests.segments_requests import CreateSegmentRequest
-from naxai.models.people.search_condition import Condition, AttributeCondSimple, AttributeObject
+from naxai.models.people.segments_condition import Condition, AttributeCondSimple, AttributeObject
 
 # Create a dynamic segment for high-value customers
 condition = Condition(
@@ -365,14 +365,15 @@ now = datetime.datetime.now(tz=datetime.timezone.utc)
 start_date = now - datetime.timedelta(days=30)
 
 history = client.people.segments.history(
-    segment_id="seg_123",
+    segment_id="174f987d-328c-41a0-8117-12fb56455587",
     start=start_date,
     stop=now
 )
 
 print(f"Segment size changes over {len(history.history)} days:")
 for day in history.history:
-    date = datetime.datetime.fromtimestamp(day.date / 1000).strftime('%Y-%m-%d')
+    print(day.date)
+    date = datetime.datetime.fromtimestamp(day.date).strftime('%Y-%m-%d')
     print(f"{date}: {day.added} added, {day.removed} removed (total: {day.current})")
 ```
 
