@@ -232,17 +232,6 @@ client.voice.activity_logs.list(
     client_id: Optional[str] = None,                                            # Filter by client ID
     campaign_id: Optional[str] = None,                                          # Filter by campaign ID
     broadcast_id: Optional[str] = None                                          # Filter by broadcast ID
-    page: Optional[int] = 1,                                                    # Page number (default: 1)
-    page_size: Optional[int] = 50,                                              # Items per page (1-100, default: 50)
-    start: Optional[int] = None,                                                # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                                                 # End timestamp (milliseconds)
-    direction: Optional[Literal["inbound", "outbound", "transfer"]] = None,     # Call direction
-    status: Optional[Literal["delivered", "failed"]] = None,                    # Call status
-    from_: Optional[str] = None,                                                # Filter by originating number
-    to: Optional[str] = None,                                                   # Filter by destination number
-    client_id: Optional[str] = None,                                            # Filter by client ID
-    campaign_id: Optional[str] = None,                                          # Filter by campaign ID
-    broadcast_id: Optional[str] = None                                          # Filter by broadcast ID
 )
 ```
 
