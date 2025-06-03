@@ -100,19 +100,17 @@ client.people.contacts.search(
 )
 ```
 
+Request: [SearchCondition](../models/people.md#searchcondition)  
 Returns: [SearchContactsResponse](../models/people.md#searchcontactsresponse)
 
 Example:
 ```python
 from naxai.models.people.helper_models.search_condition import SearchCondition
 
-# Search for active US customers
-condition = SearchCondition(
-    all=[
-        {"attribute": {"field": "country", "operator": "eq", "value": "US"}},
-        {"attribute": {"field": "status", "operator": "eq", "value": "active"}}
-    ]
-)
+# Search for vip customers
+condition = {"all": [{"attribute": {"field": "loyalty_tier", "operator": "eq", "value": "vip"}}
+            ]
+        }
 
 results = client.people.contacts.search(
     page=1,
@@ -121,8 +119,8 @@ results = client.people.contacts.search(
     condition=condition
 )
 
-print(f"Found {results.pagination.total_items} matching contacts")
-for contact in results.contacts:
+print(f"Found {results.pagination.total_record} matching contacts")
+for contact in results.items:
     print(f"- {contact.email} (ID: {contact.nx_id})")
 ```
 
@@ -148,7 +146,7 @@ client.people.contacts.create_or_update(
     external_id: Optional[str] = None,  # External identifier
     unsubscribe: Optional[bool] = None,  # Unsubscribe status
     language: Optional[str] = None,  # Preferred language code
-    created_at: Optional[int] = None,  # Creation timestamp
+    created_at: Optional[int] = int(datetime.datetime.now().timestamp()),  # Creation timestamp
     **kwargs  # Additional custom attributes
 )
 ```
@@ -169,7 +167,7 @@ response = client.people.contacts.create_or_update(
     loyalty_tier="Gold"
 )
 
-print(f"Contact {'created' if response.created else 'updated'}: {response.email}")
+print(f"Contact {response.email} created.")
 ```
 
 ### Get Contact
@@ -298,6 +296,9 @@ client.people.segments.create(
 )
 ```
 
+Request: [CreateSegmentRequest](../models/people.md#createsegmentrequest)  
+Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
+
 Example:
 ```python
 from naxai.models.people.requests.segments_requests import CreateSegmentRequest
@@ -335,6 +336,9 @@ client.people.segments.update(
     data: CreateSegmentRequest    # Updated configuration
 )
 ```
+
+Request: [CreateSegmentRequest](../models/people.md#createsegmentrequest)  
+Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
 
 ### Delete Segment
 ```python

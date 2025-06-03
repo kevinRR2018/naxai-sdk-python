@@ -7,19 +7,25 @@ The Email API allows you to send transactional emails and track their delivery a
 ### Send Email
 ```python
 client.email.send(
-    sender_email: str,                      # Verified sender email address
-    sender_name: str,                       # Display name of the sender
-    subject: str,                           # Email subject line
-    to: List[DestinationObject],            # List of recipients (1-1000)
-    cc: Optional[List[CCObject]] = None,    # CC recipients (max 50)
-    bcc: Optional[List[BCCObject]] = None,  # BCC recipients (max 50)
-    reply_to: Optional[str] = None,         # Reply-to email address
-    text: Optional[str] = None,             # Plain text email body
-    html: Optional[str] = None,             # HTML email body
-    attachments: List[Attachment] = None,    # File attachments
-    enable_tracking: Optional[bool] = None   # Enable open/click tracking
+    sender_email: str,                          # Verified sender email address
+    sender_name: str,                           # Display name of the sender
+    subject: str,                               # Email subject line
+    to: List[DestinationObject],                # List of recipients (1-1000)
+    cc: Optional[List[CCObject]] = None,        # CC recipients (max 50)
+    bcc: Optional[List[BCCObject]] = None,      # BCC recipients (max 50)
+    reply_to: Optional[str] = None,             # Reply-to email address
+    text: Optional[str] = None,                 # Plain text email body
+    html: Optional[str] = None,                 # HTML email body
+    attachments: List[Attachment] = None,       # File attachments
+    enable_tracking: Optional[bool] = None      # Enable open/click tracking
 )
 ```
+
+Request Models:
+- [DestinationObject](../models/email.md#destinationobject)
+- [CCObject](../models/email.md#ccobject)
+- [BCCObject](../models/email.md#bccobject)
+- [Attachment](../models/email.md#attachment)
 
 Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
 
@@ -75,30 +81,30 @@ client.email.transactional.send(
 )
 ```
 
+Request: [SendTransactionalEmailRequest](../models/email.md#sendtransactionalemailrequest)  
 Returns: [SendTransactionalEmailResponse](../models/email.md#sendtransactionalemailresponse)
 
 Example:
 ```python
-response = client.email.transactional.send(data={
-    "sender": {
-        "email": "sender@yourdomain.com",
-        "name": "Your Name"
-    },
-    "subject": "Team Update",
-    "to": [
-        {"email": "team@example.com", "name": "Team"}
-    ],
-    "cc": [
-        {"email": "manager@example.com", "name": "Manager"}
-    ],
-    "bcc": [
-        {"email": "archive@example.com"}
-    ],
-    "html": "<p>Monthly team update...</p>",
-    "text": "Monthly team update...",
-    "reply_to": "replies@yourdomain.com",
-    "enable_tracking": True
-})
+request = SendTransactionalEmailRequest.model_validate(
+    {
+        "sender": {
+            "email": "sender@yourdomain.com",
+            "name": "Your Name"
+            },
+            "subject": "Team Update",
+            "to": [{"email": "team@example.com", "name": "Team"}],
+            "cc": [{"email": "manager@example.com", "name": "Manager"}],
+            "bcc": [{"email": "archive@example.com", "name": "Archive"}],
+            "html": "<p>Monthly team update...</p>",
+            "text": "Monthly team update...",
+            "reply_to": "replies@yourdomain.com",
+            "enable_tracking": True
+    })
+#Send an email
+response = client.email.transactional.send(data=request)
+
+print(f"Email sent with ID: {response.id}")
 ```
 
 ## Activity Logs
@@ -108,15 +114,15 @@ The Activity Logs API allows you to track and analyze the delivery status and en
 ### List Activity Logs
 ```python
 client.email.activity_logs.list(
-    page: Optional[int] = 1,                                      # Page number (default: 1)
-    page_size: Optional[int] = 50,                               # Items per page (1-100, default: 50)
-    start: Optional[int] = None,                                 # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                                  # End timestamp (milliseconds)
-    sort: Optional[str] = "updatedAt:desc",                      # Sort order (field:direction)
-    email: Optional[str] = None,                                 # Filter by recipient email
-    client_id: Optional[str] = None,                             # Filter by client ID
-    campaign_id: Optional[str] = None,                           # Filter by campaign ID
-    status: Optional[Literal["sent", "delivered", "failed"]] = None  # Filter by status
+    page: Optional[int] = 1,                                        # Page number (default: 1)
+    page_size: Optional[int] = 50,                                  # Items per page (1-100, default: 50)
+    start: Optional[int] = None,                                    # Start timestamp (milliseconds)
+    stop: Optional[int] = None,                                     # End timestamp (milliseconds)
+    sort: Optional[str] = "updatedAt:desc",                         # Sort order (field:direction)
+    email: Optional[str] = None,                                    # Filter by recipient email
+    client_id: Optional[str] = None,                                # Filter by client ID
+    campaign_id: Optional[str] = None,                              # Filter by campaign ID
+    status: Optional[Literal["sent", "delivered", "failed"]] = None # Filter by status
 )
 ```
 
@@ -129,15 +135,15 @@ activity_logs = client.email.activity_logs.list(
     page=1,
     page_size=25
 )
-print(f"Found {activity_logs.pagination.total_items} emails")
-print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.total_pages}")
+print(f"Found {activity_logs.pagination.total_record} emails")
+print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.last}")
 for msg in activity_logs.messages:
     print(f"Email: {msg.subject} - Status: {msg.status}")
 
 # Filtering by date range, status, and recipient
 import time
-one_week_ago = int(time.time() * 1000) - (7 * 24 * 60 * 60 * 1000)
-now = int(time.time() * 1000)
+one_week_ago = int(time.time()) - (7 * 24 * 60 * 60)
+now = int(time.time())
 
 delivered_emails = client.email.activity_logs.list(
     start=one_week_ago,
@@ -239,9 +245,9 @@ The Reporting Resource provides comprehensive analytics and metrics for your ema
 ### Email Metrics
 ```python
 client.email.reporting.metrics.list(
-    start: Optional[int] = (now - 7 days),     # Start timestamp in seconds since epoch
-    stop: Optional[int] = now,                 # End timestamp in seconds since epoch
-    group: Optional[Literal["day", "month"]] = "day"  # Time interval grouping
+    start: Optional[int] = (now - 7 days),              # Start timestamp in seconds since epoch
+    stop: Optional[int] = now,                          # End timestamp in seconds since epoch
+    group: Optional[Literal["day", "month"]] = "day"    # Time interval grouping
 )
 ```
 
@@ -277,7 +283,7 @@ metrics = client.email.reporting.metrics.list(
 )
 
 print(f"Email metrics from {datetime.fromtimestamp(metrics.start/1000)}")
-print(f"to {datetime.fromtimestamp(metrics.stop/1000)}")
+print(f"to {datetime.fromtimestamp(current_time)}")
 print(f"Grouped by: {metrics.group}")
 print(f"Data points: {len(metrics.stats)}")
 
@@ -309,14 +315,6 @@ if metrics.stats:
     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, "
           f"Clicked: {best_day.clicked_unique}")
 
-# Get monthly metrics for the current year
-year_start = int(datetime(datetime.now().year, 1, 1).timestamp())
-monthly_metrics = client.email.reporting.metrics.list(
-    start=year_start,
-    stop=current_time,
-    group="month"
-)
-print(f"\nMonthly email metrics for {datetime.now().year}")
 ```
 
 Notes:
@@ -339,9 +337,9 @@ Notes:
 ### Clicked URLs Metrics
 ```python
 client.email.reporting.clicked_urls.list(
-    start: Optional[int] = (now - 7 days),     # Start timestamp in seconds since epoch
-    stop: Optional[int] = now,                 # End timestamp in seconds since epoch
-    group: Optional[Literal["day", "month"]] = "day"  # Time interval grouping
+    start: Optional[int] = (now - 7 days),              # Start timestamp in seconds since epoch
+    stop: Optional[int] = now,                          # End timestamp in seconds since epoch
+    group: Optional[Literal["day", "month"]] = "day"    # Time interval grouping
 )
 ```
 
@@ -366,7 +364,7 @@ metrics = client.email.reporting.clicked_urls.list(
 )
 
 print(f"URL click metrics from {datetime.fromtimestamp(metrics.start/1000)}")
-print(f"to {datetime.fromtimestamp(metrics.stop/1000)}")
+print(f"to {datetime.fromtimestamp(current_time)}")
 print(f"Found data for {len(metrics.stats)} URLs")
 
 # Find and display the most clicked URLs
