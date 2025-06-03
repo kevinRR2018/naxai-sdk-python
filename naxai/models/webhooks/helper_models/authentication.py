@@ -29,6 +29,7 @@ class BasicAuthModel(BaseModel):
     """
     type_: str = Field(alias="type", default="basic")
     user: str
+    password: str
 
     model_config = {"populate_by_name": True}
 
