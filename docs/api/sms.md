@@ -23,7 +23,6 @@ client.sms.send(
 ```
 
 Request: [SendSMSRequest](../models/sms.md#sendsmsrequest)  
-Request: [SendSMSRequest](../models/sms.md#sendsmsrequest)  
 Returns: [SendSMSResponse](../models/sms.md#sendsmsresponse)
 
 Example:
@@ -202,7 +201,6 @@ for stat in country_metrics.stats:
 ## Best Practices
 
 1. Always use `idempotency_key` for important messages to prevent duplicates
-2. Use E.164 format for phone numbers (e.g., "32477112233")
 2. Use E.164 format for phone numbers (e.g., "32477112233")
 3. Monitor delivery errors regularly
 4. Use appropriate time ranges for metrics to avoid timeout issues
