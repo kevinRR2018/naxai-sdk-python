@@ -36,8 +36,8 @@ The `ScheduleObject` for each day contains:
 
 Example:
 ```python
-from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
-from naxai.models.calendars.schedule_object import ScheduleObject
+from naxai.models.calendars.requests.calendar_requests import (
+    CreateCalendarRequest, ScheduleObject)
 
 # Create a calendar with business hours
 schedule = [
