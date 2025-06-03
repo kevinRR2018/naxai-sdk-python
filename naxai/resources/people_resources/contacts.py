@@ -326,6 +326,7 @@ class ContactsResource:
               from your system
             - For bulk operations, consider using the batch API endpoints
         """
+
         data = {
             "email": email,
             "externalId": external_id,
