@@ -146,7 +146,7 @@ client.people.contacts.create_or_update(
     external_id: Optional[str] = None,  # External identifier
     unsubscribe: Optional[bool] = None,  # Unsubscribe status
     language: Optional[str] = None,  # Preferred language code
-    created_at: Optional[int] = None,  # Creation timestamp
+    created_at: Optional[int] = int(datetime.datetime.now().timestamp()),  # Creation timestamp
     **kwargs  # Additional custom attributes
 )
 ```
@@ -167,7 +167,7 @@ response = client.people.contacts.create_or_update(
     loyalty_tier="Gold"
 )
 
-print(f"Contact {'created' if response.created else 'updated'}: {response.email}")
+print(f"Contact {response.email} created.")
 ```
 
 ### Get Contact
@@ -217,7 +217,6 @@ client.people.contacts.events.send(
 )
 ```
 
-Request: [SendContactEventRequest](../models/people.md#sendcontacteventrequest)  
 Returns: None
 
 Example:
