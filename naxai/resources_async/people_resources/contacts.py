@@ -32,6 +32,7 @@ Sub-resources:
 """
 
 import json
+import datetime
 from typing import Optional, Union
 from pydantic import Field, validate_call
 from naxai.models.people.helper_models.search_condition import SearchCondition
@@ -239,9 +240,8 @@ class ContactsResource:
                                external_id: Optional[str] = None,
                                unsubscribe: Optional[bool] = None,
                                language: Optional[str] = None,
-                               created_at: Optional[int] = Field(ge=2208988800,
-                                                                 le=4102444800,
-                                                                 default=None),
+                               created_at: Optional[int] = Field(le=4102444800,
+                                                                 default=int(datetime.datetime.now().timestamp())),
                                **kwargs):
         """
         Create a new contact or update an existing one in the Naxai People API.
