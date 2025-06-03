@@ -31,7 +31,7 @@ class EventsResource:
                 identifier: str,
                 name: Optional[str] = None,
                 type_: Optional[Literal["event"]] = Field(default=None),
-                timestamp: Optional[int] = datetime.datetime.now(tz=datetime.timezone.utc),
+                timestamp: Optional[int] = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp()),
                 idempotency_key: Optional[str] = Field(default=None, max_length=200),
                 data: Optional[dict[str,str]] = None):
 
