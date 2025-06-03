@@ -40,7 +40,7 @@ response = client.voice.call.create(
     welcome=welcome,
     end=end
 )
-print(f"Call initiated with ID: {response.call_id}")
+print(f"Call initiated with ID: {response.calls[0].call_id}")
 ```
 
 ### Send an SMS
@@ -84,7 +84,8 @@ contact = client.people.contacts.create_or_update(
     identifier="user@example.com",
     email="user@example.com",
     phone="1234567890",
-    language="en"
+    language="en",
+    external_id="USER_123"
 )
 
 # Search contacts
