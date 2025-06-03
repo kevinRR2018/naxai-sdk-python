@@ -309,11 +309,12 @@ class WebhooksResource:
             >>> updated = client.webhooks.update([update_op])
             >>> print(f"Updated webhook URL: {updated.url}")
         """
+        json_str = [operation.model_dump() for operation in update_operations]
         # pylint: disable=protected-access
         return UpdateWebhookResponse.model_validate_json(
             json.dumps(self._client._request("PATCH",
                                              self.root_path + "/" + webhook_id,
-                                             json=update_operations,
+                                             json=json_str,
                                              headers=self.headers)
                                                    ))
 
