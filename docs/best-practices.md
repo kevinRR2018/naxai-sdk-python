@@ -96,9 +96,10 @@ from naxai.base.exceptions import (
 
 try:
     response = client.voice.call.create(
-        to=["+1234567890"],
-        from_="+0987654321",
-        welcome={"say": "Welcome message"}
+        to=["1234567890"],
+        from_="0987654321",
+        welcome={"say": "Welcome message"},
+        language="en-GB"
     )
 except NaxaiAuthenticationError as e:
     # Handle authentication failures

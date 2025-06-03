@@ -7,17 +7,17 @@ The Email API allows you to send transactional emails and track their delivery a
 ### Send Email
 ```python
 client.email.send(
-    sender_email: str,                      # Verified sender email address
-    sender_name: str,                       # Display name of the sender
-    subject: str,                           # Email subject line
-    to: List[DestinationObject],            # List of recipients (1-1000)
-    cc: Optional[List[CCObject]] = None,    # CC recipients (max 50)
-    bcc: Optional[List[BCCObject]] = None,  # BCC recipients (max 50)
-    reply_to: Optional[str] = None,         # Reply-to email address
-    text: Optional[str] = None,             # Plain text email body
-    html: Optional[str] = None,             # HTML email body
-    attachments: List[Attachment] = None,    # File attachments
-    enable_tracking: Optional[bool] = None   # Enable open/click tracking
+    sender_email: str,                          # Verified sender email address
+    sender_name: str,                           # Display name of the sender
+    subject: str,                               # Email subject line
+    to: List[DestinationObject],                # List of recipients (1-1000)
+    cc: Optional[List[CCObject]] = None,        # CC recipients (max 50)
+    bcc: Optional[List[BCCObject]] = None,      # BCC recipients (max 50)
+    reply_to: Optional[str] = None,             # Reply-to email address
+    text: Optional[str] = None,                 # Plain text email body
+    html: Optional[str] = None,                 # HTML email body
+    attachments: List[Attachment] = None,       # File attachments
+    enable_tracking: Optional[bool] = None      # Enable open/click tracking
 )
 ```
 
@@ -114,15 +114,15 @@ The Activity Logs API allows you to track and analyze the delivery status and en
 ### List Activity Logs
 ```python
 client.email.activity_logs.list(
-    page: Optional[int] = 1,                                      # Page number (default: 1)
-    page_size: Optional[int] = 50,                               # Items per page (1-100, default: 50)
-    start: Optional[int] = None,                                 # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                                  # End timestamp (milliseconds)
-    sort: Optional[str] = "updatedAt:desc",                      # Sort order (field:direction)
-    email: Optional[str] = None,                                 # Filter by recipient email
-    client_id: Optional[str] = None,                             # Filter by client ID
-    campaign_id: Optional[str] = None,                           # Filter by campaign ID
-    status: Optional[Literal["sent", "delivered", "failed"]] = None  # Filter by status
+    page: Optional[int] = 1,                                        # Page number (default: 1)
+    page_size: Optional[int] = 50,                                  # Items per page (1-100, default: 50)
+    start: Optional[int] = None,                                    # Start timestamp (milliseconds)
+    stop: Optional[int] = None,                                     # End timestamp (milliseconds)
+    sort: Optional[str] = "updatedAt:desc",                         # Sort order (field:direction)
+    email: Optional[str] = None,                                    # Filter by recipient email
+    client_id: Optional[str] = None,                                # Filter by client ID
+    campaign_id: Optional[str] = None,                              # Filter by campaign ID
+    status: Optional[Literal["sent", "delivered", "failed"]] = None # Filter by status
 )
 ```
 
@@ -245,9 +245,9 @@ The Reporting Resource provides comprehensive analytics and metrics for your ema
 ### Email Metrics
 ```python
 client.email.reporting.metrics.list(
-    start: Optional[int] = (now - 7 days),     # Start timestamp in seconds since epoch
-    stop: Optional[int] = now,                 # End timestamp in seconds since epoch
-    group: Optional[Literal["day", "month"]] = "day"  # Time interval grouping
+    start: Optional[int] = (now - 7 days),              # Start timestamp in seconds since epoch
+    stop: Optional[int] = now,                          # End timestamp in seconds since epoch
+    group: Optional[Literal["day", "month"]] = "day"    # Time interval grouping
 )
 ```
 
@@ -337,9 +337,9 @@ Notes:
 ### Clicked URLs Metrics
 ```python
 client.email.reporting.clicked_urls.list(
-    start: Optional[int] = (now - 7 days),     # Start timestamp in seconds since epoch
-    stop: Optional[int] = now,                 # End timestamp in seconds since epoch
-    group: Optional[Literal["day", "month"]] = "day"  # Time interval grouping
+    start: Optional[int] = (now - 7 days),              # Start timestamp in seconds since epoch
+    stop: Optional[int] = now,                          # End timestamp in seconds since epoch
+    group: Optional[Literal["day", "month"]] = "day"    # Time interval grouping
 )
 ```
 

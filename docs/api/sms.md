@@ -49,7 +49,7 @@ print(f"Messages sent: {len(response.messages)}")
 ### List Activity Logs
 ```python
 client.sms.activity_logs.list(
-    page: int = 1,                                      # Page number to retrieve
+    page: int = 1,                                     # Page number to retrieve
     page_size: int = 25,                               # Number of items per page
     start: Optional[int] = None,                       # Start timestamp (milliseconds)
     stop: Optional[int] = None,                        # End timestamp (milliseconds)

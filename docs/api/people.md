@@ -151,7 +151,6 @@ client.people.contacts.create_or_update(
 )
 ```
 
-Request: [CreateOrUpdateContactRequest](../models/people.md#createorupdatecontactrequest)  
 Returns: [CreateOrUpdateContactResponse](../models/people.md#createorupdatecontactresponse)
 
 Example:

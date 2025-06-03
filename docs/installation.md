@@ -73,7 +73,8 @@ with NaxaiClient() as client:
     response = client.voice.call.create(
         to=["1234567890"],
         from_="0987654321",
-        welcome={"say": "Hello!"}
+        welcome={"say": "Hello!"},
+        language="en-GB"
     )
 ```
 
@@ -88,7 +89,8 @@ async def main():
         response = await client.voice.call.create(
             to=["1234567890"],
             from_="0987654321",
-            welcome={"say": "Hello!"}
+            welcome={"say": "Hello!"},
+            language="en-GB"
         )
 
 asyncio.run(main())
@@ -114,8 +116,11 @@ Example with best practices:
 
 ```python
 import os
+import logging
 from naxai import NaxaiClient
-from naxai.base.exceptions import NaxaiAuthError
+from naxai.base.exceptions import NaxaiAuthenticationError
+
+logger = logging.getLogger(__name__)
 
 # Load configuration from environment
 client_id = os.getenv("NAXAI_CLIENT_ID")
@@ -131,7 +136,7 @@ try:
     ) as client:
         # Your code here
         response = client.voice.call.create(...)
-except NaxaiAuthError as e:
+except NaxaiAuthenticationError as e:
     logger.error(f"Authentication failed: {e}")
     # Handle authentication error
 except Exception as e:
