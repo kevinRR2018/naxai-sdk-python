@@ -3,6 +3,7 @@ Unit tests for the asynchronous ContactsResource class.
 """
 import json
 import pytest
+import datetime
 from unittest.mock import patch, MagicMock, AsyncMock
 from naxai.resources_async.people_resources.contacts import ContactsResource
 from naxai.models.people.helper_models.search_condition import SearchCondition
@@ -207,7 +208,7 @@ class TestContactsResourceAsync:
             "company": "Acme Inc."
         }
         mock_client._request.return_value = mock_response
-
+        created_at = int(datetime.datetime.now(tz=datetime.timezone.utc).timestamp())
         # Call the method
         result = await contacts_resource.create_or_update(
             identifier="john.doe@example.com",
@@ -216,7 +217,8 @@ class TestContactsResourceAsync:
             language="en",
             first_name="John",
             last_name="Doe",
-            company="Acme Inc."
+            company="Acme Inc.",
+            created_at=created_at
         )
 
         # Verify the result
@@ -240,7 +242,7 @@ class TestContactsResourceAsync:
             "externalId": "cust_456",
             "unsubscribe": None,
             "language": "en",
-            "createdAt": None,
+            "createdAt": created_at,
             "first_name": "John",
             "last_name": "Doe",
             "company": "Acme Inc."
