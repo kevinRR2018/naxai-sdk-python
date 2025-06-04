@@ -195,11 +195,11 @@ result = client.calendars.check("cal_123")
 if result.match_:
     print("Current time is within working hours")
 else:
-    next_time = datetime.fromtimestamp(result.next_ / 1000)
+    next_time = datetime.fromtimestamp(result.next_)
     print(f"Next available time: {next_time}")
 
 # Check specific time
-future_time = int(time.time() * 1000) + (24 * 60 * 60 * 1000)  # Tomorrow
+future_time = int(time.time()) + (24 * 60 * 60)  # Tomorrow
 result = client.calendars.check("cal_123", timestamp=future_time)
 ```
 
