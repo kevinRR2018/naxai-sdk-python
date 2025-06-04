@@ -53,7 +53,7 @@ class ScheduleObject(BaseModel):
     model_config = {"populate_by_name": True}
 
     @model_validator(mode='after')
-    def check_passwords_match(self) -> Self:
+    def check_extension_match(self) -> Self:
         """Validates if extension_start and extension_stop are provided extend is set to True"""
         if self.extended:
             if not self.extension_start:
