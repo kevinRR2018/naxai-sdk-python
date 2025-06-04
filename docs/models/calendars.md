@@ -9,11 +9,11 @@ Base model for calendar configuration.
 
 ```python
 class Calendar(BaseModel):
-    id: Optional[str] = None           # Unique calendar identifier
-    name: str                          # Calendar name
-    timezone: Optional[str] = "Europe/Brussels"  # IANA timezone name
-    schedule: list[ScheduleObject]     # List of exactly 7 schedule objects
-    exclusions: Optional[list[str]] = None  # List of excluded dates
+    id: Optional[str] = None                    # Unique calendar identifier
+    name: str                                   # Calendar name
+    timezone: Optional[str] = "Europe/Brussels" # IANA timezone name
+    schedule: list[ScheduleObject]              # List of exactly 7 schedule objects
+    exclusions: Optional[list[str]] = None      # List of excluded dates
 ```
 
 ### ScheduleObject
@@ -54,9 +54,7 @@ calendar = Calendar(
             open=True,
             start="09:00",
             stop="17:00",
-            extended=False,
-            extension_start="",
-            extension_stop=""
+            extended=False
         ),
         # ... repeat for all 7 days
     ]
@@ -70,15 +68,16 @@ Model for creating new calendars.
 
 ```python
 class CreateCalendarRequest(BaseModel):
-    name: str                          # Calendar name
-    timezone: Optional[str] = "Europe/Brussels"  # IANA timezone
-    schedule: list[ScheduleObject]     # List of exactly 7 schedule objects
-    exclusions: Optional[list[str]] = None  # List of excluded dates
+    name: str                                   # Calendar name
+    timezone: Optional[str] = "Europe/Brussels" # IANA timezone
+    schedule: list[ScheduleObject]              # List of exactly 7 schedule objects
+    exclusions: Optional[list[str]] = None      # List of excluded dates
 ```
 
 Example:
 ```python
 from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
+from naxai.models.calendars.schedule_object  import ScheduleObject
 
 request = CreateCalendarRequest(
     name="Business Hours",
@@ -89,9 +88,7 @@ request = CreateCalendarRequest(
             open=True,
             start="09:00",
             stop="17:00",
-            extended=False,
-            extension_start="",
-            extension_stop=""
+            extended=False
         ),
         # ... repeat for all 7 days
     ],
@@ -136,11 +133,11 @@ Response model for listing calendars.
 
 ```python
 class ListCalendarsResponse(BaseModel):
-    root: list[Calendar]  # List of calendar objects
+    root: list[Calendar]            # List of calendar objects
     
-    def __len__(self) -> int         # Get number of calendars
-    def __getitem__(self, index)     # Access calendar by index
-    def __iter__(self)               # Iterate through calendars
+    def __len__(self) -> int        # Get number of calendars
+    def __getitem__(self, index)    # Access calendar by index
+    def __iter__(self)              # Iterate through calendars
 ```
 
 ### ExclusionResponse
@@ -200,7 +197,6 @@ class CheckCalendarResponse(BaseModel):
 
 Example with best practices:
 ```python
-from datetime import datetime
 from naxai.models.calendars.requests.calendar_requests import CreateCalendarRequest
 from naxai.models.calendars.schedule_object import ScheduleObject
 
@@ -223,9 +219,7 @@ for day in range(1, 8):  # 1-7 (Monday to Sunday)
             open=False,
             start="",
             stop="",
-            extended=False,
-            extension_start="",
-            extension_stop=""
+            extended=False
         ))
 
 calendar = CreateCalendarRequest(
