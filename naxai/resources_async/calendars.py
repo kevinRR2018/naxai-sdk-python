@@ -105,7 +105,7 @@ class CalendarsResource:
             ...     print(f"Next available time: {response.next_}")
             >>>
             >>> # Check specific timestamp
-            >>> specific_time = 1703066400000  # Some future timestamp
+            >>> specific_time = 1703066400  # Some future timestamp
             >>> response = await client.calendars.check(
             ...     "cal_123abc",
             ...     timestamp=specific_time
@@ -113,7 +113,7 @@ class CalendarsResource:
 
         Note:
             - The request is made with "Content-Type: application/json" header
-            - Timestamps are represented in milliseconds since epoch
+            - Timestamps are represented in seconds since epoch
             - The check considers both regular and extended hours if configured
             - Exclusion dates are taken into account during availability checking
             - The default timestamp is the current UTC time
