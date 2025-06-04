@@ -6,7 +6,9 @@ including operating hours and extended hours for each day of the week.
 """
 
 from typing import Optional
-from pydantic import BaseModel, Field
+from typing_extensions import Self
+from pydantic import BaseModel, Field, model_validator
+from naxai.base.exceptions import NaxaiValueError
 
 HOUR_PATTERN = r'^\d{2}:\d{2}$'
 
@@ -48,5 +50,14 @@ class ScheduleObject(BaseModel):
                                            pattern=HOUR_PATTERN, default=None)
     extension_stop: Optional[str] = Field(alias="extensionStop", pattern=HOUR_PATTERN, default=None)
 
-    model_config = {"populate_by_name": True,
-                    "validate_by_name": True}
+    model_config = {"populate_by_name": True}
+
+    @model_validator(mode='after')
+    def check_passwords_match(self) -> Self:
+        """Validates if extension_start and extension_stop are provided extend is set to True"""
+        if self.extended:
+            if not self.extension_start:
+                raise NaxaiValueError("extension_start can't be None when extend is True.")
+            if not self.extension_stop:
+                raise NaxaiValueError("extension_stop can't be None when extend is True.")
+        return self
