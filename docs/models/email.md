@@ -9,16 +9,16 @@ Main model for sending transactional emails.
 
 ```python
 class SendTransactionalEmailRequest(BaseModel):
-    sender: SenderObject           # Sender information
-    to: list[DestinationObject]   # List of recipients
-    cc: Optional[list[CCObject]] = None  # CC recipients
-    bcc: Optional[list[BCCObject]] = None  # BCC recipients
-    reply_to: Optional[str] = None  # Reply-to email address
-    subject: str                  # Email subject line
-    text: Optional[str] = None    # Plain text content
-    html: Optional[str] = None    # HTML content
-    attachments: Optional[list[Attachment]] = None  # File attachments
-    enable_tracking: Optional[bool] = None  # Enable open/click tracking
+    sender: SenderObject                                # Sender information
+    to: list[DestinationObject]                         # List of recipients
+    cc: Optional[list[CCObject]] = None                 # CC recipients
+    bcc: Optional[list[BCCObject]] = None               # BCC recipients
+    reply_to: Optional[str] = None                      # Reply-to email address
+    subject: str                                        # Email subject line
+    text: Optional[str] = None                          # Plain text content
+    html: Optional[str] = None                          # HTML content
+    attachments: Optional[list[Attachment]] = None      # File attachments
+    enable_tracking: Optional[bool] = None              # Enable open/click tracking
 ```
 
 ### SenderObject
@@ -26,8 +26,8 @@ Model for email sender information.
 
 ```python
 class SenderObject(BaseObject):
-    email: str                # Sender's email address
-    name: str                # Sender's display name
+    email: str  # Sender's email address
+    name: str   # Sender's display name
 ```
 
 ### DestinationObject, CCObject, BCCObject
@@ -35,8 +35,8 @@ Models for email recipients.
 
 ```python
 class BaseObject(BaseModel):
-    email: str                # Email address
-    name: str                # Display name
+    email: str  # Email address
+    name: str   # Display name
 
 class DestinationObject(BaseObject):
     # Inherits email and name from BaseObject
@@ -56,10 +56,10 @@ Model for email attachments.
 
 ```python
 class Attachment(BaseModel):
-    id: str                  # Unique attachment identifier
-    name: str               # Attachment filename
-    content_type: str       # MIME type
-    data: str              # Base64 encoded content
+    id: str             # Unique attachment identifier
+    name: str           # Attachment filename
+    content_type: str   # MIME type
+    data: str           # Base64 encoded content
 ```
 
 Example usage:
@@ -106,15 +106,15 @@ Base model for email activity tracking.
 
 ```python
 class BaseActivityLogs(BaseModel):
-    message_id: str          # Message ID
-    from_email: str         # Sender email
-    to_email: Optional[str] # Recipient email
-    subject: Optional[str]  # Email subject
-    status: Optional[Literal["sent", "delivered", "failed"]]  # Current status
-    created_at: Optional[int] # Creation timestamp (ms)
-    updated_at: Optional[int] # Last update timestamp (ms)
-    opens: Optional[int]    # Number of opens
-    clicks: Optional[int]   # Number of clicks
+    message_id: str                                                         # Message ID
+    from_email: str                                                         # Sender email
+    to_email: Optional[str]                                                 # Recipient email
+    subject: Optional[str]                                                  # Email subject
+    status: Optional[Literal["sent", "delivered", "failed", "processed"]]   # Current status
+    created_at: Optional[int]                                               # Creation timestamp (ms)
+    updated_at: Optional[int]                                               # Last update timestamp (ms)
+    opens: Optional[int]                                                    # Number of opens
+    clicks: Optional[int]                                                   # Number of clicks
 ```
 
 ### EmailEvents
@@ -122,9 +122,9 @@ Model for detailed email event tracking.
 
 ```python
 class EmailEvents(BaseModel):
-    name: Optional[str]     # Event name
-    processed: Optional[int] # Event timestamp
-    reason: Optional[Union[dict, str]] # Additional event details
+    name: Optional[str]                 # Event name
+    processed: Optional[int]            # Event timestamp
+    reason: Optional[Union[dict, str]]  # Additional event details
 ```
 
 ### GetEmailActivityLogsResponse
@@ -133,9 +133,9 @@ Detailed activity log response model.
 ```python
 class GetEmailActivityLogsResponse(BaseActivityLogs):
     events: Optional[list[EmailEvents]] = None  # Event history
-    email: Optional[str] = None        # Alternative recipient email
-    client_id: Optional[str] = None    # Client identifier
-    campaign_id: Optional[str] = None  # Campaign identifier
+    email: Optional[str] = None                 # Alternative recipient email
+    client_id: Optional[str] = None             # Client identifier
+    campaign_id: Optional[str] = None           # Campaign identifier
 ```
 
 ### ListEmailActivityLogsResponse
@@ -143,8 +143,8 @@ Model for paginated activity logs.
 
 ```python
 class ListEmailActivityLogsResponse(BaseModel):
-    pagination: Pagination  # Pagination information
-    messages: list[BaseActivityLogs]  # List of activity logs
+    pagination: Pagination              # Pagination information
+    messages: list[BaseActivityLogs]    # List of activity logs
 ```
 
 ## Metrics Models
@@ -154,20 +154,20 @@ Model for email engagement metrics.
 
 ```python
 class BaseStats(BaseModel):
-    date: Optional[int]     # Timestamp for stats period
-    sent: Optional[int]     # Emails sent
-    delivered: Optional[int] # Successfully delivered
-    opened: Optional[int]   # Total opens
-    opened_unique: Optional[int] # Unique opens
-    clicked: Optional[int]  # Total clicks
-    clicked_unique: Optional[int] # Unique clicks
-    failed: Optional[int]   # Failed deliveries
-    suppress_bound: Optional[int] # Suppressed (bounces)
-    suppress_unsubscribe: Optional[int] # Suppressed (unsubscribes)
-    bounced: Optional[int]  # Bounced emails
-    rejected: Optional[int] # Rejected emails
-    complained: Optional[int] # Spam complaints
-    unsubscribed: Optional[int] # Unsubscribe requests
+    date: Optional[int]                     # Timestamp for stats period
+    sent: Optional[int]                     # Emails sent
+    delivered: Optional[int]                # Successfully delivered
+    opened: Optional[int]                   # Total opens
+    opened_unique: Optional[int]            # Unique opens
+    clicked: Optional[int]                  # Total clicks
+    clicked_unique: Optional[int]           # Unique clicks
+    failed: Optional[int]                   # Failed deliveries
+    suppress_bound: Optional[int]           # Suppressed (bounces)
+    suppress_unsubscribe: Optional[int]     # Suppressed (unsubscribes)
+    bounced: Optional[int]                  # Bounced emails
+    rejected: Optional[int]                 # Rejected emails
+    complained: Optional[int]               # Spam complaints
+    unsubscribed: Optional[int]             # Unsubscribe requests
 ```
 
 ### BaseClickedUrlsStats
@@ -175,9 +175,9 @@ Model for URL click tracking.
 
 ```python
 class BaseClickedUrlsStats(BaseModel):
-    url: Optional[str]      # Tracked URL
-    clicked: Optional[int]  # Total clicks
-    clicked_unique: Optional[int] # Unique clicks
+    url: Optional[str]              # Tracked URL
+    clicked: Optional[int]          # Total clicks
+    clicked_unique: Optional[int]   # Unique clicks
 ```
 
 ### ListMetricsResponse
@@ -196,9 +196,9 @@ Response model for URL metrics.
 
 ```python
 class ListClickedUrlsMetricsResponse(BaseModel):
-    start: Optional[int]    # Start timestamp
-    stop: Optional[int]     # End timestamp
-    stats: list[BaseClickedUrlsStats]  # URL stats list
+    start: Optional[int]                # Start timestamp
+    stop: Optional[int]                 # End timestamp
+    stats: list[BaseClickedUrlsStats]   # URL stats list
 ```
 
 ## Best Practices

@@ -31,6 +31,7 @@ class BaseActivityLogs(BaseModel):
             - "sent": Email has been sent but delivery confirmation is pending
             - "delivered": Email has been successfully delivered to the recipient's inbox
             - "failed": Email delivery has failed
+            - "processed": Email was processed
             May be None if the status is unknown or not provided.
         created_at (Optional[int]): 
             Timestamp when the email was created/sent, in milliseconds since epoch.
@@ -93,7 +94,7 @@ class BaseActivityLogs(BaseModel):
     from_email: str = Field(alias="fromEmail")
     to_email: Optional[str] = Field(alias="toEmail", default=None)
     subject: Optional[str] = Field(default=None)
-    status: Optional[Literal["sent", "delivered", "failed"]] = Field(default=None)
+    status: Optional[Literal["sent", "delivered", "failed", "processed"]] = Field(default=None)
     created_at: Optional[int] = Field(alias="createdAt", default=None)
     updated_at: Optional[int] = Field(alias="updatedAt", default=None)
     opens: Optional[int] = Field(default=None)
@@ -276,7 +277,7 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
             May be None if not available or if to_email is used instead.
         subject (Optional[str]): The subject line of the email.
             May be None if not available.
-        status (Optional[Literal["sent", "delivered", "failed"]]):
+        status (Optional[Literal["sent", "delivered", "failed", "processed"]]):
             Current delivery status of the email.
             May be None if the status is unknown.
         created_at (Optional[int]):
@@ -380,7 +381,7 @@ class GetEmailActivityLogsResponse(BaseActivityLogs):
     from_email: Optional[str] = Field(alias="fromEmail", default=None)
     email: Optional[str] = Field(default=None)
     subject: Optional[str] = Field(default=None)
-    status: Optional[Literal["sent", "delivered", "failed"]] = Field(default=None)
+    status: Optional[Literal["sent", "delivered", "failed", "processed"]] = Field(default=None)
     created_at: Optional[int] = Field(alias="createdAt", default=None)
     updated_at: Optional[int] = Field(alias="updatedAt", default=None)
     client_id: Optional[str] = Field(alias="clientId", default=None)
