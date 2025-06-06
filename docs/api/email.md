@@ -137,7 +137,7 @@ activity_logs = client.email.activity_logs.list(
     page_size=25
 )
 print(f"Found {activity_logs.pagination.total_record} emails")
-print(f"Showing page {activity_logs.pagination.page} of {activity_logs.pagination.last}")
+print(f"Showing page {activity_logs.pagination.page}")
 for msg in activity_logs.messages:
     print(f"Email: {msg.subject} - Status: {msg.status}")
 

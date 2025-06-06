@@ -213,13 +213,12 @@ class ActivityLogsResource:
             ...     page=1,
             ...     page_size=25
             ... )
-            >>> print(f"Found {activity_logs.pagination.total_items} emails")
-            >>> print(f"Showing page {activity_logs.pagination.page} of "
-            >>>       f"{activity_logs.pagination.total_pages}")
+            >>> print(f"Found {activity_logs.pagination.total_record} emails")
+            >>> print(f"Showing page {activity_logs.pagination.page}")
             >>> for msg in activity_logs.messages:
             ...     print(f"Email: {msg.subject} - Status: {msg.status}")
             Found 87 emails
-            Showing page 1 of 4
+            Showing page 1
             Email: Your Account Verification - Status: delivered
             Email: January Newsletter - Status: delivered
             Email: Password Reset - Status: sent
