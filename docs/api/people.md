@@ -295,7 +295,7 @@ Returns: [SegmentBaseModel](../models/people.md#segmentbasemodel)
 Example:
 ```python
 from naxai.models.people.requests.segments_requests import CreateSegmentRequest
-from naxai.models.people.segments_condition import Condition, AttributeCondSimple, AttributeObject
+from naxai.models.people.helper_models.segments_condition import Condition, AttributeCondSimple, AttributeObject
 
 # Create a dynamic segment for high-value customers
 condition = Condition(
