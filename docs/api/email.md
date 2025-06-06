@@ -312,7 +312,7 @@ if total_opened > 0:
 # Find the day with highest engagement
 if metrics.stats:
     best_day = max(metrics.stats, key=lambda day: day.opened_unique or 0)
-    print(f"\nBest performing day: {datetime.fromtimestamp(best_day.date/1000)}")
+    print(f"\nBest performing day: {datetime.fromtimestamp(best_day.date)}")
     print(f"Sent: {best_day.sent}, Opened: {best_day.opened_unique}, "
           f"Clicked: {best_day.clicked_unique}")
 
@@ -364,7 +364,7 @@ metrics = client.email.reporting.clicked_urls.list(
     group="day"
 )
 
-print(f"URL click metrics from {datetime.fromtimestamp(metrics.start/1000)}")
+print(f"URL click metrics from {datetime.fromtimestamp(metrics.start)}")
 print(f"to {datetime.fromtimestamp(current_time)}")
 print(f"Found data for {len(metrics.stats)} URLs")
 

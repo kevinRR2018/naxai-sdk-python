@@ -58,8 +58,8 @@ class MetricsResource:
         Returns:
             ListMetricsResponse: A response object containing comprehensive email metrics.
             The response includes:
-                - start: Start timestamp of the reporting period (in milliseconds)
-                - stop: End timestamp of the reporting period (in milliseconds)
+                - start: Start timestamp of the reporting period
+                - stop: End timestamp of the reporting period
                 - group: The time interval grouping used ("day" or "month")
                 - stats: List of BaseStats objects with metrics for each time interval:
                     - date: Timestamp for the time interval
@@ -127,10 +127,10 @@ class MetricsResource:
             >>> if metrics.stats:
             ...     best_day = max(metrics.stats, key=lambda day: day.opened_unique or 0)
             ...     print(f"\nBest performing day: "
-            ...           f"{datetime.datetime.fromtimestamp(best_day.date/1000)}")
+            ...           f"{datetime.datetime.fromtimestamp(best_day.date)}")
             ...     print(f"Sent: {best_day.sent}, Opened: "
             ...           f"{best_day.opened_unique}, Clicked: {best_day.clicked_unique}")
-            Email metrics from 1703066400000 to 1705658400000
+            Email metrics from 1703066400 to 1705658400
             Grouped by: day
             Data points: 30
             Overall delivery rate: 98.2%
