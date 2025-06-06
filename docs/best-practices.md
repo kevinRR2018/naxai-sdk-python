@@ -220,7 +220,7 @@ from naxai.models.email import SendTransactionalEmailRequest
 from pydantic import ValidationError
 
 try:
-    request = SendTransactionalEmailRequest(
+    request = SendTransactionalEmailRequest.model_validate(
         sender={
             "email": "sender@domain.com",
             "name": "Sender Name"
