@@ -55,8 +55,8 @@ class ClickedUrlsResource:
         Returns:
             ListClickedUrlsMetricsResponse: A response object containing URL click metrics.
             The response includes:
-                - start: Start timestamp of the reporting period (in milliseconds)
-                - stop: End timestamp of the reporting period (in milliseconds)
+                - start: Start timestamp of the reporting period
+                - stop: End timestamp of the reporting period
                 - stats: List of BaseClickedUrlsStats objects with metrics for each URL:
                     - url: The URL that was clicked
                     - clicked: Total number of clicks on this URL
@@ -94,7 +94,7 @@ class ClickedUrlsResource:
             ...     print(f"{i}. {url_stats.url}")
             ...     print(f"   Total clicks: {url_stats.clicked}")
             ...     print(f"   Unique clicks: {url_stats.clicked_unique}")
-            URL click metrics from 1703066400000 to 1705658400000
+            URL click metrics from 1703066400 to 1705658400
             Found data for 12 URLs
             
             Top 3 most clicked URLs:
@@ -120,8 +120,7 @@ class ClickedUrlsResource:
             >>> print(f"Monthly URL click metrics for {datetime.datetime.now().year}")
         
         Note:
-            - The start and stop timestamps are provided in seconds since epoch but converted to
-              milliseconds in the response
+            - The start and stop timestamps are provided in seconds since epoch.
             - The default time range is the past 7 days if no parameters are provided
             - The difference between clicked and clicked_unique indicates how many recipients
               clicked multiple times on the same URL
