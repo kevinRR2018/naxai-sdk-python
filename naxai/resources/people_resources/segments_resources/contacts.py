@@ -271,23 +271,13 @@ class SegmentsContactsResource:
                     sort="email:asc"  # Sort alphabetically by email
                 )
                 
-                print(f"Page {first_page.pagination.page} of {first_page.pagination.total_pages}")
-                print(f"Showing {len(first_page.contacts)} of "
-                      f"{first_page.pagination.total_items} contacts")
+                print(f"Showing {len(first_page.items)} of "
+                      f"{first_page.pagination.total_record} contacts")
                 
                 # Display the contacts on this page
-                for contact in first_page.contacts:
+                for contact in first_page.items:
                     print(f"- {contact.email or 'No email'} (ID: {contact.nx_id})")
                 
-                # If there are more pages, fetch the next one
-                if first_page.pagination.has_more_pages:
-                    second_page = client.people.segments.contacts.list(
-                        segment_id=segment_id,
-                        page=2,
-                        page_size=25,
-                        sort="email:asc"
-                    )
-                    print(f"\nFetched page 2 with {len(second_page.contacts)} more contacts")
             ```
         
         Note:
