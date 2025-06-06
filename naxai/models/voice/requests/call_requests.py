@@ -45,12 +45,12 @@ class CreateCallRequest(BaseModel):
         end (Optional[End]): Call ending message configuration.
             None if not using end message.
     """
-    batch_id : Optional[str] = Field(alias="batchId", max_length=64)
+    batch_id : Optional[str] = Field(alias="batchId", max_length=64, default=None)
     to: list[str] = Field(max_length=1000)
     from_: str = Field(alias="from", min_length=8, max_length=15)
     language: Literal["fr-FR", "fr-BE", "nl-NL", "nl-BE", "en-GB", "de-DE"]
     voice: Literal["woman", "man"]
-    idempotency_key: Optional[str] = Field(alias="idempotencyKey", min_length=1, max_length=128)
+    idempotency_key: Optional[str] = Field(alias="idempotencyKey", min_length=1, max_length=128, default=None)
     calendar_id: Optional[str] = Field(alias="calendarId", default=None)
     scheduled_at: Optional[int] = Field(alias="scheduledAt", default=None)
     machine_detection: Optional[bool] = Field(alias="machineDetection", default=False)
