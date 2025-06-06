@@ -17,8 +17,9 @@ Model for webhooks using HTTP Basic Authentication.
 
 ```python
 class BasicAuthModel(BaseModel):
-    type_: str = "basic"  # Authentication type, always "basic"
-    user: str           # Username for basic auth
+    type_: str = "basic"    # Authentication type, always "basic"
+    user: str               # Username for basic auth
+    password: str           # Password for basic auth
 ```
 
 ### OAuth2AuthModel
@@ -26,9 +27,9 @@ Model for webhooks using OAuth2 authentication.
 
 ```python
 class OAuth2AuthModel(BaseModel):
-    type_: str = "oauth2"  # Authentication type, always "oauth2"
-    client_id: str        # OAuth2 client ID
-    auth_url: str         # OAuth2 authorization URL
+    type_: str = "oauth2"   # Authentication type, always "oauth2"
+    client_id: str          # OAuth2 client ID
+    auth_url: str           # OAuth2 authorization URL
 ```
 
 ### HeaderAuthModel
@@ -36,8 +37,8 @@ Model for webhooks using custom header authentication.
 
 ```python
 class HeaderAuthModel(BaseModel):
-    type_: str = "header"  # Authentication type, always "header"
-    header_key: str       # Custom header key name
+    type_: str = "header"   # Authentication type, always "header"
+    header_key: str         # Custom header key name
 ```
 
 ## Request Models
@@ -47,18 +48,18 @@ Model for creating new webhooks.
 
 ```python
 class CreateWebhookRequest(BaseModel):
-    name: str           # Descriptive name for the webhook
-    url: str           # Endpoint URL where events will be sent
+    name: str                                                       # Descriptive name for the webhook
+    url: str                                                        # Endpoint URL where events will be sent
     authentication: Union[
         NoAuthModel,
         BasicAuthModel,
         OAuth2AuthModel,
         HeaderAuthModel
-    ] = None           # Authentication configuration
-    active: bool = True  # Whether webhook should be active
+    ] = None                                                        # Authentication configuration
+    active: bool = True                                             # Whether webhook should be active
     event_object: Literal["All", "People", "Sms", "Call", "Email"]  # Object type for events
-    event_filter: list[str]  # Additional filtering criteria
-    event_names: list[str]   # Specific event names to subscribe to
+    event_filter: list[str]                                         # Additional filtering criteria
+    event_names: list[str]                                          # Specific event names to subscribe to
 ```
 
 ### JSON Patch Operation Models
@@ -70,12 +71,12 @@ class UpdateWebhookJsonPathRequestRemove(BaseModel):
     op: Literal["remove"]    # Operation type
 
 class UpdateWebhookJsonPathRequestAddReplace(BaseModel):
-    path: str                # JSON path to modify
-    value: str              # New value to set
+    path: str           # JSON path to modify
+    value: str          # New value to set
 
 class UpdateWebhookJsonPathRequestMoveCopy(BaseModel):
-    path: str                # JSON path destination
-    op: Literal["move", "copy"]  # Operation type
+    path: str                   # JSON path destination
+    op: Literal["move", "copy"] # Operation type
 ```
 
 ## Response Models
@@ -85,21 +86,21 @@ Base model for webhook configurations.
 
 ```python
 class WebhookBaseModel(BaseModel):
-    id: str           # Unique webhook identifier
-    name: str         # Descriptive name
-    url: str          # Endpoint URL
+    id: str                                                                     # Unique webhook identifier
+    name: str                                                                   # Descriptive name
+    url: str                                                                    # Endpoint URL
     authentication: Union[
         NoAuthModel,
         BasicAuthModel,
         OAuth2AuthModel,
         HeaderAuthModel
-    ] = None         # Authentication configuration
-    active: bool = True  # Whether webhook is active
+    ] = None                                                                    # Authentication configuration
+    active: bool = True                                                         # Whether webhook is active
     event_object: Literal["All", "People", "Sms", "Call", "Email", "Survey"]
-    event_filter: list[str]  # Event filtering criteria
-    event_names: list[str]   # Subscribed event names
-    modified_at: Optional[int]  # Last modification timestamp
-    modified_by: Optional[str]  # Last modifier identifier
+    event_filter: list[str]                                                     # Event filtering criteria
+    event_names: list[str]                                                      # Subscribed event names
+    modified_at: Optional[int]                                                  # Last modification timestamp
+    modified_by: Optional[str]                                                  # Last modifier identifier
 ```
 
 ### ListWebhooksResponse
@@ -126,11 +127,11 @@ Model for webhook events.
 
 ```python
 class EventsBaseModel(BaseModel):
-    event_name: Optional[str]        # Event name
-    event_webhook_id: Optional[str]  # Webhook ID
-    event_timestamp: Optional[int]   # Event timestamp
-    event_id: Optional[str]         # Unique event ID
-    event_data: Optional[EventDataBaseModel]  # Event payload
+    event_name: Optional[str]                   # Event name
+    event_webhook_id: Optional[str]             # Webhook ID
+    event_timestamp: Optional[int]              # Event timestamp
+    event_id: Optional[str]                     # Unique event ID
+    event_data: Optional[EventDataBaseModel]    # Event payload
 ```
 
 ### ListLastWebhookEventsResponse
@@ -176,7 +177,8 @@ webhook = CreateWebhookRequest(
     name="Customer Updates Endpoint",
     url="https://api.your-domain.com/webhooks",
     authentication=BasicAuthModel(
-        user="webhook_user"
+        user="webhook_user",
+        password="3x@mo"
     ),
     event_object="People",
     event_filter=["status_change", "group_update"],
