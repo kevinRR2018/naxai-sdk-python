@@ -57,18 +57,7 @@ print(f"Found {len(attributes)} attributes")
 system_attrs = []
 custom_attrs = []
 for attr in attributes:
-    if attr.name.startswith("system_"):
-        system_attrs.append(attr.name)
-    else:
-        custom_attrs.append(attr.name)
-
-print(f"\n{len(system_attrs)} System Attributes:")
-for name in sorted(system_attrs):
-    print(f"- {name}")
-
-print(f"\n{len(custom_attrs)} Custom Attributes:")
-for name in sorted(custom_attrs):
-    print(f"- {name}")
+    print(f"attribute: {attr.name}")
 ```
 
 ### Delete Attribute
