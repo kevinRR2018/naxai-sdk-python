@@ -441,7 +441,7 @@ contacts = client.people.segments.contacts.list(
     page=1,
     page_size=25
 )
-print(f"Showing {len(contacts.contacts)} of {contacts.pagination.total_items} contacts")
+print(f"Showing {contacts.pagination.returned_record} of {contacts.pagination.total_record} contacts")
 ```
 
 ## Best Practices
