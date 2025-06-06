@@ -94,7 +94,6 @@ Returns: [SearchContactsResponse](../models/people.md#searchcontactsresponse)
 
 Example:
 ```python
-from naxai.models.people.helper_models.search_condition import SearchCondition
 
 # Search for vip customers
 condition = {"all": [{"attribute": {"field": "loyalty_tier", "operator": "eq", "value": "vip"}}
@@ -254,13 +253,18 @@ client.people.segments.list(
 
 Example:
 ```python
-# List all custom segments
-segments = client.people.segments.list(exclude_predefined=True)
-print(f"Found {len(segments)} custom segments")
+# List all segments
+segments = client.people.segments.list(exclude_predefined=False)
+for segment in segments:
+    print(f"Segment ID: {segment.id}, Name: {segment.name}")
 
 # List dynamic segments
 dynamic_segments = client.people.segments.list(type_="dynamic")
 print(f"Found {len(dynamic_segments)} dynamic segments")
+
+# List manual segments
+manual_segments = client.people.segments.list(type_="manual")
+print(f"Found {len(manual_segments)} manual segments")
 ```
 
 ### Get Segment
