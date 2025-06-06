@@ -9,11 +9,11 @@ Main model for configuring voice call interactions.
 
 ```python
 class VoiceFlow(BaseModel):
-    machine_detection: bool = False  # Enable answering machine detection
+    machine_detection: bool = False # Enable answering machine detection
     voicemail: Optional[VoiceMail]  # Message for answering machines
-    welcome: Welcome               # Initial greeting configuration
-    menu: Optional[Menu]          # Interactive menu configuration
-    end: Optional[End]            # Call ending configuration
+    welcome: Welcome                # Initial greeting configuration
+    menu: Optional[Menu]            # Interactive menu configuration
+    end: Optional[End]              # Call ending configuration
 ```
 
 ### Welcome
@@ -21,9 +21,9 @@ Model for initial greeting messages.
 
 ```python
 class Welcome(BaseModel):
-    say: Optional[str]       # Text to speak
-    prompt: Optional[str]    # Audio file URL
-    replay: Optional[int] = 0  # Number of replays
+    say: Optional[str]          # Text to speak
+    prompt: Optional[str]       # Audio file URL
+    replay: Optional[int] = 0   # Number of replays
 ```
 
 ### Menu
@@ -31,10 +31,10 @@ Model for interactive voice menus.
 
 ```python
 class Menu(BaseModel):
-    say: Optional[str]       # Menu prompt text
-    prompt: Optional[str]    # Menu prompt audio URL
-    replay: Optional[int] = 0  # Replay count if no input
-    choices: list[Choice]    # Available menu options
+    say: Optional[str]          # Menu prompt text
+    prompt: Optional[str]       # Menu prompt audio URL
+    replay: Optional[int] = 0   # Replay count if no input
+    choices: list[Choice]       # Available menu options
 ```
 
 ### Choice
@@ -43,10 +43,10 @@ Model for menu options.
 ```python
 class Choice(BaseModel):
     key: Literal["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "#"]
-    say: Optional[str]       # Response text
-    prompt: Optional[str]    # Response audio URL
-    replay: Optional[int] = 0  # Replay count
-    transfer: Optional[Transfer]  # Transfer configuration
+    say: Optional[str]              # Response text
+    prompt: Optional[str]           # Response audio URL
+    replay: Optional[int] = 0       # Replay count
+    transfer: Optional[Transfer]    # Transfer configuration
 ```
 
 ### Transfer
@@ -54,9 +54,9 @@ Model for call transfers.
 
 ```python
 class Transfer(BaseModel):
-    destination: str         # Transfer phone number/SIP
-    attempts: int = 1       # Number of attempts (1-3)
-    timeout: int = 15      # Pickup timeout (5-30 seconds)
+    destination: str            # Transfer phone number/SIP
+    attempts: int = 1           # Number of attempts (1-3)
+    timeout: int = 15           # Pickup timeout (5-30 seconds)
     whisper: Optional[Whisper]  # Message for recipient
 ```
 
@@ -85,19 +85,19 @@ Model for initiating voice calls.
 
 ```python
 class CreateCallRequest(BaseModel):
-    batch_id: Optional[str]      # Batch identifier (max 64 chars)
-    to: list[str]               # Recipients (max 1000)
-    from_: str                  # Sender number (8-15 chars)
+    batch_id: Optional[str]             # Batch identifier (max 64 chars)
+    to: list[str]                       # Recipients (max 1000)
+    from_: str                          # Sender number (8-15 chars)
     language: Literal["fr-FR", "fr-BE", "nl-NL", "nl-BE", "en-GB", "de-DE"]
     voice: Literal["woman", "man"]
-    idempotency_key: Optional[str]  # Duplicate prevention key
-    calendar_id: Optional[str]   # Scheduling calendar
-    scheduled_at: Optional[int]  # Schedule timestamp
-    machine_detection: bool = False  # Detect answering machines
-    voicemail: Optional[VoiceMail]  # Voicemail configuration
-    welcome: Welcome            # Initial greeting
-    menu: Optional[Menu]        # Interactive menu
-    end: Optional[End]          # Ending message
+    idempotency_key: Optional[str]      # Duplicate prevention key
+    calendar_id: Optional[str]          # Scheduling calendar
+    scheduled_at: Optional[int]         # Schedule timestamp
+    machine_detection: bool = False     # Detect answering machines
+    voicemail: Optional[VoiceMail]      # Voicemail configuration
+    welcome: Welcome                    # Initial greeting
+    menu: Optional[Menu]                # Interactive menu
+    end: Optional[End]                  # Ending message
 ```
 
 ### CreateCallResponse
@@ -106,8 +106,8 @@ Response model for call creation.
 ```python
 class CreateCallResponse(BaseModel):
     batch_id: str           # Batch identifier
-    count: int             # Number of calls
-    calls: list[Call]      # Call references
+    count: int              # Number of calls
+    calls: list[Call]       # Call references
 ```
 
 ### Call
@@ -116,7 +116,7 @@ Model for call references.
 ```python
 class Call(BaseModel):
     call_id: str           # Call identifier
-    to: str               # Recipient number
+    to: str                # Recipient number
 ```
 
 ## Activity Log Models
@@ -180,22 +180,22 @@ Model for creating voice broadcasts.
 ```python
 class CreateBroadcastRequest(BaseModel):
     name: str
-    from_: str                  # Sender number (8-15 chars)
-    source: str = "people"      # Contact source
-    segment_ids: list[str]      # Target segments (max 1)
-    inclube_unsubscribed: bool = False  # Include unsubscribed
+    from_: str                              # Sender number (8-15 chars)
+    source: str = "people"                  # Contact source
+    segment_ids: list[str]                  # Target segments (max 1)
+    inclube_unsubscribed: bool = False      # Include unsubscribed
     language: Literal["fr-FR", "fr-BE", "nl-NL", "nl-BE", "en-GB", "de-DE"] = "fr-BE"
     voice: Literal["woman", "man"] = "woman"
-    scheduled_at: Optional[str]  # Schedule timestamp
-    retries: int = 0           # Retry attempts (0-3)
-    retry_on_no_input: bool = False  # Retry on no input
-    retry_on_failed: bool = False    # Retry on failure
-    retry_delays: Optional[list[int]]  # Delay between retries
-    calendar_id: Optional[str]   # Scheduling calendar
+    scheduled_at: Optional[str]             # Schedule timestamp
+    retries: int = 0                        # Retry attempts (0-3)
+    retry_on_no_input: bool = False         # Retry on no input
+    retry_on_failed: bool = False           # Retry on failure
+    retry_delays: Optional[list[int]]       # Delay between retries
+    calendar_id: Optional[str]              # Scheduling calendar
     distribution: Literal["none", "dynamic"] = "none"
-    dynamic_name: Optional[str]  # Dynamic distribution name
-    voice_flow: VoiceFlow       # Call flow configuration
-    actions: Optional[Actions]   # Response actions
+    dynamic_name: Optional[str]             # Dynamic distribution name
+    voice_flow: VoiceFlow                   # Call flow configuration
+    actions: Optional[Actions]              # Response actions
 ```
 
 ### BroadcastStatusResponse
@@ -215,13 +215,13 @@ class GetBroadcastMetricsResponse(BaseModel):
     total: int          # Total calls
     completed: int      # Completed calls
     delivered: int      # Delivered calls
-    failed: int        # Failed calls
-    canceled: int      # Canceled calls
-    paused: int        # Paused calls
-    invalid: int       # Invalid calls
-    in_progress: int   # Active calls
-    transferred: int   # Transferred calls
-    calls: int         # Total attempts
+    failed: int         # Failed calls
+    canceled: int       # Canceled calls
+    paused: int         # Paused calls
+    invalid: int        # Invalid calls
+    in_progress: int    # Active calls
+    transferred: int    # Transferred calls
+    calls: int          # Total attempts
 ```
 
 ## Reporting Models
@@ -231,7 +231,7 @@ Base model for call statistics.
 
 ```python
 class BaseStatsFields(BaseModel):
-    date: Optional[str]  # ISO date (YYYY-MM-DD)
+    date: Optional[str] # ISO date (YYYY-MM-DD)
     calls: int          # Total calls
     duration: int       # Total duration (seconds)
 ```
@@ -242,12 +242,12 @@ Model for outbound call statistics.
 ```python
 class OutboundStatsFields(BaseStatsFields):
     delivered: int      # Delivered calls
-    failed: int        # Failed calls
-    no_answer: int     # Unanswered calls
-    busy: int          # Busy signals
-    rejected: int      # Rejected calls
-    invalid: int       # Invalid numbers
-    transferred: int   # Transferred calls
+    failed: int         # Failed calls
+    no_answer: int      # Unanswered calls
+    busy: int           # Busy signals
+    rejected: int       # Rejected calls
+    invalid: int        # Invalid numbers
+    transferred: int    # Transferred calls
 ```
 
 ### InboundStats
