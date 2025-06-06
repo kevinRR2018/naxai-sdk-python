@@ -156,14 +156,15 @@ class EmailResource:
             ...     sender_name="Customer Support",
             ...     subject="Your Monthly Statement",
             ...     to=[{"email": "customer@example.com", "name": "Customer Name"}],
-            ...     cc=[{"email": "accounting@example.com"}],
+            ...     cc=[{"email": "accounting@example.com", "name": "Accounting"}],
             ...     reply_to="no-reply@example.com",
             ...     html="<html><body><p>Please find your monthly statement attached.</p>\
             ...           </body></html>",
             ...     attachments=[{
-            ...         "filename": "statement.pdf",
+            ...         "id": "83294efe-2689-4b15-8085-ad04e0316598",
+            ...         "name": "statement.pdf",
             ...         "content_type": "application/pdf",
-            ...         "content": pdf_content
+            ...         "data": pdf_content
             ...     }]
             ... )
             >>> print(f"Email with attachment sent with ID: {response.id}")
