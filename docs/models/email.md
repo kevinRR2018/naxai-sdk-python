@@ -270,7 +270,7 @@ try:
     )
     
     # Send email and get response
-    response = client.email.send(request)
+    response = client.email.transactional.send(data=request)
     
     # Track delivery status
     status = client.email.activity_logs.get(
@@ -279,7 +279,7 @@ try:
     )
     
 except Exception as e:
-    logger.error(f"Failed to send email: {e}")
+    print(f"Failed to send email: {e}")
     # Handle error appropriately
 ```
 
