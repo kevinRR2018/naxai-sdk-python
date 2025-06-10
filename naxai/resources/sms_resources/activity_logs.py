@@ -57,9 +57,9 @@ class ActivityLogsResource:
             page_size (int): Number of items per page. Defaults to 25.
                 Mapped from JSON key 'pageSize'.
             start (int, optional): 
-                Start timestamp for filtering messages, in milliseconds since epoch.
+                Start timestamp for filtering messages, in seconds since epoch.
                 Only messages sent/received after this time will be included.
-            stop (int, optional): End timestamp for filtering messages, in milliseconds since epoch.
+            stop (int, optional): End timestamp for filtering messages, in seconds since epoch.
                 Only messages sent/received before this time will be included.
             direction (Literal["inbound", "outbound"], optional): Filter by message direction.
                 - "inbound": Only include messages received by the platform
@@ -98,8 +98,8 @@ class ActivityLogsResource:
             
             >>> # Filtering by date range and status
             >>> import time
-            >>> one_week_ago = int(time.time() * 1000) - (7 * 24 * 60 * 60 * 1000)
-            >>> now = int(time.time() * 1000)
+            >>> one_week_ago = int(time.time()) - (7 * 24 * 60 * 60)
+            >>> now = int(time.time())
             >>> delivered = client.sms.activity_logs.list(
             ...     start=one_week_ago,
             ...     stop=now,
@@ -111,7 +111,7 @@ class ActivityLogsResource:
             
             >>> # Filtering by phone number
             >>> specific_number = client.sms.activity_logs.list(
-            ...     phone_number="+1234567890",
+            ...     phone_number="1234567890",
             ...     page_size=100
             ... )
             >>> print(f"Messages to/from +1234567890: {len(specific_number.messages)}")
@@ -125,7 +125,7 @@ class ActivityLogsResource:
         
         Note:
             - Use pagination parameters (page, page_size) to navigate through large result sets
-            - Timestamp parameters (start, stop) are in milliseconds since epoch
+            - Timestamp parameters (start, stop) are in seconds since epoch
             - The phone_number parameter matches against both sender and recipient numbers
             - Multiple filter parameters can be combined for more specific queries
             - Results are typically sorted by sent/received time in descending order
