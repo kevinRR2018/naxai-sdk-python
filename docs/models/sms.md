@@ -203,7 +203,7 @@ Example:
 response = client.sms.send(
     to=["+1234567890", "+2345678901"],
     from_="SENDER",
-    text="Hello!"
+    body="Hello!"
 )
 
 # Store message IDs for tracking
@@ -217,9 +217,9 @@ for msg_id in message_ids:
         print(f"Error: {status.status_reason}")
 
 # Get delivery metrics
-metrics = client.sms.reporting.list_by_country(
+metrics = client.sms.reporting.list_outgoing_metrics_by_country(
     start_date="2023-01-01",
-    end_date="2023-01-31"
+    stop_date="2023-01-31"
 )
 
 # Analyze delivery performance
