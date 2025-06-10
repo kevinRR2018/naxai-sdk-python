@@ -51,8 +51,8 @@ print(f"Messages sent: {len(response.messages)}")
 client.sms.activity_logs.list(
     page: int = 1,                                     # Page number to retrieve
     page_size: int = 25,                               # Number of items per page
-    start: Optional[int] = None,                       # Start timestamp (milliseconds)
-    stop: Optional[int] = None,                        # End timestamp (milliseconds)
+    start: Optional[int] = None,                       # Start timestamp
+    stop: Optional[int] = None,                        # End timestamp
     direction: Literal["inbound", "outbound"] = None,  # Filter by message direction
     status: Literal["delivered", "failed"] = None,     # Filter by delivery status
     phone_number: str = None,                          # Filter by phone number (7-15 chars)
@@ -69,8 +69,8 @@ Example:
 # Get all failed messages from last 24 hours
 from datetime import datetime, timedelta
 
-stop = int(datetime.now().timestamp() * 1000)
-start = int((datetime.now() - timedelta(days=1)).timestamp() * 1000)
+stop = int(datetime.now().timestamp())
+start = int((datetime.now() - timedelta(days=1)).timestamp())
 
 logs = client.sms.activity_logs.list(
     page=1,
