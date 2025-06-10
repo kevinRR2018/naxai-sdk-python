@@ -110,7 +110,7 @@ Returns: [ListOutgoingSMSMetricsResponse](../models/sms.md#listoutgoingsmsmetric
 
 ### Outgoing Metrics By Country
 ```python
-client.sms.reporting.list_by_country(
+client.sms.reporting.list_outgoing_metrics_by_country(
     start_date: str,            # YYYY-MM-DD
     stop_date: str              # YYYY-MM-DD
 )
