@@ -261,21 +261,21 @@ class DeliveryErrorStats(BaseModel):
     Attributes:
         status_category (str): The general category of the delivery error.
             Mapped from JSON key 'statusCategory'.
-        status_code (str): The specific error code identifying the delivery issue.
+        status_code (int): The specific error code identifying the delivery issue.
             Mapped from JSON key 'statusCode'.
         sms (int): Number of SMS messages that encountered this specific error.
     
     Example:
         >>> error_stats = DeliveryErrorStats(
         ...     statusCategory="carrier",
-        ...     statusCode="REJECTED_DESTINATION_BLOCKED",
+        ...     statusCode=200,
         ...     sms=45
         ... )
         >>> print(f"Error category: {error_stats.status_category}")
         >>> print(f"Error code: {error_stats.status_code}")
         >>> print(f"Affected messages: {error_stats.sms}")
         Error category: carrier
-        Error code: REJECTED_DESTINATION_BLOCKED
+        Error code: 200
         Affected messages: 45
     
     Note:
@@ -287,7 +287,7 @@ class DeliveryErrorStats(BaseModel):
         - Error patterns can be used to improve message delivery strategies
     """
     status_category: str = Field(alias="statusCategory")
-    status_code: str = Field(alias="statusCode")
+    status_code: int = Field(alias="statusCode")
     sms: int
 
     model_config = {"populate_by_name": True}
@@ -515,17 +515,17 @@ class ListDeliveryErrorMetricsResponse(BaseResponse):
         ...     stats=[
         ...         DeliveryErrorStats(
         ...             statusCategory="carrier",
-        ...             statusCode="REJECTED_DESTINATION_BLOCKED",
+        ...             statusCode=200,
         ...             sms=45
         ...         ),
         ...         DeliveryErrorStats(
         ...             statusCategory="handset",
-        ...             statusCode="HANDSET_BUSY",
+        ...             statusCode=910,
         ...             sms=28
         ...         ),
         ...         DeliveryErrorStats(
         ...             statusCategory="network",
-        ...             statusCode="NETWORK_ERROR",
+        ...             statusCode=403,
         ...             sms=17
         ...         )
         ...     ]
