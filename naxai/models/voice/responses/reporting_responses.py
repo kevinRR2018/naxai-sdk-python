@@ -49,7 +49,7 @@ class OutboundStatsFields(BaseStatsFields):
     busy: int
     rejected: int
     invalid: int
-    transferred: int
+    transferred: Optional[int] = Field(default=None)
 
     model_config = {"populate_by_name": True}
 
