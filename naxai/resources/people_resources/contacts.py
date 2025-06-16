@@ -57,10 +57,10 @@ class ContactsResource:
     @validate_call
     # pylint: disable=protected-access
     def search(self,
-                page: Optional[int] = Field(default=1, ge=1),
-                page_size: Optional[int] = Field(default=50, ge=1),
-                sort: Optional[str] = Field(default="createdAt:desc"),
-                condition: Optional[Union[dict, SearchCondition]] = Field(default=None)):
+               condition: Union[dict, SearchCondition],
+               page: Optional[int] = Field(default=1, ge=1),
+               page_size: Optional[int] = Field(default=50, ge=1),
+               sort: Optional[str] = Field(default="createdAt:desc")):
         """
         Search for contacts in the Naxai People API based on specified criteria.
         
@@ -76,10 +76,9 @@ class ContactsResource:
             sort (Optional[str]): Sorting criteria in the format "field:direction".
                 Defaults to "createdAt:desc" (newest contacts first).
                 Examples: "email:asc", "createdAt:desc", "lastName:asc"
-            condition (Optional[Union[dict, SearchCondition]]): 
+            condition (Union[dict, SearchCondition]): 
                 Search conditions to filter contacts.
                 Can be provided as a SearchCondition object or a dictionary with the same structure.
-                Defaults to None (no filtering).
         
         Returns:
             SearchContactsResponse: A response object containing the paginated list of
