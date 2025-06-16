@@ -163,7 +163,7 @@ class SegmentsContactsResource:
         """
         # pylint: disable=protected-access
         return self._client._request("POST",
-                                     self.root_path + "/" + segment_id + "/deleteContacts",
+                                     self.root_path + "/" + segment_id + "/removeContacts",
                                      json={"ids": contact_ids},
                                      headers=self.headers)
 
