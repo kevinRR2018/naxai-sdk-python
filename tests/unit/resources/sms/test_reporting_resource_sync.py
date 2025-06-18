@@ -401,17 +401,17 @@ class TestReportingResourceSync:
             "stats": [
                 {
                     "statusCategory": "carrier",
-                    "statusCode": "REJECTED_DESTINATION_BLOCKED",
+                    "statusCode": 400,
                     "sms": 45
                 },
                 {
                     "statusCategory": "handset",
-                    "statusCode": "HANDSET_BUSY",
+                    "statusCode": 401,
                     "sms": 28
                 },
                 {
                     "statusCategory": "network",
-                    "statusCode": "NETWORK_ERROR",
+                    "statusCode": 402,
                     "sms": 17
                 }
             ]
@@ -432,15 +432,15 @@ class TestReportingResourceSync:
         assert len(result.stats) == 3
         assert isinstance(result.stats[0], DeliveryErrorStats)
         assert result.stats[0].status_category == "carrier"
-        assert result.stats[0].status_code == "REJECTED_DESTINATION_BLOCKED"
+        assert result.stats[0].status_code == 400
         assert result.stats[0].sms == 45
         
         assert result.stats[1].status_category == "handset"
-        assert result.stats[1].status_code == "HANDSET_BUSY"
+        assert result.stats[1].status_code == 401
         assert result.stats[1].sms == 28
         
         assert result.stats[2].status_category == "network"
-        assert result.stats[2].status_code == "NETWORK_ERROR"
+        assert result.stats[2].status_code == 402
         assert result.stats[2].sms == 17
 
         # Verify the client was called correctly

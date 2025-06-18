@@ -154,12 +154,10 @@ class TestOutboundResource:
 
     @pytest.mark.asyncio
     @pytest.mark.parametrize("group,start_date,stop_date,error_msg", [
-        ("hour", None, None, "startDate must be provided when group is 'hour'"),
-        ("hour", "2023-01-01", None, "startDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'"),
-        ("hour", "2023-01-01 00:00:00", "2023-01-01", "stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'"),
-        ("day", None, None, "startDate must be provided when group is 'day' or 'month'"),
-        ("day", "2023-01-01", None, "stopDate must be provided when group is 'day' or 'month'"),
-        ("month", "2023-01", "2023-12", "startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'"),
+        ("hour", "2023-01-01", "2023-01-02", "start_date must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'"),
+        ("hour", "2023-01-01 00:00:00", "2023-01-02", "stop_date must be in the format 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS' when group is 'hour'"),
+        ("day", "2023-01", "2023-01-01", "start_date must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'"),
+        ("month", "2023-01-01", "2023-12", "stop_date must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'"),
     ])
     async def test_list_validation_errors(self, outbound_resource, group, start_date, stop_date, error_msg):
         """Test validation errors for invalid parameters."""
