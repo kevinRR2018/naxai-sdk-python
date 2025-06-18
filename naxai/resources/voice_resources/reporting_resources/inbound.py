@@ -37,30 +37,31 @@ class InboundResource:
 
     def list(self,
                     group: Literal["hour", "day", "month"],
-                    start_date: Optional[str] = None,
-                    stop_date: Optional[str] = None,
+                    start_date: str,
+                    stop_date: str,
                     number: Optional[str] = None
                     ):
         """
         Retrieve a list of inbound call metrics grouped by the specified time interval.
         
         This method fetches inbound call statistics from the API, allowing filtering by date range
-        and specific phone numbers. The results are grouped according to the specified time
-        interval.
+        and specific phone numbers. The results are grouped according to the
+        specified time interval.
         
         Args:
             group (Literal["hour", "day", "month"]): The time interval for grouping the metrics.
-                - "hour": Group metrics by hour (requires precise timestamp in start_date)
-                - "day": Group metrics by day
-                - "month": Group metrics by month
-            start_date (Optional[str]): The start date for the reporting period.
+                - "hour": Group metrics by hour (requires precise timestamp in start_date and stop_date.
+                          There must be exactly 24 hours between start and stop date)
+                - "day": Group metrics by day ( max 120 days between start and stop date)
+                - "month": Group metrics by month ( max 24 months between start and stop date)
+            start_date (str): The start date for the reporting period.
                 - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
                 - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
                 - Required for all grouping types
-            stop_date (Optional[str]): The end date for the reporting period.
+            stop_date (str): The end date for the reporting period.
                 - For "hour" grouping: Format must be 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
                 - For "day"/"month" grouping: Format must be 'YYYY-MM-DD' or 'YY-MM-DD'
-                - Required for "day" and "month" grouping, optional for "hour"
+                - Required for all grouping types
             number (Optional[str]): Phone number to filter the metrics by. If provided,
                 only metrics for this specific number will be returned.
         
@@ -76,16 +77,15 @@ class InboundResource:
         
         Raises:
             NaxaiValueError: If required parameters are missing or in incorrect format:
-                - When start_date is not provided
-                - When stop_date is not provided for "day" or "month" grouping
+                - When start_date and or stop_date are  not provided
                 - When date formats don't match the required format for the specified grouping
-        
+
         Example:
             >>> metrics = client.voice.reporting.inbound.list(
             ...     group="day",
             ...     start_date="2023-01-01",
             ...     stop_date="2023-01-31",
-            ...     number="+1234567890"
+            ...     number="1234567890"
             ... )
             >>> print(f"Found {len(metrics.stats)} daily records")
             >>> for stat in metrics.stats:
@@ -94,33 +94,27 @@ class InboundResource:
 
         if group == "hour":
             if start_date is None:
-                raise NaxaiValueError("startDate must be provided when group is 'hour'")
+                raise NaxaiValueError("start_date must be provided when group is 'hour'")
 
             if len(start_date) < 17 or len(start_date) > 19:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD HH:MM:SS' "
+                raise NaxaiValueError("start_date must be in the format 'YYYY-MM-DD HH:MM:SS' "
+                                      "or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
+            
+            if len(stop_date) < 17 or len(stop_date) > 19:
+                raise NaxaiValueError("stop_date must be in the format 'YYYY-MM-DD HH:MM:SS' "
                                       "or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
 
-            if stop_date is not None and (len(stop_date) < 17 or len(stop_date) > 19):
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD HH:MM:SS' "
-                                      "or 'YY-MM-DD HH:MM:SS' when group is 'hour'")
         else:
-            if start_date is None:
-                raise NaxaiValueError("startDate must be provided when group is 'day' or 'month'")
-
             if len(start_date) < 8 or len(start_date) > 10:
-                raise NaxaiValueError("startDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
-
-            if stop_date is None:
-                raise NaxaiValueError("stopDate must be provided when group is 'day' or 'month'")
+                raise NaxaiValueError("start_date must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
 
             if len(stop_date) < 8 or len(stop_date) > 10:
-                raise NaxaiValueError("stopDate must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
+                raise NaxaiValueError("stop_date must be in the format 'YYYY-MM-DD' or 'YY-MM-DD'")
 
-        params = {"group": group}
-        if start_date:
-            params["startDate"] = start_date
-        if stop_date:
-            params["stopDate"] = stop_date
+
+        params = {"group": group,
+                  "startDate": start_date,
+                  "stopDate": stop_date}
         if number:
             params["number"] = number
         # pylint: disable=protected-access
