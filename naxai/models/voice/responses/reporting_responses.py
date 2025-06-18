@@ -41,7 +41,7 @@ class OutboundStatsFields(BaseStatsFields):
         busy (int): Number of calls that received a busy signal.
         rejected (int): Number of calls rejected by the recipient or carrier.
         invalid (int): Number of calls to invalid numbers.
-        transferred (int): Number of calls that were transferred.
+        transferred (Optional[int]): Number of calls that were transferred.
     """
     delivered: int
     failed: int
@@ -72,10 +72,10 @@ class InboundStats(BaseStatsFields):
     
     Attributes:
         received (int): Number of calls received.
-        transferred (int): Number of inbound calls that were transferred.
+        transferred (Optional[int]): Number of inbound calls that were transferred.
     """
     received: int
-    transferred: int
+    transferred: Optional[int] = Field(default=None)
 
 class CountryStats(OutboundStatsFields):
     """
