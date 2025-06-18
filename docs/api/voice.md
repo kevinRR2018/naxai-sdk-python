@@ -157,8 +157,8 @@ Returns: [ListBroadcastRecipientCallsResponse](../models/voice.md#listbroadcastr
 ```python
 client.voice.reporting.inbound.list(
     group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
+    start_date: str,                            # Start date for filtering
+    stop_date: str,                             # End date for filtering
     number: Optional[str] = None                # Filter by phone number
 )
 ```
@@ -166,11 +166,11 @@ client.voice.reporting.inbound.list(
 Notes:
 - For "hour" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
+  - difference between start_date and stop_date has to be exactly 24 hours
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
+  - For month grouping, a maximum of 24 months is allowed
+  - For day grouping, a maximum of 120 days is allowed
 
 Returns: [ListInboundMetricsResponse](../models/voice.md#listinboundmetricsresponse)
 
@@ -178,8 +178,8 @@ Returns: [ListInboundMetricsResponse](../models/voice.md#listinboundmetricsrespo
 ```python
 client.voice.reporting.outbound.list(
     group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
+    start_date: str,                            # Start date for filtering
+    stop_date: str,                             # End date for filtering
     number: Optional[str] = None                # Filter by phone number
 )
 ```
@@ -187,32 +187,29 @@ client.voice.reporting.outbound.list(
 Notes:
 - For "hour" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
+  - difference between start_date and stop_date has to be exactly 24 hours
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
+  - For month grouping, a maximum of 24 months is allowed
+  - For day grouping, a maximum of 120 days is allowed
 
 Returns: [ListOutboundMetricsResponse](../models/voice.md#listoutboundmetricsresponse)
 
 ### Transfer Metrics
 ```python
 client.voice.reporting.transfer.list(
-    group: Literal["hour", "day", "month"],     # Time interval grouping
-    start_date: Optional[str] = None,           # Start date for filtering
-    stop_date: Optional[str] = None,            # End date for filtering
+    group: Literal["day", "month"],             # Time interval grouping
+    start_date: str,                            # Start date for filtering
+    stop_date: str,                             # End date for filtering
     number: Optional[str] = None                # Filter by phone number
 )
 ```
 
 Notes:
-- For "hour" grouping:
-  - start_date/stop_date format: 'YYYY-MM-DD HH:MM:SS' or 'YY-MM-DD HH:MM:SS'
-  - start_date is required
-  - stop_date is optional
 - For "day"/"month" grouping:
   - start_date/stop_date format: 'YYYY-MM-DD' or 'YY-MM-DD'
-  - Both start_date and stop_date are required
+  - For month grouping, a maximum of 24 months is allowed
+  - For day grouping, a maximum of 120 days is allowed
 
 Returns: [ListTransferMetricsResponse](../models/voice.md#listtransfermetricsresponse)
 
