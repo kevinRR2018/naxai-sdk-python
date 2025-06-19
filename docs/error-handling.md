@@ -97,17 +97,27 @@ from naxai.base.exceptions import (
     NaxaiRateLimitExceeded,
     NaxaiException
 )
+from naxai.models.email.requests import SendTransactionalEmailRequest, SenderObject, DestinationObject
 
 try:
     with NaxaiClient(
-        api_client_id="your_client_id",
-        api_client_secret="your_client_secret"
+            api_client_id="your_client_id",
+            api_client_secret="your_client_secret"
     ) as client:
         response = client.email.transactional.send(
-            sender={"email": "sender@domain.com", "name": "Sender"},
-            to=[{"email": "recipient@domain.com", "name": "Recipient"}],
-            subject="Test Email",
-            text="Hello World"
+            SendTransactionalEmailRequest(
+                sender=SenderObject(
+                    email="sender@domain.com",
+                    name="Sender"
+                ),
+                to=[
+                    DestinationObject(
+                        email="recipient@domain.com",
+                        name="Recipient"
+                    )
+                ],
+                subject="Test Email",
+                text="Hello World")
         )
 except NaxaiAuthenticationError as e:
     print(f"Authentication failed: {e.message}")
