@@ -33,30 +33,21 @@ class TransactionalResource:
         
         This method allows sending personalized transactional emails such as account notifications,
         password resets, order confirmations, and other event-triggered communications. The email
-        content can be specified using either HTML or a template ID.
+        content can be specified using either HTML or plain text.
         
         Args:
-            data (SendTransactionalEmailModel): A model containing all the information
-            needed to send
-                the transactional email, including:
-                - from_email (str): The sender's email address
-                - from_name (Optional[str]): The sender's display name
-                - to (list[str]): List of recipient email addresses
-                - cc (Optional[list[str]]): List of CC recipient email addresses
-                - bcc (Optional[list[str]]): List of BCC recipient email addresses
+            data (SendTransactionalEmailRequest): A model containing all the information
+            needed to send the transactional email, including:
+                - sender (SenderObject): The sender's information (email and name)
+                - to (list[DestinationObject]): List of primary recipients
+                - cc (Optional[list[CCObject]]): List of CC recipient email addresses
+                - bcc (Optional[list[BCCObject]]): List of BCC recipient email addresses
                 - reply_to (Optional[str]): Reply-to email address
                 - subject (str): Email subject line
                 - text (Optional[str]): Plain text version of the email
                 - html (Optional[str]): HTML version of the email
-                - template_id (Optional[str]): 
-                    ID of a template to use instead of providing HTML/text
-                - template_data (Optional[dict]): Variables to populate the template
                 - attachments (Optional[list[Attachment]]): Files to attach to the email
-                - headers (Optional[dict]): Custom email headers
-                - tags (Optional[list[str]]): Tags for categorizing the email
-                - track_opens (Optional[bool]): Whether to track email opens
-                - track_clicks (Optional[bool]): Whether to track link clicks
-                - custom_args (Optional[dict]): Custom arguments for tracking
+                - enable_tracking (Optional[bool]): Whether to enable open and click tracking
         
         Returns:
             SendTransactionalEmailResponse: A response object containing the unique identifier
@@ -73,53 +64,55 @@ class TransactionalResource:
         Example:
             >>> # Basic email with HTML content
             >>> response = client.email.transactional.send(
-            ...     SendTransactionalEmailModel(
-            ...         from_email="sender@example.com",
-            ...         from_name="Sender Name",
-            ...         to=["recipient@example.com"],
+            ...     SendTransactionalEmailRequest(
+            ...         sender=SenderObject(email="sender@example.com", name="Sender Name"),
+            ...         to=[DestinationObject(email="recipient@example.com", name="Recipient Name")],
             ...         subject="Your Account Verification",
             ...         html="<html><body><h1>Verify Your Account</h1>\
-            ...               <p>Click the link to verify your account.</p></body></html>"
+            ...               <p>Click the link to verify your account.</p></body></html>",
+            ...         text="Verify Your Account\n\nClick the link to verify your account.",
+            ...         enable_tracking=True
             ...     )
             ... )
             >>> print(f"Email sent with ID: {response.id}")
             
-            >>> # Using a template with personalization
+            >>> # Email with multiple recipients and attachments
             >>> response = client.email.transactional.send(
-            ...     SendTransactionalEmailModel(
-            ...         from_email="orders@example.com",
-            ...         from_name="Example Store",
-            ...         to=["customer@example.com"],
+            ...     SendTransactionalEmailRequest(
+            ...         sender=SenderObject(email="orders@example.com", name="Example Store"),
+            ...         to=[
+            ...             DestinationObject(email="customer@example.com", name="John Doe"),
+            ...             DestinationObject(email="manager@example.com", name="Jane Manager")
+            ...         ],
+            ...         cc=[CCObject(email="support@example.com", name="Support Team")],
+            ...         bcc=[BCCObject(email="records@example.com", name="Records")],
+            ...         reply_to="no-reply@example.com",
             ...         subject="Your Order #12345 Has Shipped",
-            ...         template_id="template_order_shipped",
-            ...         template_data={
-            ...             "customer_name": "John Doe",
-            ...             "order_number": "12345",
-            ...             "tracking_number": "TRK123456789",
-            ...             "estimated_delivery": "June 15, 2023"
-            ...         },
-            ...         track_opens=True,
-            ...         track_clicks=True,
-            ...         tags=["order", "shipping"]
+            ...         html="<html><body><p>Your order has been shipped!</p></body></html>",
+            ...         attachments=[
+            ...             Attachment(
+            ...                 id="att_123",
+            ...                 name="invoice.pdf",
+            ...                 content_type="application/pdf",
+            ...                 data="base64_encoded_pdf_data"
+            ...             )
+            ...         ],
+            ...         enable_tracking=True
             ...     )
             ... )
             >>> print(f"Order notification sent with ID: {response.id}")
         
         Note:
-            - Either html/text or template_id must be provided, but not both
-            - If using a template, the template_data should contain all variables required
-              by the template
-            - The from_email must be a verified sender in your Naxai account
+            - At least one of text or html must be provided
+            - The sender email must be a verified sender in your Naxai account
             - For high deliverability, ensure your sender domain is properly configured
               with SPF and DKIM
-            - Tracking options (track_opens, track_clicks) require proper configuration of
-              tracking domains
-            - Tags and custom_args are useful for categorizing and tracking emails in analytics
+            - Tracking options require proper configuration of tracking domains
             - Attachments should be kept reasonably sized to avoid delivery issues
         
         See Also:
-            SendTransactionalEmailModel: For the complete structure of the request data
-            CreateEmailResponse: For the structure of the response
+            SendTransactionalEmailRequest: For the complete structure of the request data
+            SendTransactionalEmailResponse: For the structure of the response
         """
         # pylint: disable=protected-access
         return SendTransactionalEmailResponse.model_validate_json(
