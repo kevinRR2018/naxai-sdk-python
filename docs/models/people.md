@@ -231,7 +231,7 @@ CONDITIONS = Literal[
 
 Example with best practices:
 ```python
-from naxai.models.people import (
+from naxai.models.people.helper_models.search_condition import (
     SearchCondition,
     AttributeCondSimple,
     AttributeObject,
@@ -241,27 +241,7 @@ from naxai.models.people import (
 )
 
 # Create a search condition for active US customers
-condition = SearchCondition(
-    all=[
-        AttributeCondSimple(
-            attribute=AttributeObject(
-                operator="eq",
-                field="country",
-                value="US"
-            )
-        ),
-        EventCond(
-            event=EventObject(
-                name="login",
-                count=1,
-                time_boundary="within-last",
-                period_boundary="day",
-                interval_boundary=30,
-                properties=EventProperties(all=[])
-            )
-        )
-    ]
-)
+condition = {"all": [{"attribute": {"field": "country", "operator": "eq", "value": "US"}}
 
 try:
     # Search for contacts
@@ -272,10 +252,10 @@ try:
         for contact in response.items:
             process_contact(contact)
             
-        if response.pagination.has_more:
+        if response.pagination.remaining_record > 0:
             response = client.people.contacts.search(
                 condition,
-                page=response.pagination.next_page
+                page=response.pagination.page + 1
             )
         else:
             break
