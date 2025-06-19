@@ -80,8 +80,7 @@ class TransferResource:
             ... )
             >>> print(f"Found {len(metrics.stats)} daily records")
             >>> for stat in metrics.stats:
-            ...     print(f"Date: {stat.date}, Calls: {stat.calls}, "
-            ...           f"Transferred: {stat.transferred}")
+            ...     print(f"Date: {stat.date}, Calls: {stat.calls}")
             ...     print(f"Average duration: "
             ...     f"{stat.duration/stat.calls:.1f} seconds" if stat.calls > 0 else "No calls")
         """
