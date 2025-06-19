@@ -101,8 +101,10 @@ class OutboundResource:
             >>> print(f"Found {len(metrics.stats)} daily records")
             >>> for stat in metrics.stats:
             ...     print(f"Date: {stat.date}, Calls: {stat.calls}, Delivered: {stat.delivered}")
-            ...     print(f"Success rate: "
-            ...           f"{stat.delivered/stat.calls*100:.1f}% if stat.calls > 0 else 'N/A'")
+            ...     if stat.calls > 0:
+            ...         print(f"Success rate: {stat.delivered / stat.calls * 100:.1f}%")
+            ...     else:
+            ...         print("Success rate: N/A")
         """
 
 
