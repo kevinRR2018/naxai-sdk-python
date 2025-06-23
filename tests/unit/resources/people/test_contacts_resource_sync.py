@@ -95,7 +95,7 @@ class TestContactsResourceSync:
         assert args[0] == "POST"
         assert args[1] == "/people/contacts"
         assert "json" in kwargs
-        assert kwargs["json"] == {"condition": condition}
+        assert kwargs["json"] == {"condition": condition.model_dump(by_alias=True, exclude_none=True)}
 
     def test_count(self, contacts_resource, mock_client):
         """Test counting contacts."""
