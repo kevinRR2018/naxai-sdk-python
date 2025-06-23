@@ -158,21 +158,18 @@ class ContactsResource:
         """
         params = {"page": page, "pageSize": page_size, "sort": sort}
 
-        body_params = condition.model_dump(by_alias=True, exclude_none=True) \
-                      if isinstance(condition, SearchCondition) else condition
-        if body_params:
-            json_body = {"condition": condition}
-
-            results = self._client._request("POST",
-                                            self.root_path,
-                                            params=params,
-                                            json=json_body,
-                                            headers=self.headers)
+        if isinstance(condition, SearchCondition):
+            json_body = {"condition": condition.model_dump(by_alias=True, exclude_none=True)}
         else:
-            results = self._client._request("POST",
-                                            self.root_path,
-                                            params=params,
-                                            headers=self.headers)
+            json_body = {"condition": condition}
+       
+
+        results = self._client._request("POST",
+                                        self.root_path,
+                                        params=params,
+                                        json=json_body,
+                                        headers=self.headers)
+       
 
         return SearchContactsResponse.model_validate_json(json.dumps(results))
 
