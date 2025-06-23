@@ -241,7 +241,7 @@ from naxai.models.people.helper_models.search_condition import (
 )
 
 # Create a search condition for active US customers
-condition = {"all": [{"attribute": {"field": "country", "operator": "eq", "value": "US"}}
+condition = {"all": [{"attribute": {"field": "country", "operator": "eq", "value": "US"}}]}
 
 try:
     # Search for contacts
