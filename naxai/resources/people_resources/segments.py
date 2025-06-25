@@ -463,9 +463,10 @@ class SegmentsResource:
         Example:
             ```python
             from naxai.models.people.requests.segments_requests import CreateSegmentRequest
-            from naxai.models.people.search_condition import (Condition,
-                                                              AttributeCondSimple,
-                                                              AttributeObject)
+            from naxai.models.people.helper_models.segments_condition import (
+                Condition,
+                AttributeCondSimple,AttributeObject
+            )
             
             with NaxaiClient(api_client_id="your_id", api_client_secret="your_secret") as client:
                 try:
