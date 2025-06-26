@@ -11,7 +11,9 @@ from naxai.models.people.responses.contacts_responses import (
     SearchContactsResponse,
     CountContactsResponse,
     CreateOrUpdateContactResponse,
-    GetContactResponse
+    GetContactResponse,
+    GetContactIdentifierResponse,
+    UpdateContactIdentifierResponse
 )
 from naxai.models.base.pagination import Pagination
 
@@ -233,3 +235,112 @@ class TestContactsResourceSync:
             "/people/contacts/john.doe@example.com",
             headers={"Content-Type": "application/json"}
         )
+
+    def test_identifier_get(self, contacts_resource, mock_client):
+        """Test getting the current primary identifier type."""
+        # Setup mock response
+        mock_response = {"Identifier": "email"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.get()
+
+        # Verify the result
+        assert isinstance(result, GetContactIdentifierResponse)
+        assert result.identifier == "email"
+
+        # Verify the client was called correctly
+        mock_client._request.assert_called_once_with(
+            "GET",
+            "/people/contacts/keyIdentifier",
+            headers={"Content-Type": "application/json"}
+        )
+
+    def test_identifier_get_phone(self, contacts_resource, mock_client):
+        """Test getting the current primary identifier type when it's phone."""
+        # Setup mock response
+        mock_response = {"Identifier": "phone"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.get()
+
+        # Verify the result
+        assert isinstance(result, GetContactIdentifierResponse)
+        assert result.identifier == "phone"
+
+    def test_identifier_get_external_id(self, contacts_resource, mock_client):
+        """Test getting the current primary identifier type when it's externalId."""
+        # Setup mock response
+        mock_response = {"Identifier": "externalId"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.get()
+
+        # Verify the result
+        assert isinstance(result, GetContactIdentifierResponse)
+        assert result.identifier == "externalId"
+
+    def test_identifier_update_email(self, contacts_resource, mock_client):
+        """Test updating the primary identifier type to email."""
+        # Setup mock response
+        mock_response = {"Identifier": "email"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.update("email")
+
+        # Verify the result
+        assert isinstance(result, UpdateContactIdentifierResponse)
+        assert result.identifier == "email"
+
+        # Verify the client was called correctly
+        mock_client._request.assert_called_once()
+        args, kwargs = mock_client._request.call_args
+        assert args[0] == "PUT"
+        assert args[1] == "/people/contacts/keyIdentifier"
+        assert kwargs["json"] == {"identifier": "email"}
+        assert kwargs["headers"] == {"Content-Type": "application/json"}
+
+    def test_identifier_update_phone(self, contacts_resource, mock_client):
+        """Test updating the primary identifier type to phone."""
+        # Setup mock response
+        mock_response = {"Identifier": "phone"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.update("phone")
+
+        # Verify the result
+        assert isinstance(result, UpdateContactIdentifierResponse)
+        assert result.identifier == "phone"
+
+        # Verify the client was called correctly
+        mock_client._request.assert_called_once()
+        args, kwargs = mock_client._request.call_args
+        assert args[0] == "PUT"
+        assert args[1] == "/people/contacts/keyIdentifier"
+        assert kwargs["json"] == {"identifier": "phone"}
+        assert kwargs["headers"] == {"Content-Type": "application/json"}
+
+    def test_identifier_update_external_id(self, contacts_resource, mock_client):
+        """Test updating the primary identifier type to externalId."""
+        # Setup mock response
+        mock_response = {"Identifier": "externalId"}
+        mock_client._request.return_value = mock_response
+
+        # Call the method
+        result = contacts_resource.identifier.update("externalId")
+
+        # Verify the result
+        assert isinstance(result, UpdateContactIdentifierResponse)
+        assert result.identifier == "externalId"
+
+        # Verify the client was called correctly
+        mock_client._request.assert_called_once()
+        args, kwargs = mock_client._request.call_args
+        assert args[0] == "PUT"
+        assert args[1] == "/people/contacts/keyIdentifier"
+        assert kwargs["json"] == {"identifier": "externalId"}
+        assert kwargs["headers"] == {"Content-Type": "application/json"}

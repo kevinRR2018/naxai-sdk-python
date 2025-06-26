@@ -22,6 +22,7 @@ Available Functions:
 """
 
 import json
+from typing import Literal
 from naxai.models.people.responses.contacts_responses import (GetContactIdentifierResponse,
                                                               UpdateContactIdentifierResponse)
 
@@ -82,13 +83,15 @@ class IdentifierResource:
                                                    self.root_path,
                                                    headers=self.headers)))
 
-    async def update(self):
+    async def update(self, identifier: Literal["email", "phone", "externalId"]):
         """
         Update the primary identifier type for contacts in the Naxai People API.
         
         This method changes which identifier type (email, phone, or externalId) is used
         as the primary identifier for contacts in your account. The primary identifier
         determines how contacts are uniquely identified in the system.
+
+        For this method to work, you'll first have to delete all or your contacts.
         
         Returns:
             UpdateContactIdentifierResponse: A response object containing the new primary
@@ -105,7 +108,7 @@ class IdentifierResource:
             async with NaxaiAsyncClient(api_client_id="your_id",
                                         api_client_secret="your_secret") as client:
                 # Update the primary identifier type
-                response = await client.people.contacts.identifier.update()
+                response = await client.people.contacts.identifier.update(identifier="email")
                 
                 # Confirm the change
                 print(f"Primary identifier type updated to: {response.identifier}")
@@ -119,15 +122,15 @@ class IdentifierResource:
         Note:
             - This is a significant change that affects how contacts are identified across 
               the entire API
-            - Before changing the identifier type, ensure that all contacts have the new identifier
-              type populated
-            - Contacts without the new identifier type may become inaccessible
+            - Before changing the identifier type, ensure that all contacts are removed
             - This operation may take some time to propagate through the system
             - Consider the impact on any integrations or automations that rely on the current
               identifier type
         """
+        request_json = {"identifier": identifier}
         # pylint: disable=protected-access
         return UpdateContactIdentifierResponse.model_validate_json(
             json.dumps(await self._client._request("PUT",
                                                    self.root_path,
+                                                   json=request_json,
                                                    headers=self.headers)))

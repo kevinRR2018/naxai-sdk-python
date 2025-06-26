@@ -232,7 +232,7 @@ identifier = client.people.contacts.identifier.get()
 print(f"Current identifier type: {identifier.identifier}")
 
 # Update identifier type
-updated = client.people.contacts.identifier.update()
+updated = client.people.contacts.identifier.update(identifier="email")
 print(f"Updated to: {updated.identifier}")
 ```
 
