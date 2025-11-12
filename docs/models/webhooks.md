@@ -96,7 +96,7 @@ class WebhookBaseModel(BaseModel):
         HeaderAuthModel
     ] = None                                                                    # Authentication configuration
     active: bool = True                                                         # Whether webhook is active
-    event_object: Literal["All", "People", "Sms", "Call", "Email", "Survey"]
+    event_object: Literal["All", "People", "Sms", "Call", "Email"]
     event_filter: list[str]                                                     # Event filtering criteria
     event_names: list[str]                                                      # Subscribed event names
     modified_at: Optional[int]                                                  # Last modification timestamp

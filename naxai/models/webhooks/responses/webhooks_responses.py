@@ -29,8 +29,7 @@ EVENT_OBJECTS = Literal["All",
                         "People",
                         "Sms",
                         "Call",
-                        "Email",
-                        "Survey"]
+                        "Email"]
 
 class WebhookBaseModel(BaseModel):
     """
